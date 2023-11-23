@@ -4,13 +4,23 @@ from scripts.database.database import session
 from scripts.database import models
 from typing import List
 from scripts.api.out_data_final import *
+from scripts.auth.token import *
+from scripts.auth.security import reusable_oauth2, validate_token
+from fastapi import Depends
+
 
 app = FastAPI(
-    title="API SUPERSHIP", description="There are APIs getting calculation result from history transactions of SUPERSHIP",
+    title="API SUPERSHIP",
+    description="There are APIs getting calculation result from history transactions of SUPERSHIP",
     docs_url="/"
 )
 
 db = session()
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 
 class RowAPI(BaseModel):
@@ -60,7 +70,19 @@ class RowCalc(BaseModel):
         orm_mode = True
 
 
-@app.get("/api/v1/output/", response_model=List[RowAPI], status_code=status.HTTP_200_OK)
+@app.post('/login')
+def login(request_data: LoginRequest):
+    print(f'[x] request_data: {request_data.__dict__}')
+    if verify_password(username=request_data.username, password=request_data.password):
+        token = generate_token(request_data.username, request_data.password)
+        return {
+            'token': token
+        }
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
+
+
+@app.get("/api/v1/output/", dependencies=[Depends(validate_token)], response_model=List[RowAPI], status_code=status.HTTP_200_OK)
 def get_all_rows(batch: int = 10):
     rows = db.query(models.RowAPI).limit(batch).all()
     if rows is None:
@@ -68,7 +90,7 @@ def get_all_rows(batch: int = 10):
     return rows
 
 
-@app.get("/api/v1/output/district/", response_model=List[RowAPI], status_code=status.HTTP_200_OK)
+@app.get("/api/v1/output/district/", dependencies=[Depends(validate_token)], response_model=List[RowAPI], status_code=status.HTTP_200_OK)
 def get_rows_by_district_code(district_code: str = '001'):
     rows = (
         db.query(models.RowAPI)
@@ -79,7 +101,7 @@ def get_rows_by_district_code(district_code: str = '001'):
     return rows
 
 
-@app.get("/api/v1/calculation/", response_model=List[RowCalc], status_code=200)
+@app.get("/api/v1/calculation/", dependencies=[Depends(validate_token)], response_model=List[RowCalc], status_code=200)
 def calculate(
         order_code: str, weight: int, pickup_type_id: int,
         sender_province_code: str, sender_district_code: str,
