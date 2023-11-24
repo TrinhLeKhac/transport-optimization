@@ -4,13 +4,11 @@ import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer
 from pydantic import ValidationError
+from config import settings
 
 reusable_oauth2 = HTTPBearer(
     scheme_name='Authorization'
 )
-
-SECURITY_ALGORITHM = 'HS256'
-SECRET_KEY = '123456'
 
 
 def validate_token(http_authorization_credentials=Depends(reusable_oauth2)) -> str:
@@ -18,7 +16,7 @@ def validate_token(http_authorization_credentials=Depends(reusable_oauth2)) -> s
     Decode JWT token to get username => return username
     """
     try:
-        payload = jwt.decode(http_authorization_credentials.credentials, SECRET_KEY, algorithms=[SECURITY_ALGORITHM])
+        payload = jwt.decode(http_authorization_credentials.credentials, settings.SECRET_KEY, algorithms=[settings.SECURITY_ALGORITHM])
         print(payload.get('exp'))
         if payload.get('exp') < int(datetime.now().strftime("%Y%m%d%H%M%S")):
             raise HTTPException(status_code=403, detail="Token expired")

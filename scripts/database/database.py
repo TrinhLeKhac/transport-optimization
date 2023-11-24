@@ -1,10 +1,9 @@
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-# from config import Config
+from config import settings
 
-# engine = create_engine(Config.SQLALCHEMY_DATABASE_URI, echo=True)
-port = 'postgresql://postgres:123456@localhost:5432/db_supership_ai'
+port = settings.SQL_DATABASE_URL
 engine = create_engine(port)
 
 Base = declarative_base()

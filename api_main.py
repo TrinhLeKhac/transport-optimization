@@ -5,7 +5,7 @@ from scripts.database import models
 from typing import List
 from scripts.api.out_data_final import *
 from scripts.auth.token import *
-from scripts.auth.security import reusable_oauth2, validate_token
+from scripts.auth.security import validate_token
 from fastapi import Depends
 
 
