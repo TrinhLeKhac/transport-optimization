@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from scripts.auth.security import validate_token
 from fastapi import Depends
 from fastapi import APIRouter
+from scripts.database.helper import *
+
 router = APIRouter()
 
 
@@ -74,7 +76,7 @@ def calculate(
     df_output['route_type'] = df_output['route_type'].astype(str)
     df_output['status'] = df_output['status'].astype(str)
 
-    final_list = []
+    result_dict_list = []
     for i in range(len(df_output)):
         result_dict = {
             # 'order_code': df_output.loc[i, :]['order_code'],
@@ -97,10 +99,11 @@ def calculate(
 
         }
 
-        final_list.append(ResultModel(**result_dict))
+        result_dict_list.append(ResultModel(**result_dict))
+        insert_data_into_postgres(data=result_dict_list, schema_name='db_schema', table_name='order')
 
     return {
         'error': False,
         'message': '',
-        'data': final_list
+        'data': result_dict_list
     }

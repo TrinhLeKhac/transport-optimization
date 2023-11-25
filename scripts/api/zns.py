@@ -3,10 +3,10 @@ from scripts.auth.security import validate_token
 from fastapi import Depends
 from fastapi import APIRouter
 from typing import List
+from scripts.database.helper import *
 
 
 class ZNSModel(BaseModel):
-    date: str
     receiver_province: str
     receiver_district: str
     carrier_id: int
@@ -15,6 +15,7 @@ class ZNSModel(BaseModel):
     feedbacks: List[str]
     note: str
     submitted_at: str
+    date: str
 
 
 router = APIRouter()
@@ -22,14 +23,13 @@ router = APIRouter()
 
 @router.post("", dependencies=[Depends(validate_token)])
 def get_data_zns(
-    date: str,
     receiver_province: str, receiver_district: str,
     carrier_id: int, message_count: int,
     star: int, feedbacks: List[str],
-    note: str, submitted_at: str
+    note: str, submitted_at: str,
+    date: str,
 ):
     zns_dict = {
-        'date': date,
         'receiver_province': receiver_province,
         'receiver_district': receiver_district,
         'carrier_id': carrier_id,
@@ -37,8 +37,12 @@ def get_data_zns(
         'star': star,
         'feedbacks': feedbacks,
         'note': note,
-        'submitted_at': submitted_at
+        'submitted_at': submitted_at,
+        'date': date,
     }
+
+    check_tbl_exists_in_postgres(schema_name='db_schema', table_name='zns')
+    insert_data_into_postgres(data=[zns_dict], schema_name='db_schema', table_name='zns')
 
     return {
         'error': False,

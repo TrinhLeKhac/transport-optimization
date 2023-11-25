@@ -2,14 +2,14 @@ from pydantic import BaseModel
 from scripts.auth.security import validate_token
 from fastapi import Depends
 from fastapi import APIRouter
+from scripts.database.helper import *
 
 
 class OrderModel(BaseModel):
-    date: str
     order_code: str
     created_at: str
-    sent_at: int
-    order_status: int
+    sent_at: str
+    order_status: str
     carrier_id: int
     carrier_status: str
     sender_province: str
@@ -23,6 +23,7 @@ class OrderModel(BaseModel):
     picked_at: str
     last_delivering_at: str
     carrier_updated_at: str
+    date: str
 
 
 router = APIRouter()
@@ -30,7 +31,6 @@ router = APIRouter()
 
 @router.post("", dependencies=[Depends(validate_token)])
 def get_data_order(
-        date: str,
         order_code: str,
         created_at: str, sent_at: str, order_status: str,
         carrier_id: int, carrier_status: str,
@@ -38,10 +38,10 @@ def get_data_order(
         receiver_province: str, receiver_district: str,
         delivery_count: int, pickup: str,
         barter: str, carrier_delivered_at: str,
-        picked_at: str, last_delivering_at: str, carrier_updated_at: str
+        picked_at: str, last_delivering_at: str, carrier_updated_at: str,
+        date: str,
 ):
     order_dict = {
-        'date': date,
         'order_code': order_code,
         'created_at': created_at,
         'sent_at': sent_at,
@@ -59,7 +59,12 @@ def get_data_order(
         'picked_at': picked_at,
         'last_delivering_at': last_delivering_at,
         'carrier_updated_at': carrier_updated_at,
+        'date': date,
     }
+
+    check_tbl_exists_in_postgres(schema_name='db_schema', table_name='order')
+    insert_data_into_postgres(data=[order_dict], schema_name='db_schema', table_name='order')
+
     return {
         'error': False,
         'message': "",
