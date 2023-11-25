@@ -6,7 +6,7 @@ sys.path.append(ROOT_PATH)
 
 from scripts.utilities.helper import *
 from scripts.utilities.config import *
-from scripts.api.out_data_api import out_data_api
+from scripts.output.out_data_api import out_data_api
 
 FINAL_FULL_COLS = [
     'order_id',

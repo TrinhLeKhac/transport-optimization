@@ -3,16 +3,15 @@ from pathlib import Path
 ROOT_PATH = str(Path(__file__).parent.parent.parent)
 sys.path.append(ROOT_PATH)
 
-from scripts.api.out_data_final import *
+from scripts.output.out_data_final import *
 from scripts.database.schemas import *
 from sqlalchemy import create_engine
-# from config import Config
+from config import settings
 
 
 def ingest_data_to_db():
-   
-    # engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
-    port = 'postgresql://postgres:123456@localhost:5432/db_supership_ai'
+
+    port = settings.SQLALCHEMY_DATABASE_URI
     engine = create_engine(port)
     print('>>> Ingest data đã qua xử lý...')
     for f, schema in TABLE_SCHEMA.items():

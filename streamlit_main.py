@@ -5,7 +5,7 @@ sys.path.append(ROOT_PATH)
 
 from scripts.utilities.streamlit_helper import *
 from scripts.processing.total_processing import total_processing
-from scripts.api.out_data_final import *
+from scripts.output.out_data_final import *
 
 st.title("Tối ưu vận chuyển (SuperShipAI)")
 

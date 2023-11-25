@@ -6,7 +6,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
 class Settings:
-    SQL_DATABASE_URL = os.getenv('SQL_DATABASE_URL', '')
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', '')
     SECRET_KEY = os.getenv('SECRET_KEY', '')
     ACCESS_TOKEN_EXPIRE_SECONDS: int = 365 * 24 * 60 * 60  # Token expired after 7 days
     SECURITY_ALGORITHM = 'HS256'
