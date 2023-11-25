@@ -2,7 +2,7 @@ from scripts.database.database import Base
 from sqlalchemy import String, Boolean, Integer, Column, Numeric, Date, TIMESTAMP
 
 
-class RowAPI(Base):
+class Output29946API(Base):
     __tablename__ = "data_api"
     id = Column(Integer, primary_key=True)
     receiver_province_code = Column(String, nullable=True)

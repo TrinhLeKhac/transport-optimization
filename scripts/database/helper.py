@@ -3,14 +3,7 @@ from psycopg2 import sql
 from config import settings
 
 
-def check_tbl_exists_in_postgres(schema_name, table_name):
-
-    # Create connection
-    connection = psycopg2.connect(
-        settings.SQLALCHEMY_DATABASE_URI
-    )
-
-    cursor = connection.cursor()
+def check_tbl_exists_in_postgres(schema_name, table_name, cursor):
 
     # Check if the table exists
     check_table_query = sql.SQL("""
@@ -22,8 +15,6 @@ def check_tbl_exists_in_postgres(schema_name, table_name):
 
     cursor.execute(check_table_query)
     table_exists = cursor.fetchone()[0]
-
-    print(table_exists)
 
     # Table doesn't exist, create it
     if not table_exists:
@@ -68,36 +59,64 @@ def check_tbl_exists_in_postgres(schema_name, table_name):
             """).format(sql.Identifier(schema_name), sql.Identifier(table_name))
             cursor.execute(create_table_query)
 
-        # Commit the transaction
-        connection.commit()
 
-        cursor.close()
-        connection.close()
+def check_row_exists_in_postgres(row, schema_name, table_name, cursor):
+
+    # Build the SELECT query dynamically based on the provided data
+    select_query = sql.SQL("""
+            SELECT * 
+            FROM {}.{}
+            WHERE {}
+        """).format(
+        sql.Identifier(schema_name),
+        sql.Identifier(table_name),
+        sql.SQL(" AND ").join(
+            sql.SQL("{} = %s").format(sql.Identifier(column))
+            for column in row.keys()
+        )
+    )
+
+    # Execute the SELECT query
+    cursor.execute(select_query, tuple(row.values()))
+
+    # Check if the row exists
+    existing_row = cursor.fetchone()
+
+    return existing_row
 
 
-def insert_data_into_postgres(data, schema_name, table_name):
+def _insert_data_to_postgres(data, schema_name, table_name, cursor):
 
+    # Assuming data is a list of dictionaries where each dictionary represents a row
+    for row in data:
+        if check_row_exists_in_postgres(row, schema_name, table_name, cursor):
+            print('Row already exists, skipping insertion.')
+        else:
+            columns = row.keys()
+            values = [row[column] for column in columns]
+
+            insert_query = sql.SQL("INSERT INTO {}.{} ({}) VALUES ({})").format(
+                sql.Identifier(schema_name),
+                sql.Identifier(table_name),
+                sql.SQL(", ").join(map(sql.Identifier, columns)),
+                sql.SQL(", ").join(sql.Placeholder() for _ in values)
+            )
+            print(insert_query)
+            cursor.execute(insert_query, values)
+
+
+def insert_data_to_postgres(data, schema_name, table_name):
     # Create connection
     connection = psycopg2.connect(
         settings.SQLALCHEMY_DATABASE_URI
     )
 
     cursor = connection.cursor()
-    # Assuming data is a list of dictionaries where each dictionary represents a row
-    for row in data:
-        columns = row.keys()
-        values = [row[column] for column in columns]
-        print(columns)
-        print(values)
-        insert_query = sql.SQL("INSERT INTO {}.{} ({}) VALUES ({})").format(
-            sql.Identifier(schema_name),
-            sql.Identifier(table_name),
-            sql.SQL(", ").join(map(sql.Identifier, columns)),
-            sql.SQL(", ").join(sql.Placeholder() for _ in values)
-        )
-        print(insert_query)
-        cursor.execute(insert_query, values)
 
+    check_tbl_exists_in_postgres(schema_name, table_name, cursor)
+    _insert_data_to_postgres(data, schema_name, table_name, cursor)
+
+    # Commit the transaction
     connection.commit()
 
     cursor.close()

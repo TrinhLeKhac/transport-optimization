@@ -41,8 +41,7 @@ def get_data_zns(
         'date': date,
     }
 
-    check_tbl_exists_in_postgres(schema_name='db_schema', table_name='zns')
-    insert_data_into_postgres(data=[zns_dict], schema_name='db_schema', table_name='zns')
+    insert_data_to_postgres(data=[zns_dict], schema_name='db_schema', table_name='zns')
 
     return {
         'error': False,

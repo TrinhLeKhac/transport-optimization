@@ -62,8 +62,7 @@ def get_data_order(
         'date': date,
     }
 
-    check_tbl_exists_in_postgres(schema_name='db_schema', table_name='order')
-    insert_data_into_postgres(data=[order_dict], schema_name='db_schema', table_name='order')
+    insert_data_to_postgres(data=[order_dict], schema_name='db_schema', table_name='order')
 
     return {
         'error': False,

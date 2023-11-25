@@ -100,7 +100,6 @@ def calculate(
         }
 
         result_dict_list.append(ResultModel(**result_dict))
-        insert_data_into_postgres(data=result_dict_list, schema_name='db_schema', table_name='order')
 
     return {
         'error': False,

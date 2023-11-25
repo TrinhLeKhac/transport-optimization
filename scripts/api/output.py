@@ -36,7 +36,7 @@ router = APIRouter()
 
 @router.post("", dependencies=[Depends(validate_token)])
 def get_all_rows(batch: int = 10):
-    rows = db.query(models.RowAPI).limit(batch).all()
+    rows = db.query(models.Output29946API).limit(batch).all()
     if rows is None:
         return {
             'error': True,
@@ -54,8 +54,8 @@ def get_all_rows(batch: int = 10):
 @router.post("/district", dependencies=[Depends(validate_token)])
 def get_rows_by_district_code(district_code: str = '001'):
     rows = (
-        db.query(models.RowAPI)
-            .filter(models.RowAPI.receiver_district_code == district_code).all()
+        db.query(models.Output29946API)
+            .filter(models.Output29946API.receiver_district_code == district_code).all()
     )
     if rows is None:
         return {
