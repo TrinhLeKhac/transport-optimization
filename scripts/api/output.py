@@ -39,33 +39,33 @@ def get_all_rows(batch: int = 10):
     rows = db.query(models.Output29946API).limit(batch).all()
     if rows is None:
         return {
-            'error': True,
-            'message': "Resources not found",
-            'data': [],
+            "error": True,
+            "message": "Resources not found",
+            "data": [],
         }
     else:
         return {
-            'error': False,
-            'message': "",
-            'data': rows,
+            "error": False,
+            "message": "",
+            "data": rows,
         }
 
 
 @router.post("/district", dependencies=[Depends(validate_token)])
-def get_rows_by_district_code(district_code: str = '001'):
+def get_rows_by_district_code(district_code: str = "001"):
     rows = (
         db.query(models.Output29946API)
             .filter(models.Output29946API.receiver_district_code == district_code).all()
     )
     if rows is None:
         return {
-            'error': True,
-            'message': "Resources not found",
-            'data': [],
+            "error": True,
+            "message": "Resources not found",
+            "data": [],
         }
     else:
         return {
-            'error': False,
-            'message': "",
-            'data': rows,
+            "error": False,
+            "message": "",
+            "data": rows,
         }

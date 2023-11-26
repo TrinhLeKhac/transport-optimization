@@ -30,24 +30,24 @@ def get_data_zns(
     date: str,
 ):
     zns_dict = {
-        'receiver_province': receiver_province,
-        'receiver_district': receiver_district,
-        'carrier_id': carrier_id,
-        'message_count': message_count,
-        'star': star,
-        'feedbacks': feedbacks,
-        'note': note,
-        'submitted_at': submitted_at,
-        'date': date,
+        "receiver_province": receiver_province,
+        "receiver_district": receiver_district,
+        "carrier_id": carrier_id,
+        "message_count": message_count,
+        "star": star,
+        "feedbacks": feedbacks,
+        "note": note,
+        "submitted_at": submitted_at,
+        "date": date,
     }
 
-    insert_data_to_postgres(data=[zns_dict], schema_name='db_schema', table_name='zns')
+    insert_data_to_postgres(data=[zns_dict], schema_name="db_schema", table_name="zns")
 
     return {
-        'error': False,
-        'message': "",
-        'data': {
-            'count': 1,
-            'zns': ZNSModel(**zns_dict),
+        "error": False,
+        "message": "",
+        "data": {
+            "count": 1,
+            "zns": ZNSModel(**zns_dict),
         },
     }

@@ -42,33 +42,33 @@ def get_data_order(
         date: str,
 ):
     order_dict = {
-        'order_code': order_code,
-        'created_at': created_at,
-        'sent_at': sent_at,
-        'order_status': order_status,
-        'carrier_id': carrier_id,
-        'carrier_status': carrier_status,
-        'sender_province': sender_province,
-        'sender_district': sender_district,
-        'receiver_province': receiver_province,
-        'receiver_district': receiver_district,
-        'delivery_count': delivery_count,
-        'pickup': pickup,
-        'barter': barter,
-        'carrier_delivered_at': carrier_delivered_at,
-        'picked_at': picked_at,
-        'last_delivering_at': last_delivering_at,
-        'carrier_updated_at': carrier_updated_at,
-        'date': date,
+        "order_code": order_code,
+        "created_at": created_at,
+        "sent_at": sent_at,
+        "order_status": order_status,
+        "carrier_id": carrier_id,
+        "carrier_status": carrier_status,
+        "sender_province": sender_province,
+        "sender_district": sender_district,
+        "receiver_province": receiver_province,
+        "receiver_district": receiver_district,
+        "delivery_count": delivery_count,
+        "pickup": pickup,
+        "barter": barter,
+        "carrier_delivered_at": carrier_delivered_at,
+        "picked_at": picked_at,
+        "last_delivering_at": last_delivering_at,
+        "carrier_updated_at": carrier_updated_at,
+        "date": date,
     }
 
-    insert_data_to_postgres(data=[order_dict], schema_name='db_schema', table_name='order')
+    insert_data_to_postgres(data=[order_dict], schema_name="db_schema", table_name="order")
 
     return {
-        'error': False,
-        'message': "",
-        'data': {
-            'count': 1,
-            'order': OrderModel(**order_dict),
+        "error": False,
+        "message": "",
+        "data": {
+            "count": 1,
+            "order": OrderModel(**order_dict),
         },
     }
