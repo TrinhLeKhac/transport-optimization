@@ -8,6 +8,15 @@ from scripts.database.helper import *
 router = APIRouter()
 
 
+class RequestModel(BaseModel):
+    sender_province: str
+    sender_district: str
+    receiver_province: str
+    receiver_district: str
+    weight: int
+    pickup: str
+
+
 class ResultModel(BaseModel):
     # order_code: str
     carrier_id: int
@@ -32,11 +41,15 @@ class ResultModel(BaseModel):
 
 
 @router.post("", dependencies=[Depends(validate_token)])
-def calculate(
-        sender_province: str, sender_district: str,
-        receiver_province: str, receiver_district: str,
-        weight: int, pickup: str,
-):
+def calculate(data: RequestModel):
+
+    sender_province = data.sender_province
+    sender_district = data.sender_district
+    receiver_province = data.receiver_province
+    receiver_district = data.receiver_district
+    weight = data.weight
+    pickup = data.pickup
+
     pickup_type = None
     if pickup == "0":
         pickup_type = "Gửi Bưu Cục"

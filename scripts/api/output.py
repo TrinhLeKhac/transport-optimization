@@ -34,7 +34,7 @@ db = session()
 router = APIRouter()
 
 
-@router.post("", dependencies=[Depends(validate_token)])
+@router.get("", dependencies=[Depends(validate_token)])
 def get_all_rows(batch: int = 10):
     rows = db.query(models.Output29946API).limit(batch).all()
     if rows is None:
@@ -51,7 +51,7 @@ def get_all_rows(batch: int = 10):
         }
 
 
-@router.post("/district", dependencies=[Depends(validate_token)])
+@router.get("/district", dependencies=[Depends(validate_token)])
 def get_rows_by_district_code(district_code: str = "001"):
     rows = (
         db.query(models.Output29946API)
