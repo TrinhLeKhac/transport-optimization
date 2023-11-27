@@ -1,6 +1,6 @@
 from scripts.api import authen, order, result, zns, output
 from fastapi.exceptions import RequestValidationError
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, HTTPException, Request, status
 from ast import literal_eval
 from fastapi.responses import JSONResponse
 
@@ -18,6 +18,12 @@ def create_str_err(exc_str):
         s = str(err["loc"]) + " => " + err["msg"]
         res.append(s)
     return "; ".join(res)
+
+
+@app.exception_handler(HTTPException)
+def not_authenticated_exception_handler(request: Request, exc: HTTPException):
+    content = {"error": True, "message": "Not authenticated", "data": []}
+    return JSONResponse(content=content, status_code=status.HTTP_403_FORBIDDEN)
 
 
 @app.exception_handler(RequestValidationError)
