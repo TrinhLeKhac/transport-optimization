@@ -3,6 +3,10 @@ from fastapi.exceptions import RequestValidationError
 from fastapi import FastAPI, HTTPException, Request, status
 from ast import literal_eval
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
+import jwt
+from typing import Union
+
 
 app = FastAPI(
     title="API SUPERSHIP",
@@ -20,10 +24,10 @@ def create_str_err(exc_str):
     return "; ".join(res)
 
 
-@app.exception_handler(HTTPException)
-def not_authenticated_exception_handler(request: Request, exc: HTTPException):
-    content = {"error": True, "message": "Not authenticated", "data": []}
-    return JSONResponse(content=content, status_code=status.HTTP_403_FORBIDDEN)
+# @app.exception_handler(ValidationError)
+# def wrong_authenticated_exception_handler(request: Request, exc: ValidationError):
+#     content = {"error": True, "message": "Wrong token", "data": []}
+#     return JSONResponse(content=content, status_code=status.HTTP_403_FORBIDDEN)
 
 
 @app.exception_handler(RequestValidationError)
