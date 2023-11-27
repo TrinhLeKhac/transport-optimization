@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, conint, constr
 from scripts.auth.security import validate_token
 from fastapi import Depends
 from fastapi import APIRouter
@@ -7,15 +7,15 @@ from scripts.database.helper import *
 
 
 class ZNSModel(BaseModel):
-    date: str
-    receiver_province: str
-    receiver_district: str
-    carrier_id: int
-    message_count: int
-    star: int
-    feedbacks: List[str]
-    note: str
-    submitted_at: str
+    date: constr(strict=True)
+    receiver_province: constr(strict=True)
+    receiver_district: constr(strict=True)
+    carrier_id: conint(strict=True)
+    message_count: conint(strict=True)
+    star: conint(ge=0, le=5, strict=True)
+    feedbacks: List[constr(strict=True)]
+    note: constr(strict=True)
+    submitted_at: constr(strict=True)
 
 
 router = APIRouter()

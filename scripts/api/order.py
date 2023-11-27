@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, conint, constr
 from scripts.auth.security import validate_token
 from fastapi import Depends
 from fastapi import APIRouter
@@ -6,24 +6,24 @@ from scripts.database.helper import *
 
 
 class OrderModel(BaseModel):
-    date: str
-    order_code: str
-    created_at: str
-    sent_at: str
-    order_status: str
-    carrier_id: int
-    carrier_status: str
-    sender_province: str
-    sender_district: str
-    receiver_province: str
-    receiver_district: str
-    delivery_count: int
-    pickup: str
-    barter: str
-    carrier_delivered_at: str
-    picked_at: str
-    last_delivering_at: str
-    carrier_updated_at: str
+    date: constr(strict=True)
+    order_code: constr(strict=True)
+    created_at: constr(strict=True)
+    sent_at: constr(strict=True)
+    order_status: constr(strict=True)
+    carrier_id: conint(strict=True)
+    carrier_status: constr(strict=True)
+    sender_province: constr(strict=True)
+    sender_district: constr(strict=True)
+    receiver_province: constr(strict=True)
+    receiver_district: constr(strict=True)
+    delivery_count: conint(strict=True)
+    pickup: constr(strict=True)
+    barter: constr(strict=True)
+    carrier_delivered_at: constr(strict=True)
+    picked_at: constr(strict=True)
+    last_delivering_at: constr(strict=True)
+    carrier_updated_at: constr(strict=True)
 
 
 router = APIRouter()

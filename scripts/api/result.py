@@ -1,5 +1,5 @@
 from scripts.output.out_data_final import *
-from pydantic import BaseModel
+from pydantic import BaseModel, conint, constr, confloat
 from scripts.auth.security import validate_token
 from fastapi import Depends
 from fastapi import APIRouter
@@ -9,32 +9,32 @@ router = APIRouter()
 
 
 class RequestModel(BaseModel):
-    sender_province: str
-    sender_district: str
-    receiver_province: str
-    receiver_district: str
-    weight: int
-    pickup: str
+    sender_province: constr(strict=True)
+    sender_district: constr(strict=True)
+    receiver_province: constr(strict=True)
+    receiver_district: constr(strict=True)
+    weight: conint(strict=True)
+    pickup: constr(strict=True)
 
 
 class ResultModel(BaseModel):
-    # order_code: str
-    carrier_id: int
-    # new_type: int
-    route_type: str
-    price: int
-    status: str
-    description: str
-    time_data: float
-    time_display: str
-    rate: float
-    score: float
-    star: float
-    for_shop: int
-    for_partner: int
-    price_ranking: int
-    speed_ranking: int
-    score_ranking: int
+    # order_code: constr(strict=True)
+    carrier_id: conint(strict=True)
+    # new_type: conint(strict=True)
+    route_type: constr(strict=True)
+    price: conint(strict=True)
+    status: constr(strict=True)
+    description: constr(strict=True)
+    time_data: confloat(strict=True)
+    time_display: constr(strict=True)
+    rate: confloat(strict=True)
+    score: confloat(strict=True)
+    star: confloat(strict=True)
+    for_shop: conint(strict=True)
+    for_partner: conint(strict=True)
+    price_ranking: conint(strict=True)
+    speed_ranking: conint(strict=True)
+    score_ranking: conint(strict=True)
 
     class Config:
         orm_mode = True

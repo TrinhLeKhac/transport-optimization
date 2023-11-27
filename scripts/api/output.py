@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, conint, constr, confloat
 from scripts.auth.security import validate_token
 from fastapi import Depends
 from fastapi import APIRouter
@@ -7,22 +7,22 @@ from scripts.database import models
 
 
 class OutputModel(BaseModel):
-    id: int
-    receiver_province_code: str
-    receiver_district_code: str
-    carrier_id: int
-    new_type: int
-    status: int
-    description: str
-    time_data: float
-    time_display: str
-    speed_ranking: int
-    score_ranking: int
-    for_shop: int
-    total_order: int
-    rate: float
-    score: float
-    star: float
+    id: conint(strict=True)
+    receiver_province_code: constr(strict=True)
+    receiver_district_code: constr(strict=True)
+    carrier_id: conint(strict=True)
+    new_type: conint(strict=True)
+    status: conint(strict=True)
+    description: constr(strict=True)
+    time_data: confloat(strict=True)
+    time_display: constr(strict=True)
+    speed_ranking: conint(strict=True)
+    score_ranking: conint(strict=True)
+    for_shop: conint(strict=True)
+    total_order: conint(strict=True)
+    rate: confloat(strict=True)
+    score: confloat(strict=True)
+    star: confloat(strict=True)
 
     # import_date: str
 
