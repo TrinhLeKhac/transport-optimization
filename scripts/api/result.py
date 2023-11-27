@@ -19,10 +19,10 @@ class RequestModel(BaseModel):
 
 class ResultModel(BaseModel):
     # order_code: constr(strict=True)
-    carrier_id: conint(strict=True)
-    # new_type: conint(strict=True)
+    carrier_id: int
+    # new_type: int
     route_type: constr(strict=True)
-    price: conint(strict=True)
+    price: int
     status: constr(strict=True)
     description: constr(strict=True)
     time_data: confloat(strict=True)
@@ -30,11 +30,11 @@ class ResultModel(BaseModel):
     rate: confloat(strict=True)
     score: confloat(strict=True)
     star: confloat(strict=True)
-    for_shop: conint(strict=True)
-    for_partner: conint(strict=True)
-    price_ranking: conint(strict=True)
-    speed_ranking: conint(strict=True)
-    score_ranking: conint(strict=True)
+    for_shop: int
+    for_partner: int
+    price_ranking: int
+    speed_ranking: int
+    score_ranking: int
 
     class Config:
         orm_mode = True
