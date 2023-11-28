@@ -17,8 +17,8 @@ FINAL_FULL_COLS = [
     'carrier_status', 'carrier_status_comment',
     'estimate_delivery_time_details', 'estimate_delivery_time',
     'delivery_success_rate', 'delivery_success_rate_id',
-    'customer_best_carrier_id', 'customer_best_carrier',
-    'partner_best_carrier_id', 'partner_best_carrier', 'score', 'star',
+    'customer_best_carrier_id',
+    'partner_best_carrier_id', 'score', 'star',
     'cheapest_carrier_id', 'fastest_carrier_id', 'highest_score_carrier_id',
 ]
 FINAL_FULL_COLS_RENAMED = [
@@ -30,8 +30,8 @@ FINAL_FULL_COLS_RENAMED = [
     'status', 'description',
     'time_data', 'time_display',
     'rate', 'rate_ranking',
-    'for_shop', 'shop_best_carrier',
-    'for_partner', 'partner_best_carrier', 'score', 'star',
+    'for_shop',
+    'for_partner', 'score', 'star',
     'price_ranking', 'speed_ranking', 'score_ranking',
 ]
 FINAL_COLS = [
@@ -189,6 +189,7 @@ def generate_order_type(input_df, carriers=ACTIVE_CARRIER):
     )
     result_df['order_type'] = result_df.apply(type_of_delivery, axis=1)
     result_df['order_type_id'] = result_df['order_type'].map(MAPPING_ORDER_TYPE_ID)
+    result_df['order_type_id'] = result_df['order_type_id'].astype(str)
     result_df['sys_order_type_id'] = result_df.apply(type_of_system_delivery, axis=1)
 
     return result_df.drop([
@@ -203,7 +204,7 @@ def combine_info_from_api(input_df, show_logs=False):
         'receiver_province_code', 'receiver_district_code', 'carrier_id', 'new_type',
         'status', 'description',
         'time_data', 'time_display',
-        'shop_best_carrier', 'for_shop',
+        'for_shop',
         'speed_ranking', 'score_ranking',
         'rate_ranking', 'rate',
         'score', 'star', 'total_order'
@@ -212,7 +213,7 @@ def combine_info_from_api(input_df, show_logs=False):
         'receiver_province_id', 'receiver_district_id', 'carrier_id', 'order_type_id',
         'carrier_status', 'carrier_status_comment',
         'estimate_delivery_time_details', 'estimate_delivery_time',
-        'customer_best_carrier', 'customer_best_carrier_id',
+        'customer_best_carrier_id',
         'fastest_carrier_id', 'highest_score_carrier_id',
         'delivery_success_rate_id', 'delivery_success_rate',
         'score', 'star', 'total_order',
@@ -399,16 +400,9 @@ def partner_best_carrier_old(data_api_df, threshold=15):
 def partner_best_carrier(data_api_df):
     data_api_df['wscore'] = data_api_df['cheapest_carrier_id'] * 1.4 + data_api_df['delivery_success_rate_id'] * 1.2 + \
                             data_api_df['highest_score_carrier_id']
-    partner_best_carrier_df = (
-        data_api_df.sort_values([
-            'receiver_province_id', 'receiver_district_id', 'order_type_id', 'wscore'
-        ]).drop_duplicates(['receiver_province_id', 'receiver_district_id', 'order_type_id'])
-        [['receiver_province_id', 'receiver_district_id', 'order_type_id', 'carrier']]
-            .rename(columns={'carrier': 'partner_best_carrier'})
-    )
-    data_api_df = data_api_df.merge(partner_best_carrier_df,
-                                    on=['receiver_province_id', 'receiver_district_id', 'order_type_id'], how='inner')
-    data_api_df['partner_best_carrier_id'] = data_api_df['partner_best_carrier'].map(MAPPING_CARRIER_ID)
+    data_api_df["partner_best_carrier_id"] = \
+        data_api_df.groupby(["order_id"])["wscore"].rank(
+            method="dense", ascending=True).astype(int)
 
     return data_api_df.drop(['wscore'], axis=1)
 
