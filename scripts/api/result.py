@@ -71,12 +71,12 @@ def execute_query(
             INNER JOIN db_schema.tbl_service_fee tbl_fee
             ON tbl_ord.carrier_id = tbl_fee.carrier_id --6
             AND tbl_ord.new_type = tbl_fee.new_type  --7
-            WHERE tbl_ord.sender_province_code = '79' 
-            AND tbl_ord.sender_district_code = '769'
-            AND tbl_ord.receiver_province_code = '79' 
-            AND tbl_ord.receiver_district_code = '777' 
-            AND tbl_fee.weight = CEIL(1200/500)*500 
-            AND tbl_fee.pickup = '1'
+            WHERE tbl_ord.sender_province_code = '{}' 
+            AND tbl_ord.sender_district_code = '{}'
+            AND tbl_ord.receiver_province_code = '{}' 
+            AND tbl_ord.receiver_district_code = '{}' 
+            AND tbl_fee.weight = CEIL({}/500)*500 
+            AND tbl_fee.pickup = '{}'
         )
         select carrier_id, route_type, price, status::varchar(1) AS status, description, time_data, time_display,
         rate, score, star, for_shop, 
