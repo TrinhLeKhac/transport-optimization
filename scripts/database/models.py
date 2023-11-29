@@ -3,7 +3,7 @@ from sqlalchemy import String, Boolean, Integer, Column, Numeric, Date, TIMESTAM
 
 
 class Output29946API(Base):
-    __tablename__ = "data_api"
+    __tablename__ = "tbl_data_api"
     id = Column(Integer, primary_key=True)
     receiver_province_code = Column(String, nullable=True)
     receiver_district_code = Column(String, nullable=True)
