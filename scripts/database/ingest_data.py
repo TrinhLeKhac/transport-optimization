@@ -14,15 +14,15 @@ def ingest_data_to_db():
     port = settings.SQLALCHEMY_DATABASE_URI
     engine = create_engine(port)
     print('>>> Ingest data đã qua xử lý...')
-    for f, schema in TABLE_SCHEMA.items():
-        if f in [
-            'buu_cuc_best', 'buu_cuc_ghn', 'buu_cuc_ghtk', 'buu_cuc_ninja_van',
-            'chat_luong_noi_bo_njv', 'ngung_giao_nhan', 'phan_vung_nvc',
-        ]:
-            tmp_df = pd.read_parquet(ROOT_PATH + '/processed_data/{}.parquet'.format(f))
-            tmp_df['import_date'] = datetime.now().strftime('%F')
-            tmp_df.to_sql(name=f, con=engine, schema="db_schema", if_exists="replace", index=False, dtype=schema)
-    print('-' * 100)
+    # for f, schema in TABLE_SCHEMA.items():
+    #     if f in [
+    #         'buu_cuc_best', 'buu_cuc_ghn', 'buu_cuc_ghtk', 'buu_cuc_ninja_van',
+    #         'chat_luong_noi_bo_njv', 'ngung_giao_nhan', 'phan_vung_nvc',
+    #     ]:
+    #         tmp_df = pd.read_parquet(ROOT_PATH + '/processed_data/{}.parquet'.format(f))
+    #         tmp_df['import_date'] = datetime.now().strftime('%F')
+    #         tmp_df.to_sql(name=f, con=engine, schema="db_schema", if_exists="replace", index=False, dtype=schema)
+    # print('-' * 100)
     #
     print('>>> Ingest output API')
     data_api_df = pd.read_parquet(ROOT_PATH + '/output/data_api.parquet')
@@ -52,19 +52,19 @@ def ingest_data_to_db():
     #                           dtype=TABLE_SCHEMA['service_fee'])
     # print('-' * 100)
 
-    print('>>> Ingest data check output')
-    if os.path.exists(ROOT_PATH + '/output/data_check_output.parquet'):
-        check_df = pd.read_parquet(ROOT_PATH + '/output/data_check_output.parquet')
-    else:
-        print('>>>>>> Out data check output')
-        check_df = out_data_final(show_logs=False)
-
-    print('>>> Ghi thông tin vào DB')
-    check_df = check_df.reset_index().rename(columns={"index": "id"})
-    check_df['import_date'] = datetime.now().strftime('%F')
-    check_df.to_sql(name='tbl_data_check_output', con=engine, schema="db_schema", if_exists="replace", index=False,
-                    dtype=TABLE_SCHEMA['data_check_output'])
-    print('>>> Done')
+    # print('>>> Ingest data check output')
+    # if os.path.exists(ROOT_PATH + '/output/data_check_output.parquet'):
+    #     check_df = pd.read_parquet(ROOT_PATH + '/output/data_check_output.parquet')
+    # else:
+    #     print('>>>>>> Out data check output')
+    #     check_df = out_data_final(show_logs=False)
+    #
+    # print('>>> Ghi thông tin vào DB')
+    # check_df = check_df.reset_index().rename(columns={"index": "id"})
+    # check_df['import_date'] = datetime.now().strftime('%F')
+    # check_df.to_sql(name='tbl_data_check_output', con=engine, schema="db_schema", if_exists="replace", index=False,
+    #                 dtype=TABLE_SCHEMA['data_check_output'])
+    # print('>>> Done')
 
 
 if __name__ == '__main__':

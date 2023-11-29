@@ -18,9 +18,7 @@ class RequestModel(BaseModel):
 
 
 class ResultModel(BaseModel):
-    # order_code: constr(strict=True)
     carrier_id: int
-    # new_type: int
     route_type: constr(strict=True)
     price: int
     status: constr(strict=True)
@@ -40,82 +38,95 @@ class ResultModel(BaseModel):
         orm_mode = True
 
 
+def execute_query(
+    sender_province_code, sender_district_code,
+    receiver_province_code, receiver_district_code,
+    weight, pickup
+):
+
+    # Create connection
+    connection = psycopg2.connect(
+        settings.SQLALCHEMY_DATABASE_URI
+    )
+
+    cursor = connection.cursor()
+
+    table_query = """
+        WITH carrier_information AS (
+            SELECT 
+            tbl_ord.carrier_id, tbl_ord.route_type, 
+            tbl_fee.price, 
+            tbl_api.status, tbl_api.description, tbl_api.time_data,
+            tbl_api.time_display, tbl_api.rate, tbl_api.score, tbl_api.star, 
+            tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
+            CAST (DENSE_RANK() OVER (
+                ORDER BY tbl_fee.price ASC
+            ) AS smallint) AS price_ranking
+            FROM db_schema.tbl_order_type tbl_ord
+            INNER JOIN db_schema.tbl_data_api tbl_api
+            ON tbl_ord.carrier_id = tbl_api.carrier_id --6
+            AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code
+            AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code --713
+            AND tbl_ord.new_type = tbl_api.new_type --7
+            INNER JOIN db_schema.tbl_service_fee tbl_fee
+            ON tbl_ord.carrier_id = tbl_fee.carrier_id --6
+            AND tbl_ord.new_type = tbl_fee.new_type  --7
+            WHERE tbl_ord.sender_province_code = '79' 
+            AND tbl_ord.sender_district_code = '769'
+            AND tbl_ord.receiver_province_code = '79' 
+            AND tbl_ord.receiver_district_code = '777' 
+            AND tbl_fee.weight = CEIL(1200/500)*500 
+            AND tbl_fee.pickup = '1'
+        )
+        select carrier_id, route_type, price, status::varchar(1) AS status, description, time_data, time_display,
+        rate, score, star, for_shop, 
+        CAST (DENSE_RANK() OVER (
+            ORDER BY
+                (1.4 * price_ranking + 1.2 * rate_ranking + score_ranking)
+            ASC
+        ) AS smallint) AS for_partner,
+        price_ranking, speed_ranking, score_ranking
+        FROM carrier_information;
+    """.format(
+        sender_province_code, sender_district_code,
+        receiver_province_code, receiver_district_code,
+        weight, pickup
+    )
+
+    cursor.execute(table_query)
+    rows = cursor.fetchall()
+    print(rows)
+
+    # Get the field names from the Pydantic model
+    field_names = ResultModel.__annotations__.keys()
+    result = [ResultModel(**dict(zip(field_names, row))) for row in rows]
+
+    # Commit the transaction
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    return result
+
+
 @router.post("", dependencies=[Depends(validate_token)])
 def calculate(data: RequestModel):
-
-    sender_province = data.sender_province
-    sender_district = data.sender_district
-    receiver_province = data.receiver_province
-    receiver_district = data.receiver_district
+    sender_province_code = data.sender_province
+    sender_district_code = data.sender_district
+    receiver_province_code = data.receiver_province
+    receiver_district_code = data.receiver_district
     weight = data.weight
     pickup = data.pickup
 
-    pickup_type = None
-    if pickup == "0":
-        pickup_type = "Gửi Bưu Cục"
-    elif pickup == "1":
-        pickup_type = "Lấy Tận Nơi"
-
-    df_input = pd.DataFrame(data={
-        "order_id": ["order"],
-        "weight": [weight],
-        "delivery_type": [pickup_type],
-        "sender_province_id": [sender_province],
-        "sender_district_id": [sender_district],
-        "receiver_province_id": [receiver_province],
-        "receiver_district_id": [receiver_district],
-    })
-    df_output = out_data_final(df_input, show_logs=False)
-    df_output = df_output[[
-        # "order_code",
-        "carrier_id",
-        # "new_type",
-        "route_type",
-        "price",
-        "status",
-        "description",
-        "time_data",
-        "time_display",
-        "rate",
-        "score",
-        "star",
-        "for_shop",
-        "for_partner",
-        "price_ranking",
-        "speed_ranking",
-        "score_ranking",
-
-    ]]
-    df_output["route_type"] = df_output["route_type"].astype(str)
-    df_output["status"] = df_output["status"].astype(str)
-
-    result_dict_list = []
-    for i in range(len(df_output)):
-        result_dict = {
-            # "order_code": df_output.loc[i, :]["order_code"],
-            "carrier_id": df_output.loc[i, :]["carrier_id"],
-            # "new_type": df_output.loc[i, :]["new_type"],
-            "route_type": df_output.loc[i, :]["route_type"],
-            "price": df_output.loc[i, :]["price"],
-            "status": df_output.loc[i, :]["status"],
-            "description": df_output.loc[i, :]["description"],
-            "time_data": df_output.loc[i, :]["time_data"],
-            "time_display": df_output.loc[i, :]["time_display"],
-            "rate": df_output.loc[i, :]["rate"],
-            "score": df_output.loc[i, :]["score"],
-            "star": df_output.loc[i, :]["star"],
-            "for_shop": df_output.loc[i, :]["for_shop"],
-            "for_partner": df_output.loc[i, :]["for_partner"],
-            "price_ranking": df_output.loc[i, :]["price_ranking"],
-            "speed_ranking": df_output.loc[i, :]["speed_ranking"],
-            "score_ranking": df_output.loc[i, :]["score_ranking"],
-
-        }
-
-        result_dict_list.append(ResultModel(**result_dict))
+    result = execute_query(
+        sender_province_code, sender_district_code,
+        receiver_province_code, receiver_district_code,
+        weight, pickup
+    )
 
     return {
         "error": False,
         "message": "",
-        "data": result_dict_list
+        "data": result
     }
