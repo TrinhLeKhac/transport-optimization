@@ -40,17 +40,17 @@ def ingest_data_to_db():
     #                         dtype=TABLE_SCHEMA['data_api_full'])
     # print('-' * 100)
 
-    print('>>> Ingest data order_type')
-    data_order_type_df = pd.read_parquet(ROOT_PATH + '/output/data_order_type.parquet')
-    data_order_type_df.to_sql(name='tbl_order_type', con=engine, schema="db_schema", if_exists="replace", index=False,
-                              dtype=TABLE_SCHEMA['order_type'], chunksize=10000)
-    print('-' * 100)
+    # print('>>> Ingest data order_type')
+    # data_order_type_df = pd.read_parquet(ROOT_PATH + '/output/data_order_type.parquet')
+    # data_order_type_df.to_sql(name='tbl_order_type', con=engine, schema="db_schema", if_exists="replace", index=False,
+    #                           dtype=TABLE_SCHEMA['order_type'], chunksize=10000)
+    # print('-' * 100)
 
-    print('>>> Ingest data service_fee')
-    service_fee_df = pd.read_parquet(ROOT_PATH + '/output/service_fee.parquet')
-    service_fee_df.to_sql(name='tbl_service_fee', con=engine, schema="db_schema", if_exists="replace", index=False,
-                              dtype=TABLE_SCHEMA['service_fee'])
-    print('-' * 100)
+    # print('>>> Ingest data service_fee')
+    # service_fee_df = pd.read_parquet(ROOT_PATH + '/output/service_fee.parquet')
+    # service_fee_df.to_sql(name='tbl_service_fee', con=engine, schema="db_schema", if_exists="replace", index=False,
+    #                           dtype=TABLE_SCHEMA['service_fee'])
+    # print('-' * 100)
 
     # print('>>> Ingest data check output')
     # if os.path.exists(ROOT_PATH + '/output/data_check_output.parquet'):

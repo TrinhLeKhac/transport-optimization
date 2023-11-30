@@ -47,22 +47,27 @@ API_COLS_RENAMED = [
 ]
 
 THOI_GIAN_GIAO_HANG_DEFAULT = {
-    'Nội Miền': '2.0 - 2.5 ngày',
-    'Cận Miền': '3.0 - 3.5 ngày',
-    'Cách Miền': '4.0 - 4.5 ngày',
-    'Nội Thành Tỉnh': '2.0 - 2.5 ngày',
-    'Ngoại Thành Tỉnh': '2.0 - 2.5 ngày',
-    'Nội Thành Tp.HCM - HN': '2.0 - 2.5 ngày',
-    'Ngoại Thành Tp.HCM - HN': '2.0 - 2.5 ngày',
+    'Nội Miền': '1.75 - 2.25 ngày',
+    'Cận Miền': '2.75 - 3.25 ngày',
+    'Cách Miền': '3.75 - 4.25 ngày',
+    'Nội Thành Tỉnh': '1.75 - 2.25 ngày',
+    'Ngoại Thành Tỉnh': '1.75 - 2.25 ngày',
+    'Nội Thành Tp.HCM - HN': '1.75 - 2.25 ngày',
+    'Ngoại Thành Tp.HCM - HN': '1.75 - 2.25 ngày',
 }
 
 
+# def round_value(x):
+#     round_05 = int(x) + 0.5
+#     if x < round_05:
+#         return '{} - {} ngày'.format(round_05, round_05 + 0.5)
+#     else:
+#         return '{} - {} ngày'.format(round_05 + 0.5, round_05 + 1)
+
 def round_value(x):
-    round_05 = int(x) + 0.5
-    if x < round_05:
-        return '{} - {} ngày'.format(round_05, round_05 + 0.5)
-    else:
-        return '{} - {} ngày'.format(round_05 + 0.5, round_05 + 1)
+    th1 = round(x - 0.25, 1)
+    th2 = round(x + 0.25, 1)
+    return '{} - {} ngày'.format(th1, th2)
 
 
 def customer_best_carrier_old(data_api_df, threshold=15):
