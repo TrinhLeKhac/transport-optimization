@@ -13,7 +13,7 @@ class RequestModel(BaseModel):
     sender_district: constr(strict=True)
     receiver_province: constr(strict=True)
     receiver_district: constr(strict=True)
-    weight: conint(strict=True)
+    weight: conint(strict=True, gt=0, le=50000)
     pickup: constr(strict=True)
 
 
