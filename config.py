@@ -8,7 +8,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 class Settings:
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', '')
     SECRET_KEY = os.getenv('SECRET_KEY', '')
-    ACCESS_TOKEN_EXPIRE_SECONDS: int = 365 * 24 * 60 * 60  # Token expired after 7 days
+    ACCESS_TOKEN_EXPIRE_SECONDS: int = 365 * 24 * 60 * 60  # Token expired after 365 days
     SECURITY_ALGORITHM = 'HS256'
     USERNAME_AUTH = os.getenv('USERNAME_AUTH', '')
     PASSWORD_AUTH = os.getenv('PASSWORD_AUTH', '')
@@ -16,12 +16,3 @@ class Settings:
 
 
 settings = Settings()
-
-# import json
-#
-# with open('/etc/config.json') as config_file:
-#     config = json.load(config_file)
-#
-#
-# class Config:
-#     SQLALCHEMY_DATABASE_URI = config.get("SQLALCHEMY_DATABASE_URI")
