@@ -75,7 +75,7 @@ def execute_query(
             AND tbl_ord.sender_district_code = '{}'
             AND tbl_ord.receiver_province_code = '{}' 
             AND tbl_ord.receiver_district_code = '{}' 
-            AND tbl_fee.weight = CEIL({}/500)*500 
+            AND tbl_fee.weight = CEIL({}/500.0)*500 
             AND tbl_fee.pickup = '{}'
         )
         select carrier_id, route_type, price, status::varchar(1) AS status, description, time_data, time_display,
@@ -86,7 +86,8 @@ def execute_query(
             ASC
         ) AS smallint) AS for_partner,
         price_ranking, speed_ranking, score_ranking
-        FROM carrier_information;
+        FROM carrier_information
+        ORDER BY carrier_id;
     """.format(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
