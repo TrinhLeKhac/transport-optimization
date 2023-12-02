@@ -79,6 +79,46 @@ TRONG_SO = {
                 'Trung bình thời gian giao hàng lớn hơn hoặc bằng 168h': -10,
                 'Không có thông tin': 5,
             },
+            'Liên Miền Đặc Biệt': {
+                # 72h
+                'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 20 đơn': 10,
+                'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 10 đơn': 9,
+                'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 5 đơn': 8,
+                'Trung bình dưới 72h và tổng số đơn giao hàng bé hơn hoặc bằng 5 đơn': 6,
+                # 96h
+                'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 30 đơn': 10,
+                'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 20 đơn': 9,
+                'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 10 đơn': 8,
+                'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 5 đơn': 6,
+                'Trung bình dưới 96h và tổng số đơn giao hàng bé hơn hoặc bằng 5 đơn': 4,
+                # trễ
+                'Trung bình dưới 120h và tổng số đơn giao hàng lớn hơn 3 đơn': -2,
+                'Trung bình dưới 120h và tổng số đơn giao hàng bé hơn hoặc bằng 3 đơn': -1,
+                'Trung bình dưới 144h và tổng số đơn giao hàng lớn hơn 3 đơn': -6,
+                'Trung bình dưới 144h và tổng số đơn giao hàng bé hơn hoặc bằng 3 đơn': -4,
+                'Trung bình thời gian giao hàng lớn hơn hoặc bằng 144h': -10,
+                'Không có thông tin': 5,
+            },
+            'Liên Miền Tp.HCM - HN': {
+                # 72h
+                'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 20 đơn': 10,
+                'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 10 đơn': 9,
+                'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 5 đơn': 8,
+                'Trung bình dưới 72h và tổng số đơn giao hàng bé hơn hoặc bằng 5 đơn': 6,
+                # 96h
+                'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 30 đơn': 10,
+                'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 20 đơn': 9,
+                'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 10 đơn': 8,
+                'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 5 đơn': 6,
+                'Trung bình dưới 96h và tổng số đơn giao hàng bé hơn hoặc bằng 5 đơn': 4,
+                # trễ
+                'Trung bình dưới 120h và tổng số đơn giao hàng lớn hơn 3 đơn': -2,
+                'Trung bình dưới 120h và tổng số đơn giao hàng bé hơn hoặc bằng 3 đơn': -1,
+                'Trung bình dưới 144h và tổng số đơn giao hàng lớn hơn 3 đơn': -6,
+                'Trung bình dưới 144h và tổng số đơn giao hàng bé hơn hoặc bằng 3 đơn': -4,
+                'Trung bình thời gian giao hàng lớn hơn hoặc bằng 144h': -10,
+                'Không có thông tin': 5,
+            },
             'Cận Miền': {
                 # 72h
                 'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 20 đơn': 10,
@@ -117,6 +157,26 @@ TRONG_SO = {
                 'Trung bình dưới 120h và tổng số đơn giao hàng lớn hơn 3 đơn': -6,
                 'Trung bình dưới 120h và tổng số đơn giao hàng bé hơn hoặc bằng 3 đơn': -4,
                 'Trung bình thời gian giao hàng lớn hơn hoặc bằng 120h': -10,
+                'Không có thông tin': 5,
+            },
+            'Nội Miền Tp.HCM - HN': {
+                # 24h
+                'Trung bình dưới 24h và tổng số đơn giao hàng lớn hơn 20 đơn': 10,
+                'Trung bình dưới 24h và tổng số đơn giao hàng lớn hơn 10 đơn': 9,
+                'Trung bình dưới 24h và tổng số đơn giao hàng lớn hơn 5 đơn': 8,
+                'Trung bình dưới 24h và tổng số đơn giao hàng bé hơn hoặc bằng 5 đơn': 6,
+                # 48h
+                'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 30 đơn': 10,
+                'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 20 đơn': 9,
+                'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 10 đơn': 8,
+                'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 5 đơn': 6,
+                'Trung bình dưới 48h và tổng số đơn giao hàng bé hơn hoặc bằng 5 đơn': 4,
+                # trễ
+                'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 3 đơn': -2,
+                'Trung bình dưới 72h và tổng số đơn giao hàng bé hơn hoặc bằng 3 đơn': -1,
+                'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 3 đơn': -6,
+                'Trung bình dưới 96h và tổng số đơn giao hàng bé hơn hoặc bằng 3 đơn': -4,
+                'Trung bình thời gian giao hàng lớn hơn hoặc bằng 96h': -10,
                 'Không có thông tin': 5,
             },
             'Nội Thành Tỉnh': {
