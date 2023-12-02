@@ -6,7 +6,7 @@ def score_thoi_gian_giao_hang(tong_don, thoi_gian_giao_tb, loai_van_chuyen):
     if tong_don == -1:
         return 'Không có thông tin'
     # group 1 (Cách Miền)
-    if loai_van_chuyen == 'Cách Miền':
+    if loai_van_chuyen in ['Cách Miền']:
         # thời gian giao trung bình < 96h
         if (tong_don > 20) and (thoi_gian_giao_tb < 96):
             return 'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 20 đơn'
@@ -39,7 +39,7 @@ def score_thoi_gian_giao_hang(tong_don, thoi_gian_giao_tb, loai_van_chuyen):
         elif thoi_gian_giao_tb >= 168:
             return 'Trung bình thời gian giao hàng lớn hơn hoặc bằng 168h'
     # group 1 (Cận Miền)
-    if loai_van_chuyen == 'Cận Miền':
+    if loai_van_chuyen in ['Cận Miền', 'Liên Miền Tp.HCM - HN', 'Liên Miền Đặc Biệt']:
         # thời gian giao trung bình < 72h
         if (tong_don > 20) and (thoi_gian_giao_tb < 72):
             return 'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 20 đơn'
@@ -73,7 +73,40 @@ def score_thoi_gian_giao_hang(tong_don, thoi_gian_giao_tb, loai_van_chuyen):
             return 'Trung bình thời gian giao hàng lớn hơn hoặc bằng 144h'
 
     # group 2 (Nội Miền)
-    if loai_van_chuyen == 'Nội Miền':
+    if loai_van_chuyen in ['Nội Miền Tp.HCM - HN']:
+        # thời gian giao trung bình < 24h
+        if (tong_don > 20) and (thoi_gian_giao_tb < 24):
+            return 'Trung bình dưới 24h và tổng số đơn giao hàng lớn hơn 20 đơn'
+        elif (tong_don > 10) and (thoi_gian_giao_tb < 24):
+            return 'Trung bình dưới 24h và tổng số đơn giao hàng lớn hơn 10 đơn'
+        elif (tong_don > 5) and (thoi_gian_giao_tb < 24):
+            return 'Trung bình dưới 24h và tổng số đơn giao hàng lớn hơn 5 đơn'
+        elif (tong_don <= 5) and (thoi_gian_giao_tb < 24):
+            return 'Trung bình dưới 24h và tổng số đơn giao hàng bé hơn hoặc bằng 5 đơn'
+        # thời gian giao trung bình < 48h
+        elif (tong_don > 30) and (thoi_gian_giao_tb < 48):
+            return 'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 30 đơn'
+        elif (tong_don > 20) and (thoi_gian_giao_tb < 48):
+            return 'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 20 đơn'
+        elif (tong_don > 10) and (thoi_gian_giao_tb < 48):
+            return 'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 10 đơn'
+        elif (tong_don > 5) and (thoi_gian_giao_tb < 48):
+            return 'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 5 đơn'
+        elif (tong_don <= 5) and (thoi_gian_giao_tb < 48):
+            return 'Trung bình dưới 48h và tổng số đơn giao hàng bé hơn hoặc bằng 5 đơn'
+        # trễ
+        elif (tong_don > 3) and (thoi_gian_giao_tb < 72):
+            return 'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 3 đơn'
+        elif (tong_don <= 3) and (thoi_gian_giao_tb < 72):
+            return 'Trung bình dưới 72h và tổng số đơn giao hàng bé hơn hoặc bằng 3 đơn'
+        elif (tong_don > 3) and (thoi_gian_giao_tb < 96):
+            return 'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 3 đơn'
+        elif (tong_don <= 3) and (thoi_gian_giao_tb < 96):
+            return 'Trung bình dưới 96h và tổng số đơn giao hàng bé hơn hoặc bằng 3 đơn'
+        elif thoi_gian_giao_tb >= 96:
+            return 'Trung bình thời gian giao hàng lớn hơn hoặc bằng 96h'
+
+    if loai_van_chuyen in ['Nội Miền']:
         # thời gian giao trung bình < 48h
         if (tong_don > 20) and (thoi_gian_giao_tb < 48):
             return 'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 20 đơn'
@@ -175,11 +208,7 @@ def transform_data_thoi_gian_giao_hang_toan_trinh():
     cross_df = (
         PROVINCE_MAPPING_DISTRICT_CROSS_CARRIER_DF.merge(
             pd.DataFrame(
-                data={'order_type': [
-                    'Nội Thành Tỉnh', 'Ngoại Thành Tỉnh',
-                    'Nội Thành Tp.HCM - HN', 'Ngoại Thành Tp.HCM - HN',
-                    'Nội Miền', 'Cận Miền', 'Cách Miền'
-                ]}
+                data={'order_type': list(MAPPING_ORDER_TYPE_ID.keys())}
             ), how='cross'
         )
     )

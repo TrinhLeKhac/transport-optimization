@@ -1,12 +1,6 @@
 from scripts.utilities.helper import *
 
-COLUMNS_CUOC_PHI = [
-    'gt', 'lt_or_eq',
-    'Nội Thành Tỉnh', 'Ngoại Thành Tỉnh',
-    'Nội Thành Tp.HCM - HN', 'Ngoại Thành Tp.HCM - HN',
-    'Nội Miền', 'Cận Miền', 'Cách Miền',
-    'Nội Miền Tp.HCM - HN', 'Liên Miền Tp.HCM - HN', 'Liên Miền Đặc Biệt',
-]
+COLUMNS_CUOC_PHI = ['gt', 'lt_or_eq'] + list(MAPPING_ORDER_TYPE_ID.keys())
 
 
 def xu_ly_bang_gia_cuoc():
@@ -96,12 +90,7 @@ def xu_ly_bang_gia_cuoc():
     cuoc_phi_df = pd.melt(
         cuoc_phi_df,
         id_vars=['carrier_id', 'carrier', 'gt', 'lt_or_eq'],
-        value_vars=[
-            'Nội Thành Tỉnh', 'Ngoại Thành Tỉnh',
-            'Nội Thành Tp.HCM - HN', 'Ngoại Thành Tp.HCM - HN',
-            'Nội Miền', 'Cận Miền', 'Cách Miền',
-            'Nội Miền Tp.HCM - HN', 'Liên Miền Tp.HCM - HN', 'Liên Miền Đặc Biệt'
-        ],
+        value_vars=list(MAPPING_ORDER_TYPE_ID.keys()),
         var_name='order_type', value_name='service_fee'
     )
 
