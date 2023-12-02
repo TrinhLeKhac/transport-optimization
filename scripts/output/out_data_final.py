@@ -16,6 +16,7 @@ FINAL_FULL_COLS = [
     'weight', 'service_fee', 'delivery_type',
     'carrier_status', 'carrier_status_comment',
     'estimate_delivery_time_details', 'estimate_delivery_time',
+    'total_order',
     'delivery_success_rate', 'delivery_success_rate_id',
     'customer_best_carrier_id',
     'partner_best_carrier_id', 'score', 'star',
@@ -29,6 +30,7 @@ FINAL_FULL_COLS_RENAMED = [
     'weight', 'price', 'pickup_type',
     'status', 'description',
     'time_data', 'time_display',
+    'total_order',
     'rate', 'rate_ranking',
     'for_shop',
     'for_partner', 'score', 'star',
@@ -37,14 +39,14 @@ FINAL_FULL_COLS_RENAMED = [
 FINAL_COLS = [
     'order_id', 'carrier_id', 'order_type_id', 'sys_order_type_id', 'service_fee',
     'carrier_status', 'carrier_status_comment',
-    'estimate_delivery_time_details', 'estimate_delivery_time', 'delivery_success_rate',
+    'estimate_delivery_time_details', 'estimate_delivery_time', 'total_order', 'delivery_success_rate',
     'customer_best_carrier_id', 'partner_best_carrier_id', 'score', 'star',
     'cheapest_carrier_id', 'fastest_carrier_id', 'highest_score_carrier_id',
 ]
 FINAL_COLS_RENAMED = [
     'order_code', 'carrier_id', 'new_type', 'route_type', 'price',
     'status', 'description',
-    'time_data', 'time_display', 'rate',
+    'time_data', 'time_display', 'total_order', 'rate',
     'for_shop', 'for_partner', 'score', 'star',
     'price_ranking', 'speed_ranking', 'score_ranking',
 ]
@@ -220,7 +222,7 @@ def combine_info_from_api(input_df, show_logs=False):
     ]
     result_df = (
         input_df.merge(
-            api_data_final, 
+            api_data_final,
             on=['receiver_province_id', 'receiver_district_id', 'carrier_id', 'order_type_id'], how='left'
         )
     )
@@ -437,7 +439,7 @@ def out_data_final(input_df=None, carriers=ACTIVE_CARRIER, show_logs=False):
         final_df.to_parquet(ROOT_PATH + '/output/data_check_output.parquet')
     else:
         final_df = final_df[FINAL_COLS]
-        final_df.columns=FINAL_COLS_RENAMED
+        final_df.columns = FINAL_COLS_RENAMED
     print('-' * 100)
 
     return final_df
