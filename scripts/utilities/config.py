@@ -276,7 +276,7 @@ TRONG_SO = {
 MAPPING_TIEU_CHI_ID = {
     'Ngưng giao nhận': 1, 
     'Đánh giá ZNS': 2, 
-    'Tỉ lệ hoàn hàng': 3,
+    'Tỉ lệ giao hàng': 3,
     'Chất lượng nội bộ': 4,
     'Thời gian giao hàng': 5,
     'Có kho giao nhận': 6,  
@@ -295,10 +295,24 @@ MAPPING_ORDER_TYPE_ID = {
     'Liên Miền Đặc Biệt': 10,
 }
 
+MAPPING_ORDER_TYPE_ID_ROUTE_TYPE = {
+    1: 5,
+    2: 5,
+    3: 1,
+    4: 1,
+    5: 6,
+    6: 7,
+    7: 7,
+    8: 3,
+    9: 4,
+    10: 2
+}
+
 OVERLOADING_SCORE_DICT = {
     'Ngưng giao nhận': [-10],
     'Đánh giá ZNS': [-8, -10],
-    'Tỉ lệ hoàn hàng': [-10],
+    'Tỉ lệ giao hàng': [-10],
+    'Chất lượng nội bộ': [-6],
     'Thời gian giao hàng': [-10],
     'Có kho giao nhận': [-10]
 }

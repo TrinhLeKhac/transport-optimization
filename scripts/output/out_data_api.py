@@ -8,8 +8,10 @@ from scripts.utilities.config import *
 from scripts.transform.total_transform import total_transform
 
 API_FULL_COLS = [
-    'receiver_province_id', 'receiver_province', 'receiver_district_id', 'receiver_district',
-    'carrier_id', 'carrier', 'order_type', 'order_type_id', 'carrier_status', 'carrier_status_comment',
+    'receiver_province_id', 'receiver_province',
+    'receiver_district_id', 'receiver_district',
+    'carrier_id', 'carrier', 'order_type',
+    'order_type_id', 'sys_order_type_id', 'carrier_status', 'carrier_status_comment',
     'estimate_delivery_time_details', 'estimate_delivery_time',
     'customer_best_carrier_id',
     'fastest_carrier_id', 'highest_score_carrier_id',
@@ -20,7 +22,7 @@ API_FULL_COLS_RENAMED = [
     'receiver_province_code', 'receiver_province', 
     'receiver_district_code', 'receiver_district',
     'carrier_id', 'carrier', 'order_type', 
-    'new_type', 'status', 'description',
+    'new_type', 'route_type', 'status', 'description',
     'time_data', 'time_display',
     'for_shop',
     'speed_ranking', 'score_ranking',
@@ -30,7 +32,7 @@ API_FULL_COLS_RENAMED = [
 
 API_COLS = [
     'receiver_province_id', 'receiver_district_id',
-    'carrier_id', 'order_type_id', 'carrier_status', 'carrier_status_comment',
+    'carrier_id', 'order_type_id', 'sys_order_type_id', 'carrier_status', 'carrier_status_comment',
     'estimate_delivery_time_details', 'estimate_delivery_time',
     'fastest_carrier_id', 'highest_score_carrier_id',
     'customer_best_carrier_id', 'total_order', 'delivery_success_rate_id',
@@ -39,7 +41,7 @@ API_COLS = [
 
 API_COLS_RENAMED = [
     'receiver_province_code', 'receiver_district_code',
-    'carrier_id', 'new_type', 'status', 'description',
+    'carrier_id', 'new_type', 'route_type', 'status', 'description',
     'time_data', 'time_display',
     'speed_ranking', 'score_ranking',
     'for_shop', 'total_order', 'rate_ranking',
@@ -47,22 +49,18 @@ API_COLS_RENAMED = [
 ]
 
 THOI_GIAN_GIAO_HANG_DEFAULT = {
-    'Nội Miền': '1.75 - 2.25 ngày',
-    'Cận Miền': '2.75 - 3.25 ngày',
-    'Cách Miền': '3.75 - 4.25 ngày',
     'Nội Thành Tỉnh': '1.75 - 2.25 ngày',
     'Ngoại Thành Tỉnh': '1.75 - 2.25 ngày',
     'Nội Thành Tp.HCM - HN': '1.75 - 2.25 ngày',
     'Ngoại Thành Tp.HCM - HN': '1.75 - 2.25 ngày',
+    'Nội Miền Tp.HCM - HN': '0.75 - 1.25 ngày',
+    'Nội Miền': '1.75 - 2.25 ngày',
+    'Cận Miền': '2.75 - 3.25 ngày',
+    'Liên Miền Tp.HCM - HN': '2.75 - 3.25 ngày',
+    'Liên Miền Đặc Biệt': '2.75 - 3.25 ngày',
+    'Cách Miền': '3.75 - 4.25 ngày',
 }
 
-
-# def round_value(x):
-#     round_05 = int(x) + 0.5
-#     if x < round_05:
-#         return '{} - {} ngày'.format(round_05, round_05 + 0.5)
-#     else:
-#         return '{} - {} ngày'.format(round_05 + 0.5, round_05 + 1)
 
 def round_value(x):
     th1 = round(x - 0.25, 1)
@@ -139,18 +137,22 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
             'carrier_status_comment'] == 'Loại', 'carrier_status_comment'] = 'Tổng số đánh giá ZNS 1, 2 sao >= 30% tổng đơn'
 
     qua_tai3 = ti_le_giao_hang.loc[
-        ti_le_giao_hang['score'].isin(OVERLOADING_SCORE_DICT['Tỉ lệ hoàn hàng'])]
+        ti_le_giao_hang['score'].isin(OVERLOADING_SCORE_DICT['Tỉ lệ giao hàng'])]
     qua_tai3 = qua_tai3[['receiver_province', 'receiver_district', 'carrier', 'status']].rename(
         columns={'status': 'carrier_status_comment'})
 
-    qua_tai4 = thoi_gian_giao_hang.loc[thoi_gian_giao_hang['score'].isin(OVERLOADING_SCORE_DICT['Thời gian giao hàng'])]
-    qua_tai4['carrier_status_comment'] = qua_tai4['status'] + ' (' + qua_tai4['order_type'] + ')'
+    qua_tai4 = chat_luong_noi_bo.loc[chat_luong_noi_bo['score'].isin(OVERLOADING_SCORE_DICT['Chất lượng nội bộ'])]
+    qua_tai4['carrier_status_comment'] = qua_tai4['status'] + ' (clnb)'
     qua_tai4 = qua_tai4[['receiver_province', 'receiver_district', 'carrier', 'carrier_status_comment']]
 
-    qua_tai5 = kho_giao_nhan.loc[kho_giao_nhan['score'].isin(OVERLOADING_SCORE_DICT['Có kho giao nhận'])]
-    qua_tai5 = qua_tai5[['receiver_province', 'receiver_district', 'carrier', 'status']].rename(
+    qua_tai5 = thoi_gian_giao_hang.loc[thoi_gian_giao_hang['score'].isin(OVERLOADING_SCORE_DICT['Thời gian giao hàng'])]
+    qua_tai5['carrier_status_comment'] = qua_tai5['status'] + ' (' + qua_tai5['order_type'] + ')'
+    qua_tai5 = qua_tai5[['receiver_province', 'receiver_district', 'carrier', 'carrier_status_comment']]
+
+    qua_tai6 = kho_giao_nhan.loc[kho_giao_nhan['score'].isin(OVERLOADING_SCORE_DICT['Có kho giao nhận'])]
+    qua_tai6 = qua_tai6[['receiver_province', 'receiver_district', 'carrier', 'status']].rename(
         columns={'status': 'carrier_status_comment'})
-    qua_tai = pd.concat([qua_tai1, qua_tai2, qua_tai3, qua_tai4, qua_tai5])
+    qua_tai = pd.concat([qua_tai1, qua_tai2, qua_tai3, qua_tai4, qua_tai5, qua_tai6])
 
     qua_tai = (
         qua_tai.groupby([
@@ -173,7 +175,7 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
     })
     loai_van_chuyen_df = pd.DataFrame(THOI_GIAN_GIAO_HANG_DEFAULT.items(),
                                       columns=['order_type', 'default_delivery_time'])
-    loai_van_chuyen_df['default_delivery_time_details'] = [2, 3, 4, 2, 2, 2, 2]
+    loai_van_chuyen_df['default_delivery_time_details'] = [2, 2, 2, 2, 1, 2, 3, 3, 3, 4]
 
     thoi_gian_giao_hang_default = (
         PROVINCE_MAPPING_DISTRICT_DF[['province', 'district']].rename(columns={
@@ -224,12 +226,6 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
     score_final.loc[score_final['score'] > q_upper, 'score'] = q_upper
     score_final['score'] = (score_final['score'] - q_lower) / (q_upper - q_lower)
     score_final['score'] = np.round(score_final['score'], 2)
-
-    # score_final['stars'] = 1
-    # score_final.loc[score_final['score'] > 0.15, 'stars'] = 2
-    # score_final.loc[score_final['score'] > 0.3, 'stars'] = 3
-    # score_final.loc[score_final['score'] > 0.5, 'stars'] = 4
-    # score_final.loc[score_final['score'] > 0.8, 'stars'] = 5
 
     if show_logs:
         print('5. Combine api data')
@@ -293,8 +289,10 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
 
     api_data_final = api_data_final.merge(zns_df, on=['receiver_province', 'receiver_district', 'carrier'], how='left')
     api_data_final['star'] = api_data_final['star'].fillna(5.0)
+    api_data_final['sys_order_type_id'] = api_data_final['order_type_id'].map(MAPPING_ORDER_TYPE_ID_ROUTE_TYPE)
     api_data_final['carrier_status'] = api_data_final['carrier_status'].astype(str)
     api_data_final['order_type_id'] = api_data_final['order_type_id'].astype(str)
+    api_data_final['sys_order_type_id'] = api_data_final['sys_order_type_id'].astype(str)
 
     if return_full_cols_df:
         api_data_final = api_data_final[API_FULL_COLS]
