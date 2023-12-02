@@ -230,6 +230,9 @@ MAPPING_ORDER_TYPE_ID = {
     'Nội Miền': 5,
     'Cận Miền': 6,
     'Cách Miền': 7,
+    'Nội Miền Tp.HCM - HN': 8,
+    'Liên Miền Tp.HCM - HN': 9,
+    'Liên Miền Đặc Biệt': 10,
 }
 
 OVERLOADING_SCORE_DICT = {

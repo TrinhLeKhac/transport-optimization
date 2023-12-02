@@ -7,88 +7,11 @@ from scripts.utilities.helper import *
 from scripts.utilities.config import *
 
 
-# def type_of_delivery(s):
-#     if ((s['sender_outer_region_id'] == 0) & (s['receiver_outer_region_id'] == 2)) \
-#             | ((s['sender_outer_region_id'] == 2) & (s['receiver_outer_region_id'] == 0)):
-#         return 7
-#     elif ((s['sender_outer_region_id'] == 0) & (s['receiver_outer_region_id'] == 1)) \
-#             | ((s['sender_outer_region_id'] == 1) & (s['receiver_outer_region_id'] == 2)) \
-#             | ((s['sender_outer_region_id'] == 1) & (s['receiver_outer_region_id'] == 0)) \
-#             | ((s['sender_outer_region_id'] == 2) & (s['receiver_outer_region_id'] == 1)):
-#         return 6
-#     elif s['sender_province_id'] != s['receiver_province_id']:
-#         return 5
-#     elif (s['receiver_inner_region_id'] == 0) \
-#             & (s['receiver_province_id'] in ['79', '01']):
-#         return 3
-#     elif (s['receiver_inner_region_id'] == 0) \
-#             & (s['receiver_province_id'] not in ['79', '01']):
-#         return 1
-#     elif (s['receiver_inner_region_id'] == 1) \
-#             & (s['receiver_province_id'] in ['79', '01']):
-#         return 4
-#     elif (s['receiver_inner_region_id'] == 1) \
-#             & (s['receiver_province_id'] not in ['79', '01']):
-#         return 2
-
-
-# def type_of_system_delivery(s):
-#     if (s['sender_province_id'] in ['79', '01']) \
-#             & (s['sender_province_id'] == s['receiver_province_id']):
-#         return 1
-#     elif ((s['sender_province_id'] == '79') & (
-#             s['receiver_province_id'] in ['01', '48'])) \
-#             | ((s['sender_province_id'] == '01') & (
-#             s['receiver_province_id'] in ['79', '48'])) \
-#             | ((s['receiver_province_id'] == '79') & (
-#             s['sender_province_id'] in ['01', '48'])) \
-#             | ((s['receiver_province_id'] == '01') & (
-#             s['sender_province_id'] in ['79', '48'])):
-#         return 2
-#     elif ((s['sender_province_id'] == '79') & (s['receiver_outer_region_id'] == 2)) \
-#             | ((s['sender_province_id'] == '01') & (s['receiver_outer_region_id'] == 0)) \
-#             | ((s['receiver_province_id'] == '79') & (s['sender_outer_region_id'] == 2)) \
-#             | ((s['receiver_province_id'] == '01') & (s['sender_outer_region_id'] == 0)):
-#         return 3
-#     elif ((s['sender_province_id'] == '79') & (
-#             s['receiver_outer_region_id'] in [0, 1])) \
-#             | (
-#             (s['sender_province_id'] == '01') & (s['receiver_outer_region_id'] in [1, 2])) \
-#             | ((s['receiver_province_id'] == '79') & (
-#             s['sender_outer_region_id'] in [0, 1])) \
-#             | (
-#             (s['receiver_province_id'] == '01') & (s['sender_outer_region_id'] in [1, 2])):
-#         return 4
-#     elif s['sender_province_id'] == s['receiver_province_id']:
-#         return 5
-#     elif s['sender_outer_region_id'] == s['receiver_outer_region_id']:
-#         return 6
-#     elif ((s['sender_outer_region_id'] == 0) & (s['receiver_outer_region_id'] in [1, 2])) \
-#             | ((s['sender_outer_region_id'] == 1) & (s['receiver_outer_region_id'] in [0, 2])) \
-#             | ((s['sender_outer_region_id'] == 2) & (s['receiver_outer_region_id'] in [0, 1])) \
-#             | ((s['receiver_outer_region_id'] == 0) & (s['sender_outer_region_id'] in [1, 2])) \
-#             | ((s['receiver_outer_region_id'] == 1) & (s['sender_outer_region_id'] in [0, 2])) \
-#             | ((s['receiver_outer_region_id'] == 2) & (s['sender_outer_region_id'] in [0, 1])):
-#         return 7
-
 def out_data_order_type(show_logs=True):
 
     if show_logs:
         print('1. Xử lý data phân vùng nhà vận chuyển...')
     phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
-    phan_vung_nvc = (
-        phan_vung_nvc
-            .merge(
-            PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                'province_id': 'receiver_province_id',
-                'district_id': 'receiver_district_id',
-                'province': 'receiver_province',
-                'district': 'receiver_district'
-            }), on=['receiver_province', 'receiver_district'], how='left')
-    )
-    phan_vung_nvc['outer_region_id'] = phan_vung_nvc['outer_region'].map({'Miền Bắc': 0, 'Miền Trung': 1, 'Miền Nam': 2})
-    phan_vung_nvc['inner_region_id'] = phan_vung_nvc['inner_region'].map({'Nội Thành': 0, 'Ngoại Thành': 1})
-    phan_vung_nvc['carrier_id'] = phan_vung_nvc['carrier'].map(MAPPING_CARRIER_ID)
     phan_vung_nvc = phan_vung_nvc[['carrier_id', 'receiver_province_id', 'receiver_district_id', 'outer_region_id', 'inner_region_id']]
 
     if show_logs:

@@ -33,7 +33,26 @@ def convert_datetime_type2(s):
 
 
 def type_of_delivery(s):
-    if ((s['sender_outer_region'] == 'Miền Bắc') & (s['receiver_outer_region'] == 'Miền Nam')) \
+    if ((s['sender_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['receiver_province'] in ['Thành phố Hà Nội', 'Thành phố Đà Nẵng'])) \
+            | ((s['sender_province'] == 'Thành phố Hà Nội') & (
+            s['receiver_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Đà Nẵng'])) \
+            | ((s['receiver_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['sender_province'] in ['Thành phố Hà Nội', 'Thành phố Đà Nẵng'])) \
+            | ((s['receiver_province'] == 'Thành phố Hà Nội') & (
+            s['sender_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Đà Nẵng'])):
+        return 'Liên Miền Đặc Biệt'
+    elif ((s['sender_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['receiver_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
+            | (
+            (s['sender_province'] == 'Thành phố Hà Nội') & (s['receiver_outer_region'] in ['Miền Trung', 'Miền Nam'])) \
+            | ((s['receiver_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['sender_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
+            | (
+            (s['receiver_province'] == 'Thành phố Hà Nội') & (s['sender_outer_region'] in ['Miền Trung', 'Miền Nam'])):
+        return 'Liên Miền Tp.HCM - HN'
+
+    elif ((s['sender_outer_region'] == 'Miền Bắc') & (s['receiver_outer_region'] == 'Miền Nam')) \
             | ((s['sender_outer_region'] == 'Miền Nam') & (s['receiver_outer_region'] == 'Miền Bắc')):
         return 'Cách Miền'
     elif ((s['sender_outer_region'] == 'Miền Bắc') & (s['receiver_outer_region'] == 'Miền Trung')) \
@@ -41,6 +60,10 @@ def type_of_delivery(s):
             | ((s['sender_outer_region'] == 'Miền Trung') & (s['receiver_outer_region'] == 'Miền Bắc')) \
             | ((s['sender_outer_region'] == 'Miền Nam') & (s['receiver_outer_region'] == 'Miền Trung')):
         return 'Cận Miền'
+    elif ((s['sender_province'] != s['receiver_province'])
+          & ((s['sender_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội'])
+             | (s['receiver_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội']))):
+        return 'Nội Miền Tp.HCM - HN'
     elif s['sender_province'] != s['receiver_province']:
         return 'Nội Miền'
     elif (s['receiver_inner_region'] == 'Nội Thành') \
@@ -75,21 +98,25 @@ def type_of_system_delivery(s):
             | ((s['receiver_province'] == 'Thành phố Hồ Chí Minh') & (s['sender_outer_region'] == 'Miền Nam')) \
             | ((s['receiver_province'] == 'Thành phố Hà Nội') & (s['sender_outer_region'] == 'Miền Bắc')):
         return 3
-    elif ((s['sender_province'] == 'Thành phố Hồ Chí Minh') & (s['receiver_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
-            | ((s['sender_province'] == 'Thành phố Hà Nội') & (s['receiver_outer_region'] in ['Miền Trung', 'Miền Nam'])) \
-            | ((s['receiver_province'] == 'Thành phố Hồ Chí Minh') & (s['sender_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
-            | ((s['receiver_province'] == 'Thành phố Hà Nội') & (s['sender_outer_region'] in ['Miền Trung', 'Miền Nam'])):
+    elif ((s['sender_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['receiver_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
+            | (
+            (s['sender_province'] == 'Thành phố Hà Nội') & (s['receiver_outer_region'] in ['Miền Trung', 'Miền Nam'])) \
+            | ((s['receiver_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['sender_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
+            | (
+            (s['receiver_province'] == 'Thành phố Hà Nội') & (s['sender_outer_region'] in ['Miền Trung', 'Miền Nam'])):
         return 4
     elif s['sender_province'] == s['receiver_province']:
         return 5
     elif s['sender_outer_region'] == s['receiver_outer_region']:
         return 6
     elif ((s['sender_outer_region'] == 'Miền Bắc') & (s['receiver_outer_region'] in ['Miền Trung', 'Miền Nam'])) \
-        | ((s['sender_outer_region'] == 'Miền Trung') & (s['receiver_outer_region'] in ['Miền Bắc', 'Miền Nam'])) \
-        | ((s['sender_outer_region'] == 'Miền Nam') & (s['receiver_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
-        | ((s['receiver_outer_region'] == 'Miền Bắc') & (s['sender_outer_region'] in ['Miền Trung', 'Miền Nam'])) \
-        | ((s['receiver_outer_region'] == 'Miền Trung') & (s['sender_outer_region'] in ['Miền Bắc', 'Miền Nam'])) \
-        | ((s['receiver_outer_region'] == 'Miền Nam') & (s['sender_outer_region'] in ['Miền Bắc', 'Miền Trung'])):
+            | ((s['sender_outer_region'] == 'Miền Trung') & (s['receiver_outer_region'] in ['Miền Bắc', 'Miền Nam'])) \
+            | ((s['sender_outer_region'] == 'Miền Nam') & (s['receiver_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
+            | ((s['receiver_outer_region'] == 'Miền Bắc') & (s['sender_outer_region'] in ['Miền Trung', 'Miền Nam'])) \
+            | ((s['receiver_outer_region'] == 'Miền Trung') & (s['sender_outer_region'] in ['Miền Bắc', 'Miền Nam'])) \
+            | ((s['receiver_outer_region'] == 'Miền Nam') & (s['sender_outer_region'] in ['Miền Bắc', 'Miền Trung'])):
         return 7
 
 
@@ -226,6 +253,7 @@ def tong_hop_thong_tin_giao_dich():
 
     print('Tính toán loại vận chuyển từ địa chỉ giao và nhận...')
     phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
+    phan_vung_nvc = phan_vung_nvc[['carrier', 'receiver_province', 'receiver_district', 'outer_region', 'inner_region']]
     giao_dich_valid = (
         giao_dich_valid.merge(
             phan_vung_nvc.rename(columns={
@@ -258,3 +286,7 @@ def tong_hop_thong_tin_giao_dich():
 
     print('Lưu thông tin...')
     giao_dich_valid.to_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet', index=False)
+
+
+if __name__ == '__main__':
+    tong_hop_thong_tin_giao_dich()
