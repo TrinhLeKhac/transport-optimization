@@ -141,8 +141,19 @@ def score_thoi_gian_giao_hang(tong_don, thoi_gian_giao_tb, loai_van_chuyen):
 
     # group 3 (Nội Tỉnh)
     if loai_van_chuyen in ['Nội Thành Tỉnh', 'Ngoại Thành Tỉnh', 'Nội Thành Tp.HCM - HN', 'Ngoại Thành Tp.HCM - HN']:
+        # thời gian giao trung bình < 24h
+        if (tong_don > 30) and (thoi_gian_giao_tb < 24):
+            return 'Trung bình dưới 24h và tổng số đơn giao hàng lớn hơn 30 đơn'
+        elif (tong_don > 20) and (thoi_gian_giao_tb < 24):
+            return 'Trung bình dưới 24h và tổng số đơn giao hàng lớn hơn 20 đơn'
+        elif (tong_don > 10) and (thoi_gian_giao_tb < 24):
+            return 'Trung bình dưới 24h và tổng số đơn giao hàng lớn hơn 10 đơn'
+        elif (tong_don > 5) and (thoi_gian_giao_tb < 24):
+            return 'Trung bình dưới 24h và tổng số đơn giao hàng lớn hơn 5 đơn'
+        elif (tong_don <= 5) and (thoi_gian_giao_tb < 24):
+            return 'Trung bình dưới 24h và tổng số đơn giao hàng bé hơn hoặc bằng 5 đơn'
         # thời gian giao trung bình < 48h
-        if (tong_don > 30) and (thoi_gian_giao_tb < 48):
+        elif (tong_don > 30) and (thoi_gian_giao_tb < 48):
             return 'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 30 đơn'
         elif (tong_don > 20) and (thoi_gian_giao_tb < 48):
             return 'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 20 đơn'
@@ -152,24 +163,13 @@ def score_thoi_gian_giao_hang(tong_don, thoi_gian_giao_tb, loai_van_chuyen):
             return 'Trung bình dưới 48h và tổng số đơn giao hàng lớn hơn 5 đơn'
         elif (tong_don <= 5) and (thoi_gian_giao_tb < 48):
             return 'Trung bình dưới 48h và tổng số đơn giao hàng bé hơn hoặc bằng 5 đơn'
-        # thời gian giao trung bình < 72h
-        elif (tong_don > 30) and (thoi_gian_giao_tb < 72):
-            return 'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 30 đơn'
-        elif (tong_don > 20) and (thoi_gian_giao_tb < 72):
-            return 'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 20 đơn'
-        elif (tong_don > 10) and (thoi_gian_giao_tb < 72):
-            return 'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 10 đơn'
-        elif (tong_don > 5) and (thoi_gian_giao_tb < 72):
-            return 'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 5 đơn'
-        elif (tong_don <= 5) and (thoi_gian_giao_tb < 72):
-            return 'Trung bình dưới 72h và tổng số đơn giao hàng bé hơn hoặc bằng 5 đơn'
         # trễ
-        elif (tong_don > 3) and (thoi_gian_giao_tb < 96):
-            return 'Trung bình dưới 96h và tổng số đơn giao hàng lớn hơn 3 đơn'
-        elif (tong_don <= 3) and (thoi_gian_giao_tb < 96):
-            return 'Trung bình dưới 96h và tổng số đơn giao hàng bé hơn hoặc bằng 3 đơn'
-        elif thoi_gian_giao_tb >= 96:
-            return 'Trung bình thời gian giao hàng lớn hơn hoặc bằng 96h'
+        elif (tong_don > 3) and (thoi_gian_giao_tb < 72):
+            return 'Trung bình dưới 72h và tổng số đơn giao hàng lớn hơn 3 đơn'
+        elif (tong_don <= 3) and (thoi_gian_giao_tb < 72):
+            return 'Trung bình dưới 72h và tổng số đơn giao hàng bé hơn hoặc bằng 3 đơn'
+        elif thoi_gian_giao_tb >= 72:
+            return 'Trung bình thời gian giao hàng lớn hơn hoặc bằng 72h'
 
 
 def transform_data_thoi_gian_giao_hang_toan_trinh():
