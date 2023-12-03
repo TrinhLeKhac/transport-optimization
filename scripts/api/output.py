@@ -7,12 +7,13 @@ from scripts.database import models
 
 
 class OutputModel(BaseModel):
-    id: conint(strict=True)
+    # id: conint(strict=True)
     receiver_province_code: constr(strict=True)
     receiver_district_code: constr(strict=True)
     carrier_id: conint(strict=True)
-    new_type: conint(strict=True)
-    status: conint(strict=True)
+    new_type: constr(strict=True)
+    route_type: constr(strict=True)
+    status: constr(strict=True)
     description: constr(strict=True)
     time_data: confloat(strict=True)
     time_display: constr(strict=True)
@@ -20,11 +21,11 @@ class OutputModel(BaseModel):
     score_ranking: conint(strict=True)
     for_shop: conint(strict=True)
     total_order: conint(strict=True)
+    # rate_ranking: conint(strict=True)
     rate: confloat(strict=True)
     score: confloat(strict=True)
     star: confloat(strict=True)
-
-    # import_date: str
+    # import_date: constr(strict=True)
 
     class Config:
         orm_mode = True
