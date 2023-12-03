@@ -7,7 +7,7 @@ def st_get_province_mapping_district():
     return pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
 
 
-def _get_data_viz(target_df, threshold=0.6):
+def _get_data_viz_p1(target_df, threshold=0.6):
     good_df = target_df.loc[target_df['score'] >= threshold].sort_values(['order_code', 'price'],
                                                                          ascending=[True, True]).drop_duplicates(
         'order_code', keep='first')
@@ -41,13 +41,59 @@ def _get_data_viz(target_df, threshold=0.6):
     return analyze_df
 
 
-def get_data_viz(target_df):
+def get_data_viz_p1(target_df):
     thresholds = np.linspace(0.5, 1, 101)
     analyze_df_list = []
 
     for th in thresholds:
         print('Threshold: ', th)
-        analyze_df = _get_data_viz(target_df, th)
+        analyze_df = _get_data_viz_p1(target_df, th)
+        analyze_df_list.append(analyze_df)
+        print('-' * 100)
+    total_analyze_df = pd.concat(analyze_df_list, ignore_index=True)
+
+    return total_analyze_df
+
+
+def _get_data_viz_p2(target_df, threshold=0.6):
+    good_df = target_df.loc[target_df['score'] >= threshold].sort_values(['order_code', 'price'],
+                                                                         ascending=[True, True]).drop_duplicates(
+        'order_code', keep='first')
+    good_df['quality'] = 'good'
+    bad_df = target_df.loc[target_df['score'] < threshold].sort_values(['order_code', 'score'],
+                                                                       ascending=[True, False]).drop_duplicates(
+        'order_code', keep='first')
+    bad_filter_df = bad_df.loc[~bad_df['order_code'].isin(good_df['order_code'])]
+    bad_filter_df['quality'] = 'bad'
+
+    print(f'n_order >= threshold: {len(good_df)}')
+    print(f'n_order < threshold: {len(bad_filter_df)}')
+
+    result_df = pd.concat([good_df, bad_filter_df], ignore_index=True)
+
+    analyze_df = (
+        result_df
+            .groupby(['carrier', 'quality'])
+            .agg(
+            n_orders=('order_code', 'count'),
+            monetary=('price', 'sum')).reset_index()
+    )
+    analyze_df['score'] = threshold
+    analyze_df = analyze_df[[
+        'score', 'carrier', 'quality',
+        'n_orders', 'monetary'
+    ]]
+
+    return analyze_df
+
+
+def get_data_viz_p2(target_df):
+    thresholds = np.linspace(0.5, 1, 101)
+    analyze_df_list = []
+
+    for th in thresholds:
+        print('Threshold: ', th)
+        analyze_df = _get_data_viz_p2(target_df, th)
         analyze_df_list.append(analyze_df)
         print('-' * 100)
     total_analyze_df = pd.concat(analyze_df_list, ignore_index=True)
@@ -56,9 +102,16 @@ def get_data_viz(target_df):
 
 
 @st.cache_data
-def st_get_data_viz():
+def st_get_data_viz_p1():
     data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_check_output.parquet')
-    viz_df = get_data_viz(data_history_df)
+    viz_df = get_data_viz_p1(data_history_df)
+    return viz_df
+
+
+@st.cache_data
+def st_get_data_viz_p2():
+    data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_check_output.parquet')
+    viz_df = get_data_viz_p2(data_history_df)
     return viz_df
 
 
