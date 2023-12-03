@@ -3,8 +3,8 @@ from scripts.api.result import execute_query
 
 
 def create_customer_tab():
-    toggle2 = st.toggle('Thông tin')
-    if toggle2:
+    toggle = st.toggle('Thông tin', key='toggle_customer_tab')
+    if toggle:
         st.markdown(
             """
             **Show thông tin trả về từ API**

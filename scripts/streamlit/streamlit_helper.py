@@ -1,16 +1,65 @@
 from scripts.utilities.helper import *
 from scripts.database.helper import *
-from scripts.api.result import ResultModel
-
-
-@st.cache_data
-def st_get_data_api_final():
-    return pd.read_parquet(ROOT_PATH + '/output/data_check_output_backup.parquet')
 
 
 @st.cache_data
 def st_get_province_mapping_district():
     return pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
+
+
+def _get_data_viz(target_df, threshold=0.6):
+    good_df = target_df.loc[target_df['score'] >= threshold].sort_values(['order_code', 'price'],
+                                                                         ascending=[True, True]).drop_duplicates(
+        'order_code', keep='first')
+    bad_df = target_df.loc[target_df['score'] < threshold].sort_values(['order_code', 'score'],
+                                                                       ascending=[True, False]).drop_duplicates(
+        'order_code', keep='first')
+    bad_filter_df = bad_df.loc[~bad_df['order_code'].isin(good_df['order_code'])]
+
+    print(f'n_order >= threshold: {len(good_df)}')
+    print(f'n_order < threshold: {len(bad_filter_df)}')
+
+    result_df = pd.concat([good_df, bad_filter_df], ignore_index=True)
+    monetary = result_df['price'].sum()
+
+    err_df = result_df.loc[result_df['status'].isin(['1', '2'])]
+    err_df['error_type'] = err_df['description'].str.split(r' \+ ')
+    err_df = err_df.explode('error_type')
+    analyze_df = err_df.groupby(['carrier', 'error_type', 'order_type'])['order_code'].count().rename(
+        'n_errors').reset_index()
+
+    analyze_df['score'] = threshold
+    analyze_df['monetary'] = monetary
+    analyze_df['n_good_order'] = len(good_df)
+    analyze_df['n_bad_order'] = len(bad_filter_df)
+    analyze_df['total_error'] = len(err_df)
+    analyze_df = analyze_df[[
+        'score', 'monetary', 'n_good_order', 'n_bad_order', 'total_error',
+        'carrier', 'error_type', 'order_type', 'n_errors'
+    ]]
+
+    return analyze_df
+
+
+def get_data_viz(target_df):
+    thresholds = np.linspace(0.5, 1, 101)
+    analyze_df_list = []
+
+    for th in thresholds:
+        print('Threshold: ', th)
+        analyze_df = _get_data_viz(target_df, th)
+        analyze_df_list.append(analyze_df)
+        print('-' * 100)
+    total_analyze_df = pd.concat(analyze_df_list, ignore_index=True)
+
+    return total_analyze_df
+
+
+@st.cache_data
+def st_get_data_viz():
+    data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_check_output.parquet')
+    viz_df = get_data_viz(data_history_df)
+    return viz_df
 
 
 # function support streamlit render
@@ -21,11 +70,10 @@ def save_uploaded_file(uploaded_file, folder):
 
 
 def get_st_dataframe_from_db(
-    sender_province_code, sender_district_code,
-    receiver_province_code, receiver_district_code,
-    weight, pickup
+        sender_province_code, sender_district_code,
+        receiver_province_code, receiver_district_code,
+        weight, pickup
 ):
-
     # Create connection
     connection = psycopg2.connect(
         settings.SQLALCHEMY_DATABASE_URI

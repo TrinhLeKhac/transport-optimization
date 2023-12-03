@@ -10,8 +10,8 @@ def create_manual_tab():
     )
 
     if 'File Excel' in option:
-        toggle1 = st.toggle('Hướng dẫn')
-        if toggle1:
+        toggle = st.toggle('Hướng dẫn', key='toggle_manual_tab')
+        if toggle:
             st.markdown(
                 """
                 **Import đầy đủ các files chứa các thông tin cần thiết sau**
