@@ -7,55 +7,7 @@ def st_get_province_mapping_district():
     return pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
 
 
-def _get_data_viz_p1(target_df, threshold=0.6):
-    good_df = target_df.loc[target_df['score'] >= threshold].sort_values(['order_code', 'price'],
-                                                                         ascending=[True, True]).drop_duplicates(
-        'order_code', keep='first')
-    bad_df = target_df.loc[target_df['score'] < threshold].sort_values(['order_code', 'score'],
-                                                                       ascending=[True, False]).drop_duplicates(
-        'order_code', keep='first')
-    bad_filter_df = bad_df.loc[~bad_df['order_code'].isin(good_df['order_code'])]
-
-    print(f'n_order >= threshold: {len(good_df)}')
-    print(f'n_order < threshold: {len(bad_filter_df)}')
-
-    result_df = pd.concat([good_df, bad_filter_df], ignore_index=True)
-    monetary = result_df['price'].sum()
-
-    err_df = result_df.loc[result_df['status'].isin(['1', '2'])]
-    err_df['error_type'] = err_df['description'].str.split(r' \+ ')
-    err_df = err_df.explode('error_type')
-    analyze_df = err_df.groupby(['carrier', 'error_type', 'order_type'])['order_code'].count().rename(
-        'n_errors').reset_index()
-
-    analyze_df['score'] = threshold
-    analyze_df['monetary'] = monetary
-    analyze_df['n_good_order'] = len(good_df)
-    analyze_df['n_bad_order'] = len(bad_filter_df)
-    analyze_df['total_error'] = len(err_df)
-    analyze_df = analyze_df[[
-        'score', 'monetary', 'n_good_order', 'n_bad_order', 'total_error',
-        'carrier', 'error_type', 'order_type', 'n_errors'
-    ]]
-
-    return analyze_df
-
-
-def get_data_viz_p1(target_df):
-    thresholds = np.linspace(0.5, 1, 101)
-    analyze_df_list = []
-
-    for th in thresholds:
-        print('Threshold: ', th)
-        analyze_df = _get_data_viz_p1(target_df, th)
-        analyze_df_list.append(analyze_df)
-        print('-' * 100)
-    total_analyze_df = pd.concat(analyze_df_list, ignore_index=True)
-
-    return total_analyze_df
-
-
-def _get_data_viz_p2(target_df, threshold=0.6):
+def _get_data_viz(target_df, threshold=0.6):
     good_df = target_df.loc[target_df['score'] >= threshold].sort_values(['order_code', 'price'],
                                                                          ascending=[True, True]).drop_duplicates(
         'order_code', keep='first')
@@ -71,47 +23,60 @@ def _get_data_viz_p2(target_df, threshold=0.6):
 
     result_df = pd.concat([good_df, bad_filter_df], ignore_index=True)
 
-    analyze_df = (
-        result_df
-            .groupby(['carrier', 'quality'])
-            .agg(
+    # 1. Data viz_1
+    monetary = result_df['price'].sum()
+
+    err_df = result_df.loc[result_df['status'].isin(['1', '2'])]
+    err_df['error_type'] = err_df['description'].str.split(r' \+ ')
+    err_df = err_df.explode('error_type')
+    analyze_df1 = err_df.groupby(['carrier', 'error_type', 'order_type'])['order_code'].count().rename(
+        'n_errors').reset_index()
+
+    analyze_df1['score'] = threshold
+    analyze_df1['monetary'] = monetary
+    analyze_df1['n_good_order'] = len(good_df)
+    analyze_df1['n_bad_order'] = len(bad_filter_df)
+    analyze_df1['total_error'] = len(err_df)
+    analyze_df1 = analyze_df1[[
+        'score', 'monetary', 'n_good_order', 'n_bad_order', 'total_error',
+        'carrier', 'error_type', 'order_type', 'n_errors'
+    ]]
+    # 2. Data viz_2
+    analyze_df2 = (
+        result_df.groupby(['carrier', 'quality']).agg(
             n_orders=('order_code', 'count'),
-            monetary=('price', 'sum')).reset_index()
+            monetary=('price', 'sum')
+        ).reset_index()
     )
-    analyze_df['score'] = threshold
-    analyze_df = analyze_df[[
+    analyze_df2['score'] = threshold
+    analyze_df2 = analyze_df2[[
         'score', 'carrier', 'quality',
         'n_orders', 'monetary'
     ]]
+    return analyze_df1, analyze_df2
 
-    return analyze_df
 
-
-def get_data_viz_p2(target_df):
+def get_data_viz(target_df):
     thresholds = np.linspace(0.5, 1, 101)
-    analyze_df_list = []
+    analyze_df1_list = []
+    analyze_df2_list = []
 
     for th in thresholds:
         print('Threshold: ', th)
-        analyze_df = _get_data_viz_p2(target_df, th)
-        analyze_df_list.append(analyze_df)
+        analyze_df1, analyze_df2 = _get_data_viz(target_df, th)
+        analyze_df1_list.append(analyze_df1)
+        analyze_df2_list.append(analyze_df2)
         print('-' * 100)
-    total_analyze_df = pd.concat(analyze_df_list, ignore_index=True)
+    total_analyze_df1 = pd.concat(analyze_df1_list, ignore_index=True)
+    total_analyze_df2 = pd.concat(analyze_df2_list, ignore_index=True)
 
-    return total_analyze_df
-
-
-@st.cache_data
-def st_get_data_viz_p1():
-    data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_check_output.parquet')
-    viz_df = get_data_viz_p1(data_history_df)
-    return viz_df
+    return total_analyze_df1, total_analyze_df2
 
 
 @st.cache_data
-def st_get_data_viz_p2():
+def st_get_data_viz():
     data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_check_output.parquet')
-    viz_df = get_data_viz_p2(data_history_df)
+    viz_df = get_data_viz(data_history_df)
     return viz_df
 
 
