@@ -141,19 +141,21 @@ def create_partner_tab():
     interactive = st.container()
     with interactive:
         # 1. Toggle thông tin
-        toggle = st.toggle('Thông tin', key='toggle_partner_tab')
-        if toggle:
-            st.markdown(
+        _, toggle_div, _ = st.columns([1, 2, 1])
+        with toggle_div:
+            toggle = st.toggle('Thông tin', key='toggle_partner_tab')
+            if toggle:
+                st.markdown(
+                    """
+                    **Modules này hỗ trợ chọn score tối ưu vận chuyển một cách trực quan dựa vào thống kê lỗi và chi phí**
+                    * Thông tin:
+                        * Chart tương quan chi phí - lỗi.
+                        * Chart hiển thị lỗi chi tiết của NVC.
+                    * Tiêu chí chọn đơn:
+                        * Nếu tồn tại ít nhất 1 NVC có điểm >= ngưỡng, chọn NVC có cước phí nhỏ nhất.
+                        * Nếu tất cả các NVC có điểm < ngưỡng, chọn NVC có score cao nhất.
                 """
-                **Modules này hỗ trợ chọn score tối ưu vận chuyển một cách trực quan dựa vào thống kê lỗi và chi phí**
-                * Thông tin:
-                    * Chart tương quan chi phí - lỗi.
-                    * Chart hiển thị lỗi chi tiết của NVC.
-                * Tiêu chí chọn đơn:
-                    * Nếu tồn tại ít nhất 1 NVC có điểm >= ngưỡng, chọn NVC có cước phí nhỏ nhất.
-                    * Nếu tất cả các NVC có điểm < ngưỡng, chọn NVC có score cao nhất.
-            """
-            )
+                )
 
         total_analyze_df1, total_analyze_df2 = st_get_data_viz()
 
