@@ -436,7 +436,7 @@ def out_data_final(input_df=None, carriers=ACTIVE_CARRIER, show_logs=False):
         print('Shape: ', final_df.shape)
         if not os.path.exists(ROOT_PATH + '/output'):
             os.makedirs(ROOT_PATH + '/output')
-        final_df.to_parquet(ROOT_PATH + '/output/data_streamlit.parquet')
+        final_df.to_parquet(ROOT_PATH + '/output/data_visualization.parquet')
     else:
         final_df = final_df[FINAL_COLS]
         final_df.columns = FINAL_COLS_RENAMED
