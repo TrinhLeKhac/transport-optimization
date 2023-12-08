@@ -144,7 +144,7 @@ TABLE_SCHEMA = {
         "star": NUMERIC(2, 1),
         "import_date": VARCHAR(length=10),
     },
-    'data_check_output': {
+    'data_streamlit': {
         'id': INTEGER,
         'order_code': VARCHAR(length=30),
         'sender_province_code': VARCHAR(length=2),

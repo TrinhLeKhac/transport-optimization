@@ -75,7 +75,7 @@ def get_data_viz(target_df):
 
 @st.cache_data
 def st_get_data_viz():
-    data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_check_output.parquet')
+    data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_streamlit.parquet')
     viz_df = get_data_viz(data_history_df)
     return viz_df
 

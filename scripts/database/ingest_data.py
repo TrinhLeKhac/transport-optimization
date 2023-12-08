@@ -53,8 +53,8 @@ def ingest_data_to_db():
     print('-' * 100)
 
     print('>>> Ingest data check output')
-    if os.path.exists(ROOT_PATH + '/output/data_check_output.parquet'):
-        check_df = pd.read_parquet(ROOT_PATH + '/output/data_check_output.parquet')
+    if os.path.exists(ROOT_PATH + '/output/data_streamlit.parquet'):
+        check_df = pd.read_parquet(ROOT_PATH + '/output/data_streamlit.parquet')
     else:
         print('>>>>>> Out data check output')
         check_df = out_data_final(show_logs=False)
@@ -62,8 +62,8 @@ def ingest_data_to_db():
     print('>>> Ghi thông tin vào DB')
     check_df = check_df.reset_index().rename(columns={"index": "id"})
     check_df['import_date'] = datetime.now().strftime('%F')
-    check_df.to_sql(name='tbl_data_check_output', con=engine, schema="db_schema", if_exists="replace", index=False,
-                    dtype=TABLE_SCHEMA['data_check_output'])
+    check_df.to_sql(name='tbl_data_streamlit', con=engine, schema="db_schema", if_exists="replace", index=False,
+                    dtype=TABLE_SCHEMA['data_streamlit'])
     print('>>> Done')
 
 
