@@ -106,7 +106,7 @@ TABLE_SCHEMA = {
         'new_type': VARCHAR(length=2),
         'route_type': VARCHAR(length=1),
         'status': VARCHAR(length=1),
-        'description': VARCHAR(length=200),
+        'description': VARCHAR(length=500),
         'time_data': NUMERIC(5, 2),
         'time_display': VARCHAR(length=30),
         'speed_ranking': SMALLINT,
