@@ -1,0 +1,13 @@
+cookie:
+  expiry_seconds: 30
+  key: some_signature_key
+  name: some_cookie_name
+credentials:
+  names:
+    trinh:
+      email: emperorfire52@gmail.com
+      username: trinhlk2
+      password: '123'
+preauthorized:
+  emails:
+    - emperorfire5252@gmail.com
