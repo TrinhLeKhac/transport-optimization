@@ -1,13 +1,13 @@
 cookie:
-  expiry_seconds: 30
+  expiry_seconds: 2*24*60*60
   key: some_signature_key
   name: some_cookie_name
 credentials:
   names:
     trinh:
       email: emperorfire52@gmail.com
-      username: trinhlk2
-      password: '123'
+      username: superai_supership
+      password: Trinh@SuperShip#24
 preauthorized:
   emails:
-    - emperorfire5252@gmail.com
+    - emperorfire5252@gmail.com # Liệt kê các emails có quyền đăng nhập vào phần này
