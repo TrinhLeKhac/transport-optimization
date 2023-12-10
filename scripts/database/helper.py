@@ -39,6 +39,7 @@ def check_tbl_exists_in_postgres(schema_name, table_name, cursor):
                 CREATE TABLE {}.{} (
                     order_code VARCHAR(30),
                     created_at VARCHAR(20),
+                    weight INTEGER,
                     sent_at VARCHAR(20),
                     order_status VARCHAR(30),
                     carrier_id SMALLINT,

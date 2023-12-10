@@ -9,6 +9,7 @@ class OrderModel(BaseModel):
     date: constr(strict=True)
     order_code: constr(strict=True)
     created_at: constr(strict=True)
+    weight: conint(gt=0, strict=True)
     sent_at: constr(strict=True)
     order_status: constr(strict=True)
     carrier_id: conint(strict=True)
