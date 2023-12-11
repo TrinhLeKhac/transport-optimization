@@ -1,5 +1,5 @@
 cookie:
-  expiry_seconds: 2*24*60*60
+  expiry_days: 2
   key: keys123456
   name: streamlit_cookie_name
 credentials:

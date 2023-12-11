@@ -47,7 +47,7 @@ class Authenticator:
         self.emails = [v['email'] for v in self.config['credentials']['names'].values()]
         self.cookie_name = self.config['cookie']['name']
         self.cookie_signature_key = self.config['cookie']['key']
-        self.cookie_expiry_second = self.config['cookie']['expiry_seconds']
+        self.cookie_expiry_day = self.config['cookie']['expiry_days']
         self.cookie_manager = stx.CookieManager()
 
     def _set_exp_date(self) -> int:
@@ -55,7 +55,7 @@ class Authenticator:
         Creates the re-authentication cookie's expiry date.
         """
         expire = int((datetime.now() + timedelta(
-            seconds=self.cookie_expiry_second
+            seconds=self.cookie_expiry_day
         )).strftime("%Y%m%d%H%M%S"))
 
         return expire
@@ -88,7 +88,7 @@ class Authenticator:
         Set cookie for re-authentication.
         """
         self.cookie_manager.set(self.cookie_name, self.encoded_jwt,
-                                expires_at=datetime.now() + timedelta(seconds=self.cookie_expiry_second))
+                                expires_at=datetime.now() + timedelta(seconds=self.cookie_expiry_day))
 
     def _check_cookie(self):
         """
@@ -170,17 +170,6 @@ class Authenticator:
 
                 if login_form.form_submit_button('Login'):
                     self._check_credentials()
-        # print(st.session_state['username'])
-        # print(st.session_state['password'])
-        # print(st.session_state['authentication_status'])
-
-        # if st.session_state["authentication_status"]:
-        #     st.write(f'Welcome *{st.session_state["username"]}*')
-        #     st.title('Some content')
-        # elif st.session_state["authentication_status"] is False:
-        #     st.sidebar.error('Username/password is incorrect')
-        # elif st.session_state["authentication_status"] is None:
-        #     st.sidebar.warning('Please enter your username and password')
 
         return st.session_state['username'], st.session_state['password'], st.session_state['authentication_status']
 
