@@ -1,7 +1,7 @@
 cookie:
   expiry_seconds: 2*24*60*60
-  key: some_signature_key
-  name: some_cookie_name
+  key: keys123456
+  name: streamlit_cookie_name
 credentials:
   names:
     trinh:
