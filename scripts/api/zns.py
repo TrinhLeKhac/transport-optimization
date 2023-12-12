@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Optional
 from pydantic import BaseModel, conint, constr
 from scripts.auth.security import validate_token
 from fastapi import Depends

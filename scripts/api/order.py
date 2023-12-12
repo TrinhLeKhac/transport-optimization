@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, conint, constr
 from scripts.auth.security import validate_token
 from fastapi import Depends
@@ -21,9 +22,9 @@ class OrderModel(BaseModel):
     delivery_count: conint(strict=True)
     pickup: constr(strict=True)
     barter: constr(strict=True)
-    carrier_delivered_at: constr(strict=True)
+    carrier_delivered_at: Optional[constr(strict=True)] = None
     picked_at: constr(strict=True)
-    last_delivering_at: constr(strict=True)
+    last_delivering_at: Optional[constr(strict=True)] = None
     carrier_updated_at: constr(strict=True)
 
 
