@@ -240,8 +240,8 @@ def xu_ly_giao_dich_co_khoi_luong():
     giao_dich_co_khoi_luong_df.to_parquet(ROOT_PATH + '/processed_data/giao_dich_co_khoi_luong.parquet', index=False)
 
 
-def tong_hop_thong_tin_giao_dich(is_api=True):
-    if not is_api:
+def tong_hop_thong_tin_giao_dich(from_api=True):
+    if not from_api:
         print('Đọc thông tin giao dịch và giao dịch có khối lượng...')
         giao_dich_tong_df = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_tong.parquet')
         giao_dich_co_khoi_luong_df = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_co_khoi_luong.parquet')
@@ -309,10 +309,16 @@ def tong_hop_thong_tin_giao_dich(is_api=True):
         port = settings.SQLALCHEMY_DATABASE_URI
         engine = create_engine(port)
         giao_dich_valid = pd.read_sql_query('select * from db_schema.order', con=engine)
-        # print(giao_dich_valid.head(1))
+        giao_dich_valid = giao_dich_valid[[
+            'order_code', 'created_at', 'weight', 'sent_at', 'order_status',
+            'carrier_id', 'carrier_status',
+            'sender_province', 'sender_district', 'receiver_province', 'receiver_district',
+            'delivery_count', 'pickup', 'barter',
+            'carrier_delivered_at', 'picked_at', 'last_delivering_at', 'carrier_updated_at', 'date'
+        ]]
         # 4. Lưu thông tin
         giao_dich_valid.to_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid_from_api.parquet', index=False)
 
 
 if __name__ == '__main__':
-    tong_hop_thong_tin_giao_dich(is_api=True)
+    tong_hop_thong_tin_giao_dich(from_api=True)

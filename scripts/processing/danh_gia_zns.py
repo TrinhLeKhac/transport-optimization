@@ -3,8 +3,8 @@ from sqlalchemy import create_engine
 from config import settings
 
 
-def xu_ly_danh_gia_zns(is_api=True):
-    if not is_api:
+def xu_ly_danh_gia_zns(from_api=True):
+    if not from_api:
         # 1. Đọc dữ liệu
         danh_gia_zns_df = pd.read_excel(ROOT_PATH + '/input/Đánh Giá ZNS.xlsx')
         danh_gia_zns_df = danh_gia_zns_df[[
@@ -59,4 +59,4 @@ def xu_ly_danh_gia_zns(is_api=True):
 
 
 if __name__ == '__main__':
-    xu_ly_danh_gia_zns(is_api=True)
+    xu_ly_danh_gia_zns(from_api=True)
