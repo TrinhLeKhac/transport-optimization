@@ -1,39 +1,6 @@
 from sqlalchemy.types import NUMERIC, SMALLINT, INTEGER, VARCHAR, Boolean, TEXT, TIMESTAMP
 
 TABLE_SCHEMA = {
-    # 1. Table from API
-    'zns': {
-        "receiver_province": VARCHAR(length=30),
-        "receiver_district": VARCHAR(length=30),
-        "carrier_id": SMALLINT,
-        "message_count": INTEGER,
-        "star": INTEGER,
-        "feedbacks": "TEXT []",
-        "note": VARCHAR(length=100),
-        "submitted_at": VARCHAR(length=20),
-        "date": VARCHAR(length=10),
-    },
-    'order': {
-        "order_code": VARCHAR(length=30),
-        "created_at": VARCHAR(length=20),
-        "sent_at": VARCHAR(length=20),
-        "order_status": VARCHAR(length=30),
-        "carrier_id": SMALLINT,
-        "carrier_status": VARCHAR(length=30),
-        "sender_province": VARCHAR(length=30),
-        "sender_district":VARCHAR(length=30),
-        "receiver_province": VARCHAR(length=30),
-        "receiver_district": VARCHAR(length=30),
-        "delivery_count": INTEGER,
-        "pickup": VARCHAR(length=1),
-        "barter": VARCHAR(length=1),
-        "carrier_delivered_at": VARCHAR(length=20),
-        "picked_at": VARCHAR(length=20),
-        "last_delivering_at": VARCHAR(length=20),
-        "carrier_updated_at": VARCHAR(length=20),
-        "date": VARCHAR(length=10),
-    },
-    # 2. Table ingest from processing Excel data
     'buu_cuc_best': {
         'receiver_province': VARCHAR(length=30),
         'receiver_district': VARCHAR(length=30),
