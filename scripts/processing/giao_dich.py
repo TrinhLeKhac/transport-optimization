@@ -1,4 +1,6 @@
 from scripts.utilities.helper import *
+from sqlalchemy import create_engine
+from config import settings
 
 OLD_DATA_COLS = [
     'Tạo Lúc', 'Mã Đơn Hàng', 'Nhà Vận Chuyển', 'Trạng Thái Vận Đơn',
@@ -238,71 +240,79 @@ def xu_ly_giao_dich_co_khoi_luong():
     giao_dich_co_khoi_luong_df.to_parquet(ROOT_PATH + '/processed_data/giao_dich_co_khoi_luong.parquet', index=False)
 
 
-def tong_hop_thong_tin_giao_dich():
-    print('Đọc thông tin giao dịch và giao dịch có khối lượng...')
-    giao_dich_tong_df = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_tong.parquet')
-    giao_dich_co_khoi_luong_df = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_co_khoi_luong.parquet')
+def tong_hop_thong_tin_giao_dich(is_api=True):
+    if not is_api:
+        print('Đọc thông tin giao dịch và giao dịch có khối lượng...')
+        giao_dich_tong_df = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_tong.parquet')
+        giao_dich_co_khoi_luong_df = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_co_khoi_luong.parquet')
 
-    print('Combine thông tin giao dịch')
-    giao_dich_valid_df = giao_dich_tong_df.merge(giao_dich_co_khoi_luong_df, on='order_id', how='inner')
-    print('Số giao dịch hợp lệ: ', len(giao_dich_valid_df))
+        print('Combine thông tin giao dịch')
+        giao_dich_valid_df = giao_dich_tong_df.merge(giao_dich_co_khoi_luong_df, on='order_id', how='inner')
+        print('Số giao dịch hợp lệ: ', len(giao_dich_valid_df))
 
-    print('Tách địa chỉ tỉnh/thành, quận/huyện lấy hàng từ kho nhận')
-    giao_dich_valid_df['sender_province'] = giao_dich_valid_df['storage_address'].str.split(', ').str[-1]
-    giao_dich_valid_df['sender_district'] = giao_dich_valid_df['storage_address'].str.split(', ').str[-2]
+        print('Tách địa chỉ tỉnh/thành, quận/huyện lấy hàng từ kho nhận')
+        giao_dich_valid_df['sender_province'] = giao_dich_valid_df['storage_address'].str.split(', ').str[-1]
+        giao_dich_valid_df['sender_district'] = giao_dich_valid_df['storage_address'].str.split(', ').str[-2]
 
-    print('Chuẩn hóa thông tin tỉnh/thành, quận/huyện lấy hàng...')
-    giao_dich_valid = normalize_province_district(giao_dich_valid_df, tinh_thanh='sender_province',
-                                                  quan_huyen='sender_district')
+        print('Chuẩn hóa thông tin tỉnh/thành, quận/huyện lấy hàng...')
+        giao_dich_valid = normalize_province_district(giao_dich_valid_df, tinh_thanh='sender_province',
+                                                      quan_huyen='sender_district')
 
-    print('Chuẩn hóa thông tin tỉnh/thành, quận/huyện giao hàng...')
-    giao_dich_valid = normalize_province_district(giao_dich_valid, tinh_thanh='receiver_province',
-                                                  quan_huyen='receiver_district')
+        print('Chuẩn hóa thông tin tỉnh/thành, quận/huyện giao hàng...')
+        giao_dich_valid = normalize_province_district(giao_dich_valid, tinh_thanh='receiver_province',
+                                                      quan_huyen='receiver_district')
 
-    giao_dich_valid = giao_dich_valid[
-        giao_dich_valid['sender_province'].notna()
-        & giao_dich_valid['sender_district'].notna()
-        & giao_dich_valid['receiver_province'].notna()
-        & giao_dich_valid['receiver_district'].notna()
-        ]
-    print('Số giao dịch sau khi chuẩn hóa tỉnh/thành, quận/huyện: ', len(giao_dich_valid))
+        giao_dich_valid = giao_dich_valid[
+            giao_dich_valid['sender_province'].notna()
+            & giao_dich_valid['sender_district'].notna()
+            & giao_dich_valid['receiver_province'].notna()
+            & giao_dich_valid['receiver_district'].notna()
+            ]
+        print('Số giao dịch sau khi chuẩn hóa tỉnh/thành, quận/huyện: ', len(giao_dich_valid))
 
-    print('Tính toán loại vận chuyển từ địa chỉ giao và nhận...')
-    phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
-    phan_vung_nvc = phan_vung_nvc[['carrier', 'receiver_province', 'receiver_district', 'outer_region', 'inner_region']]
-    giao_dich_valid = (
-        giao_dich_valid.merge(
-            phan_vung_nvc.rename(columns={
-                'receiver_province': 'sender_province',
-                'receiver_district': 'sender_district',
-                'outer_region': 'sender_outer_region',
-                'inner_region': 'sender_inner_region',
-            }), on=['carrier', 'sender_province', 'sender_district'], how='left').merge(
-            phan_vung_nvc.rename(columns={
-                'outer_region': 'receiver_outer_region',
-                'inner_region': 'receiver_inner_region',
-            }), on=['carrier', 'receiver_province', 'receiver_district'], how='left')
-    )
-    giao_dich_valid['order_type'] = giao_dich_valid.apply(type_of_delivery, axis=1)
-    giao_dich_valid['order_type_id'] = giao_dich_valid['order_type'].map(MAPPING_ORDER_TYPE_ID)
-    giao_dich_valid['sys_order_type_id'] = giao_dich_valid.apply(type_of_system_delivery, axis=1)
+        print('Tính toán loại vận chuyển từ địa chỉ giao và nhận...')
+        phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
+        phan_vung_nvc = phan_vung_nvc[['carrier', 'receiver_province', 'receiver_district', 'outer_region', 'inner_region']]
+        giao_dich_valid = (
+            giao_dich_valid.merge(
+                phan_vung_nvc.rename(columns={
+                    'receiver_province': 'sender_province',
+                    'receiver_district': 'sender_district',
+                    'outer_region': 'sender_outer_region',
+                    'inner_region': 'sender_inner_region',
+                }), on=['carrier', 'sender_province', 'sender_district'], how='left').merge(
+                phan_vung_nvc.rename(columns={
+                    'outer_region': 'receiver_outer_region',
+                    'inner_region': 'receiver_inner_region',
+                }), on=['carrier', 'receiver_province', 'receiver_district'], how='left')
+        )
+        giao_dich_valid['order_type'] = giao_dich_valid.apply(type_of_delivery, axis=1)
+        giao_dich_valid['order_type_id'] = giao_dich_valid['order_type'].map(MAPPING_ORDER_TYPE_ID)
+        giao_dich_valid['sys_order_type_id'] = giao_dich_valid.apply(type_of_system_delivery, axis=1)
 
-    giao_dich_valid = giao_dich_valid[[
-        'carrier_created_at', 'order_id', 'carrier', 'weight',
-        'sender_province', 'sender_district',
-        'receiver_province', 'receiver_district',
-        'order_status', 'order_type', 'order_type_id', 'sys_order_type_id',
-        'n_deliveries', 'delivery_type',
-        'is_returned', 'finished_at',
-    ]]
+        giao_dich_valid = giao_dich_valid[[
+            'carrier_created_at', 'order_id', 'carrier', 'weight',
+            'sender_province', 'sender_district',
+            'receiver_province', 'receiver_district',
+            'order_status', 'order_type', 'order_type_id', 'sys_order_type_id',
+            'n_deliveries', 'delivery_type',
+            'is_returned', 'finished_at',
+        ]]
 
-    set_carrier = set(giao_dich_valid['carrier'].unique().tolist())
-    set_norm_full_carrier = set(MAPPING_CARRIER_ID.keys())
-    assert set_carrier - set_norm_full_carrier == set(), 'Ops, Tên nhà vận chuyển chưa được chuẩn hóa'
+        set_carrier = set(giao_dich_valid['carrier'].unique().tolist())
+        set_norm_full_carrier = set(MAPPING_CARRIER_ID.keys())
+        assert set_carrier - set_norm_full_carrier == set(), 'Ops, Tên nhà vận chuyển chưa được chuẩn hóa'
 
-    print('Lưu thông tin...')
-    giao_dich_valid.to_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet', index=False)
+        print('Lưu thông tin...')
+        giao_dich_valid.to_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet', index=False)
+    else:
+        port = settings.SQLALCHEMY_DATABASE_URI
+        engine = create_engine(port)
+        giao_dich_valid = pd.read_sql_query('select * from db_schema.order', con=engine)
+        # print(giao_dich_valid.head(1))
+        # 4. Lưu thông tin
+        giao_dich_valid.to_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid_from_api.parquet', index=False)
 
 
 if __name__ == '__main__':
-    tong_hop_thong_tin_giao_dich()
+    tong_hop_thong_tin_giao_dich(is_api=True)
