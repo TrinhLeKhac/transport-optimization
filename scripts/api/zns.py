@@ -1,3 +1,4 @@
+from typing import Union, Optional
 from pydantic import BaseModel, conint, constr
 from scripts.auth.security import validate_token
 from fastapi import Depends
@@ -13,8 +14,8 @@ class ZNSModel(BaseModel):
     carrier_id: conint(strict=True)
     message_count: conint(strict=True)
     star: conint(ge=0, le=5, strict=True)
-    feedbacks: List[constr(strict=True)]
-    note: constr(strict=True)
+    feedbacks: Optional[List[constr(strict=True)]] = None
+    note: Optional[constr(strict=True)] = None
     submitted_at: constr(strict=True)
 
 
