@@ -52,13 +52,14 @@ def xu_ly_danh_gia_zns(from_api=True):
         danh_gia_zns_df['carrier'] = danh_gia_zns_df['carrier_id'].map(MAPPING_ID_CARRIER)
         danh_gia_zns_df = danh_gia_zns_df[[
             'receiver_province', 'receiver_district', 'carrier',
-            'message_count', 'star', 'feedbacks', 'note', 'submitted_at',
+            'message_count', 'star', 'feedbacks', 'note', 'submitted_at', 'date'
         ]]
         danh_gia_zns_df.columns = [
             'receiver_province', 'receiver_district', 'carrier',
-            'n_messages', 'n_stars', 'comment', 'review', 'reviewed_at',
+            'n_messages', 'n_stars', 'comment', 'review', 'reviewed_at', 'date'
         ]
         danh_gia_zns_df['reviewed_at'] = pd.to_datetime(danh_gia_zns_df['reviewed_at'], errors='coerce')
+        danh_gia_zns_df['date'] = pd.to_datetime(danh_gia_zns_df['date'], errors='coerce')
 
         # 4. Lưu thông tin
         danh_gia_zns_df.to_parquet(ROOT_PATH + '/processed_data/danh_gia_zns_from_api.parquet', index=False)
