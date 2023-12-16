@@ -1,11 +1,8 @@
 from scripts.api import authen, order, result, zns, output
 from fastapi.exceptions import RequestValidationError
-from fastapi import FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, Request, status
 from ast import literal_eval
 from fastapi.responses import JSONResponse
-from pydantic import ValidationError
-import jwt
-from typing import Union
 
 
 app = FastAPI(
@@ -24,17 +21,10 @@ def create_str_err(exc_str):
     return "; ".join(res)
 
 
-# @app.exception_handler(ValidationError)
-# def wrong_authenticated_exception_handler(request: Request, exc: ValidationError):
-#     content = {"error": True, "message": "Wrong token", "data": []}
-#     return JSONResponse(content=content, status_code=status.HTTP_403_FORBIDDEN)
-
-
 @app.exception_handler(RequestValidationError)
 def validation_exception_handler(request: Request, exc: RequestValidationError):
     exc_str = f"{exc}".replace("\n", " ").replace("   ", " ")
     path = request.url.path
-    # print(path)
     if path == "/superai/auth":
         content = {"error": True, "message": create_str_err(exc_str), "data": {"token": "Invalid"}}
     else:

@@ -5,7 +5,7 @@ ROOT_PATH = str(Path(__file__).parent.parent.parent)
 sys.path.append(ROOT_PATH)
 
 from scripts.output.out_data_final import *
-from scripts.database.schemas import *
+from scripts.database.pd_sql_schemas import *
 from sqlalchemy import create_engine
 from config import settings
 

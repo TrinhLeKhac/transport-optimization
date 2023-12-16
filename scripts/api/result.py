@@ -1,41 +1,11 @@
-from scripts.output.out_data_final import *
 from pydantic import BaseModel, conint, constr, confloat
 from scripts.auth.security import validate_token
 from fastapi import Depends
 from fastapi import APIRouter
 from scripts.database.helper import *
+from scripts.api import schemas
 
 router = APIRouter()
-
-
-class RequestModel(BaseModel):
-    sender_province: constr(strict=True)
-    sender_district: constr(strict=True)
-    receiver_province: constr(strict=True)
-    receiver_district: constr(strict=True)
-    weight: conint(strict=True, gt=0, le=50000)
-    pickup: constr(strict=True)
-
-
-class ResultModel(BaseModel):
-    carrier_id: int
-    route_type: constr(strict=True)
-    price: int
-    status: constr(strict=True)
-    description: constr(strict=True)
-    time_data: confloat(strict=True)
-    time_display: constr(strict=True)
-    rate: confloat(strict=True)
-    score: confloat(strict=True)
-    star: confloat(strict=True)
-    for_shop: int
-    for_partner: int
-    price_ranking: int
-    speed_ranking: int
-    score_ranking: int
-
-    class Config:
-        orm_mode = True
 
 
 def execute_query(
@@ -99,8 +69,8 @@ def execute_query(
     print(rows)
 
     # Get the field names from the Pydantic model
-    field_names = ResultModel.__annotations__.keys()
-    result = [ResultModel(**dict(zip(field_names, row))) for row in rows]
+    field_names = schemas.ResultModel.__annotations__.keys()
+    result = [schemas.ResultModel(**dict(zip(field_names, row))) for row in rows]
 
     # Commit the transaction
     connection.commit()
@@ -112,7 +82,7 @@ def execute_query(
 
 
 @router.post("", dependencies=[Depends(validate_token)])
-def calculate(data: RequestModel):
+def calculate(data: schemas.RequestModel):
     sender_province_code = data.sender_province
     sender_district_code = data.sender_district
     receiver_province_code = data.receiver_province

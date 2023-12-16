@@ -2,8 +2,8 @@ from pydantic import BaseModel, conint, constr, confloat
 from scripts.auth.security import validate_token
 from fastapi import Depends
 from fastapi import APIRouter
-from scripts.database.database import session
-from scripts.database import models
+from scripts.api.database import session
+from scripts.api import models
 
 
 class OutputModel(BaseModel):

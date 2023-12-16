@@ -1,30 +1,16 @@
-from typing import Optional
-from pydantic import BaseModel, conint, constr
-from scripts.auth.security import validate_token
 from fastapi import Depends
 from fastapi import APIRouter
-from typing import List
+from scripts.auth.security import validate_token
 from scripts.database.helper import *
-
-
-class ZNSModel(BaseModel):
-    date: constr(strict=True)
-    receiver_province: constr(strict=True)
-    receiver_district: constr(strict=True)
-    carrier_id: conint(strict=True)
-    message_count: conint(strict=True)
-    star: conint(ge=0, le=5, strict=True)
-    feedbacks: Optional[List[constr(strict=True)]] = None
-    note: Optional[constr(strict=True)] = None
-    submitted_at: constr(strict=True)
+from scripts.api import schemas
 
 
 router = APIRouter()
 
 
 @router.post("", dependencies=[Depends(validate_token)])
-def get_data_zns(request_data: ZNSModel):
-    data = request_data.model_dump()  # invert method: ZNSModel(**data)
+def get_data_zns(request_data: schemas.MessageZNSModel):
+    data = request_data.model_dump()
     insert_data_to_postgres(data=[data], schema_name="db_schema", table_name="zns")
 
     return {
@@ -32,6 +18,6 @@ def get_data_zns(request_data: ZNSModel):
         "message": "",
         "data": {
             "count": 1,
-            "zns": data,  # can show ZNSModel or dict
+            "zns": data,
         },
     }

@@ -1,12 +1,9 @@
 from datetime import datetime
-from typing import Any, Dict, List
-
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer
 from pydantic import ValidationError
 from config import settings
-from fastapi.responses import JSONResponse
 
 reusable_oauth2 = HTTPBearer(
     scheme_name='Authorization'

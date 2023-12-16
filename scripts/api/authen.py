@@ -1,11 +1,6 @@
-from pydantic import BaseModel, constr
 from scripts.auth.token import *
 from fastapi import APIRouter
-
-
-class LoginModel(BaseModel):
-    username: constr(strict=True)
-    password: constr(strict=True)
+from scripts.api.schemas import LoginModel
 
 
 router = APIRouter()
