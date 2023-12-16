@@ -1,9 +1,8 @@
-from pydantic import BaseModel, conint, constr, confloat
-from scripts.auth.security import validate_token
-from fastapi import Depends
-from fastapi import APIRouter
-from scripts.database.helper import *
+from fastapi import Depends, APIRouter
+from sqlalchemy.orm import Session
 from scripts.api import schemas
+from scripts.api.database import *
+from scripts.database.helper import *
 
 router = APIRouter()
 
@@ -69,8 +68,8 @@ def execute_query(
     print(rows)
 
     # Get the field names from the Pydantic model
-    field_names = schemas.ResultModel.__annotations__.keys()
-    result = [schemas.ResultModel(**dict(zip(field_names, row))) for row in rows]
+    field_names = schemas.APIResultModel.__annotations__.keys()
+    result = [schemas.APIResultModel(**dict(zip(field_names, row))) for row in rows]
 
     # Commit the transaction
     connection.commit()
@@ -81,8 +80,8 @@ def execute_query(
     return result
 
 
-@router.post("", dependencies=[Depends(validate_token)])
-def calculate(data: schemas.RequestModel):
+@router.post("")
+def calculate(data: schemas.APIRequestModel, db: Session = Depends(get_db)):
     sender_province_code = data.sender_province
     sender_district_code = data.sender_district
     receiver_province_code = data.receiver_province

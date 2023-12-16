@@ -1,23 +1,25 @@
-from fastapi import Depends
-from fastapi import APIRouter
-from scripts.auth.security import validate_token
-from scripts.database.helper import *
-from scripts.api import schemas
-
+from fastapi import Depends, APIRouter
+from sqlalchemy.orm import Session
+from scripts.api import schemas, models
+from scripts.api.database import *
 
 router = APIRouter()
 
 
-@router.post("", dependencies=[Depends(validate_token)])
-def get_data_zns(request_data: schemas.MessageZNSModel):
-    data = request_data.model_dump()
-    insert_data_to_postgres(data=[data], schema_name="db_schema", table_name="zns")
+@router.post("")
+def get_data_zns(request_data: schemas.MessageZNSModel, db: Session = Depends(get_db)):
+    data_dict = request_data.model_dump()
+
+    db_zns = models.MessageZNS(**data_dict)
+    db.add(db_zns)
+    db.commit()
+    db.refresh(db_zns)
 
     return {
         "error": False,
         "message": "",
         "data": {
             "count": 1,
-            "zns": data,
+            "zns": db_zns,
         },
     }

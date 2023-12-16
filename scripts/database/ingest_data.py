@@ -32,14 +32,6 @@ def ingest_data_to_db():
                        dtype=TABLE_SCHEMA['data_api'])
     print('-' * 100)
 
-    # print('>>> Ingest output API full')
-    # data_api_full_df = out_data_api(return_full_cols_df=True, show_logs=False)
-    # data_api_full_df = data_api_full_df.reset_index().rename(columns={"index": "id"})
-    # data_api_full_df['import_date'] = datetime.now().strftime('%F')
-    # data_api_full_df.to_sql(name='tbl_data_api_full', con=engine, schema="db_schema", if_exists="replace", index=False,
-    #                         dtype=TABLE_SCHEMA['data_api_full'])
-    # print('-' * 100)
-
     print('>>> Ingest data order_type')
     data_order_type_df = pd.read_parquet(ROOT_PATH + '/output/data_order_type.parquet')
     data_order_type_df.to_sql(name='tbl_order_type', con=engine, schema="db_schema", if_exists="replace", index=False,

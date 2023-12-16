@@ -1,22 +1,23 @@
-from fastapi import Depends
-from fastapi import APIRouter
-from scripts.database.helper import *
-from scripts.auth.security import validate_token
-from scripts.api import schemas
+from fastapi import Depends, APIRouter
+from sqlalchemy.orm import Session
+from scripts.api import schemas, models
+from scripts.api.database import *
 
 router = APIRouter()
 
 
-@router.post("", dependencies=[Depends(validate_token)])
-def get_data_order(request_data: schemas.OrderModel):
-    data = request_data.model_dump()
-    insert_data_to_postgres(data=[data], schema_name="db_schema", table_name="order")
+@router.post("")
+def get_data_order(request_data: schemas.OrderModel, db: Session = Depends(get_db)):
+    db_order = models.Order(**request_data.model_dump())
+    db.add(db_order)
+    db.commit()
+    db.refresh(db_order)
 
     return {
         "error": False,
         "message": "",
         "data": {
             "count": 1,
-            "order": data,
+            "order": db_order,
         },
     }

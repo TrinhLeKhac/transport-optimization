@@ -1,14 +1,16 @@
 from scripts.api import authen, order, result, zns, output
 from fastapi.exceptions import RequestValidationError
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, status, Depends
 from ast import literal_eval
 from fastapi.responses import JSONResponse
 
+from scripts.auth.security import validate_token
 
 app = FastAPI(
     title="API SUPERSHIP",
     description="There are APIs getting calculation result from history transactions of SUPERSHIP",
-    docs_url="/"
+    docs_url="/",
+    dependencies=[Depends(validate_token)],
 )
 
 
