@@ -2,7 +2,6 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 from scripts.api import schemas
 from scripts.api.database import *
-from scripts.database.helper import *
 
 router = APIRouter()
 

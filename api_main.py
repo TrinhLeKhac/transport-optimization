@@ -1,16 +1,16 @@
-from scripts.api import authen, order, result, zns, output
+from scripts.api.router import result, output, order, zns
+from scripts.api.auth import authen
 from fastapi.exceptions import RequestValidationError
 from fastapi import FastAPI, Request, status, Depends
 from ast import literal_eval
 from fastapi.responses import JSONResponse
 
-from scripts.auth.security import validate_token
+from scripts.api.auth.security import validate_token
 
 app = FastAPI(
     title="API SUPERSHIP",
     description="There are APIs getting calculation result from history transactions of SUPERSHIP",
     docs_url="/",
-    dependencies=[Depends(validate_token)],
 )
 
 
@@ -35,7 +35,7 @@ def validation_exception_handler(request: Request, exc: RequestValidationError):
 
 
 app.include_router(authen.router, tags=[""], prefix="/superai/auth")
-app.include_router(zns.router, tags=[""], prefix="/superai/zns")
-app.include_router(order.router, tags=[""], prefix="/superai/order")
-app.include_router(result.router, tags=[""], prefix="/superai/result")
-app.include_router(output.router, tags=[""], prefix="/superai/output")
+app.include_router(zns.router, tags=[""], prefix="/superai/zns", dependencies=[Depends(validate_token)])
+app.include_router(order.router, tags=[""], prefix="/superai/order", dependencies=[Depends(validate_token)])
+app.include_router(result.router, tags=[""], prefix="/superai/result", dependencies=[Depends(validate_token)])
+app.include_router(output.router, tags=[""], prefix="/superai/output", dependencies=[Depends(validate_token)])

@@ -1,5 +1,4 @@
 from scripts.streamlit.streamlit_helper import *
-from scripts.api.result import execute_query
 
 
 def create_customer_tab():

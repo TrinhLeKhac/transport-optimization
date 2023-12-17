@@ -1,5 +1,5 @@
-from scripts.auth.token import *
 from fastapi import APIRouter
+from scripts.api.auth.token import *
 from scripts.api.schemas import LoginModel
 
 
