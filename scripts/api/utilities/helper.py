@@ -28,7 +28,7 @@ def create_tbl_if_not_exists(schema_name, table_name):
                 submitted_at VARCHAR(20),
                 date VARCHAR(10)
             );
-            ALTER TABLE {schema_name}.{table_name} ADD CONSTRAINT constraint_dup_{table_name} UNIQUE (
+            ALTER TABLE {schema_name}.{table_name} ADD CONSTRAINT constraint_dup_{table_name} UNIQUE NULLS NOT DISTINCT (
                 receiver_province, 
                 receiver_district, 
                 carrier_id, 
@@ -65,7 +65,7 @@ def create_tbl_if_not_exists(schema_name, table_name):
                 carrier_updated_at VARCHAR(20),
                 date VARCHAR(10)
             );
-            ALTER TABLE {schema_name}.{table_name} ADD CONSTRAINT constraint_dup_{table_name} UNIQUE (
+            ALTER TABLE {schema_name}.{table_name} ADD CONSTRAINT constraint_dup_{table_name} UNIQUE NULLS NOT DISTINCT (
                 order_code, 
                 created_at, 
                 weight, 
