@@ -1,14 +1,14 @@
 from typing import Union, List
 
-from sqlalchemy.sql.sqltypes import String, Integer, Numeric
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.sqltypes import Numeric
 from sqlalchemy.types import ARRAY
 
 from sqlalchemy import (
     Integer,
     PrimaryKeyConstraint,
-    String,
+    String, select,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 from scripts.api.base import Base
 
@@ -81,3 +81,41 @@ class API(Base):
     import_date: Mapped[str] = mapped_column(String(10))
 
     __table_args__ = (PrimaryKeyConstraint("id", name="data_api_pkey"), {"schema": "db_schema"})
+
+    @classmethod
+    async def find_by_batch(cls, db_session: AsyncSession, batch: int = 10):
+        stmt = select(cls).limit(batch)
+        result = await db_session.execute(stmt)
+        instances = result.scalars().all()
+
+        if instances is None:
+            return {
+                "error": True,
+                "message": "Resources not found",
+                "data": [],
+            }
+        else:
+            return {
+                "error": False,
+                "message": "",
+                "data": instances,
+            }
+
+    @classmethod
+    async def find_by_district(cls, db_session: AsyncSession, district_code: str = "001"):
+        stmt = select(cls).where(cls.receiver_district_code == district_code)
+        result = await db_session.execute(stmt)
+        instances = result.scalars().all()
+
+        if instances is None:
+            return {
+                "error": True,
+                "message": "Resources not found",
+                "data": [],
+            }
+        else:
+            return {
+                "error": False,
+                "message": "",
+                "data": instances,
+            }
