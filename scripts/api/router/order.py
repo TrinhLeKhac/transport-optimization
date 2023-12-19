@@ -1,8 +1,7 @@
 from fastapi import Depends, APIRouter
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import async_sessionmaker,
 from sqlalchemy.exc import ProgrammingError, IntegrityError
 from scripts.api import schemas, models
-from scripts.api.database import *
 from scripts.api.utilities.helper import *
 
 router = APIRouter()
