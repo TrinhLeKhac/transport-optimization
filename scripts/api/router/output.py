@@ -1,40 +1,65 @@
 from fastapi import Depends, APIRouter
-from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from scripts.api import models
 from scripts.api.database import *
+
 
 router = APIRouter()
 
 
 @router.get("")
-def get_all_rows(batch: int = 10, db: Session = Depends(get_db)):
-    db_api = db.query(models.API).limit(batch).all()
-    if db_api is None:
+async def get_all_rows(
+    batch: int = 10,
+    db_session: AsyncSession = Depends(get_db)
+):
+    try:
+        result = await models.API.find_by_batch(db_session, batch)
+    except SQLAlchemyError as e:
         return {
             "error": True,
-            "message": "Resources not found",
-            "data": [],
+            "message": "Request to the API can not be processed",
+            "data": {}
         }
     else:
-        return {
-            "error": False,
-            "message": "",
-            "data": db_api,
-        }
+        if result is None:
+            return {
+                "error": True,
+                "message": "Resources not found",
+                "data": [],
+            }
+        else:
+            return {
+                "error": False,
+                "message": "",
+                "data": result,
+            }
 
 
 @router.get("/district")
-def get_rows_by_district_code(district_code: str = "001", db: Session = Depends(get_db)):
-    db_api_by_district = db.query(models.API).filter(models.API.receiver_district_code == district_code).all()
-    if db_api_by_district is None:
+async def get_rows_by_district_code(
+    district_code: str = "001",
+    db_session: AsyncSession = Depends(get_db)
+):
+    try:
+        result = await models.API.find_by_district(db_session, district_code)
+    except SQLAlchemyError as e:
         return {
             "error": True,
-            "message": "Resources not found",
-            "data": [],
+            "message": "Request to the API can not be processed",
+            "data": {}
         }
     else:
-        return {
-            "error": False,
-            "message": "",
-            "data": db_api_by_district,
-        }
+        if result is None:
+            return {
+                "error": True,
+                "message": "Resources not found",
+                "data": [],
+            }
+        else:
+            return {
+                "error": False,
+                "message": "",
+                "data": result,
+            }

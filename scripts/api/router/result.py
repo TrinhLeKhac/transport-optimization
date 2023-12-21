@@ -1,3 +1,4 @@
+import psycopg2
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 from scripts.api import schemas

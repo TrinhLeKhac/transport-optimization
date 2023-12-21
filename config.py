@@ -1,4 +1,5 @@
 import os
+from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(__file__)
@@ -7,6 +8,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 class Settings:
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', '')
+    SQLALCHEMY_ASYNCIO_DATABASE_URI = os.getenv('SQLALCHEMY_ASYNCIO_DATABASE_URI', '')
     SECRET_KEY = os.getenv('SECRET_KEY', '')
     ACCESS_TOKEN_EXPIRE_SECONDS: int = 365 * 24 * 60 * 60  # Token expired after 365 days
     SECURITY_ALGORITHM = 'HS256'

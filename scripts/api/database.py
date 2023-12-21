@@ -1,22 +1,25 @@
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from collections.abc import AsyncGenerator
+
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker
+
 from config import settings
 
-port = settings.SQLALCHEMY_DATABASE_URI
-engine = create_engine(port)
+engine = create_async_engine(
+    settings.SQLALCHEMY_ASYNCIO_DATABASE_URI,
+    future=True,
+    echo=True,
+)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# expire_on_commit=False will prevent attributes from being expired after commit.
+AsyncSessionFactory = async_sessionmaker(
+    engine,
+    autoflush=False,
+    expire_on_commit=False,
+)
 
-Base = declarative_base()
 
-print("Creating database...")
-Base.metadata.create_all(engine)
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# Dependency
+async def get_db() -> AsyncGenerator:
+    async with AsyncSessionFactory() as session:
+        yield session

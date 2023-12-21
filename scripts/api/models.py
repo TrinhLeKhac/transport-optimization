@@ -1,73 +1,121 @@
-from sqlalchemy import String, Integer, Column, Numeric
+from typing import Union, List
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.sqltypes import Numeric
 from sqlalchemy.types import ARRAY
-from scripts.api.database import Base
+
+from sqlalchemy import (
+    Integer,
+    PrimaryKeyConstraint,
+    String, select,
+)
+from sqlalchemy.orm import Mapped, mapped_column
+from scripts.api.base import Base
 
 
 class MessageZNS(Base):
     __tablename__ = "zns"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    receiver_province = Column(String, nullable=False)
-    receiver_district = Column(String, nullable=False)
-    carrier_id = Column(Integer, nullable=False)
-    message_count = Column(Integer, nullable=False)
-    star = Column(Integer, nullable=False)
-    feedbacks = Column(ARRAY(String), nullable=True)
-    note = Column(String, nullable=True)
-    submitted_at = Column(String, nullable=False)
-    date = Column(String, nullable=False)
+    id: Mapped[int] = mapped_column(Integer, autoincrement=True)
+    receiver_province: Mapped[str] = mapped_column(String(2))
+    receiver_district: Mapped[str] = mapped_column(String(3))
+    carrier_id: Mapped[int] = mapped_column(Integer)
+    message_count: Mapped[int] = mapped_column(Integer)
+    star: Mapped[int] = mapped_column(Integer)
+    feedbacks: Mapped[Union[List[str], None]] = mapped_column(ARRAY(String(256)))
+    note: Mapped[Union[str, None]] = mapped_column(String(256))
+    submitted_at: Mapped[str] = mapped_column(String(20))
+    date: Mapped[str] = mapped_column(String(10))
 
-    __table_args__ = {"schema": "db_schema"}
+    __table_args__ = (PrimaryKeyConstraint("id", name="message_zns_pkey"), {"schema": "db_schema"})
 
 
 class Order(Base):
     __tablename__ = "order"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    order_code = Column(String, nullable=False)
-    created_at = Column(String, nullable=False)
-    weight = Column(Integer, nullable=False)
-    sent_at = Column(String, nullable=False)
-    order_status = Column(String, nullable=False)
-    carrier_id = Column(Integer, nullable=False)
-    carrier_status = Column(String, nullable=False)
-    sender_province = Column(String, nullable=False)
-    sender_district = Column(String, nullable=False)
-    receiver_province = Column(String, nullable=False)
-    receiver_district = Column(String, nullable=False)
-    delivery_count = Column(Integer, nullable=False)
-    pickup = Column(String, nullable=False)
-    barter = Column(String, nullable=False)
-    carrier_delivered_at = Column(String, nullable=True)
-    picked_at = Column(String, nullable=False)
-    last_delivering_at = Column(String, nullable=True)
-    carrier_updated_at = Column(String, nullable=False)
-    date = Column(String, nullable=False)
+    id: Mapped[int] = mapped_column(Integer, autoincrement=True)
+    order_code: Mapped[str] = mapped_column(String(30))
+    created_at: Mapped[str] = mapped_column(String(20))
+    weight: Mapped[int] = mapped_column(Integer)
+    sent_at: Mapped[str] = mapped_column(String(20))
+    order_status: Mapped[str] = mapped_column(String(256))
+    carrier_id: Mapped[int] = mapped_column(Integer)
+    carrier_status: Mapped[str] = mapped_column(String(256))
+    sender_province: Mapped[str] = mapped_column(String(2))
+    sender_district: Mapped[str] = mapped_column(String(3))
+    receiver_province: Mapped[str] = mapped_column(String(2))
+    receiver_district: Mapped[str] = mapped_column(String(3))
+    delivery_count: Mapped[int] = mapped_column(Integer)
+    pickup: Mapped[str] = mapped_column(String(1))
+    barter: Mapped[str] = mapped_column(String(1))
+    carrier_delivered_at: Mapped[Union[str, None]] = mapped_column(String(20))
+    picked_at: Mapped[str] = mapped_column(String(20))
+    last_delivering_at: Mapped[Union[str, None]] = mapped_column(String(20))
+    carrier_updated_at: Mapped[str] = mapped_column(String(20))
+    date: Mapped[str] = mapped_column(String(10))
 
-    __table_args__ = {"schema": "db_schema"}
+    __table_args__ = (PrimaryKeyConstraint("id", name="order_pkey"), {"schema": "db_schema"})
 
 
 class API(Base):
     __tablename__ = "tbl_data_api"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    receiver_province_code = Column(String, nullable=True)
-    receiver_district_code = Column(String, nullable=True)
-    carrier_id = Column(Integer, nullable=False)
-    new_type = Column(String, nullable=False)
-    route_type = Column(String, nullable=False)
-    status = Column(String, default=False)
-    description = Column(String, nullable=False)
-    time_data = Column(Numeric(5, 2), nullable=False)
-    time_display = Column(String, nullable=False)
-    speed_ranking = Column(Integer, nullable=False)
-    score_ranking = Column(Integer, nullable=False)
-    for_shop = Column(Integer, nullable=False)
-    total_order = Column(Integer, nullable=False)
-    rate_ranking = Column(Integer, nullable=False)
-    rate = Column(Numeric(5, 2), nullable=False)
-    score = Column(Numeric(3, 2), nullable=False)
-    star = Column(Numeric(2, 1), nullable=False)
-    import_date = Column(String, nullable=False)
+    id: Mapped[int] = mapped_column(Integer, autoincrement=True)
+    receiver_province_code: Mapped[str] = mapped_column(String(2))
+    receiver_district_code: Mapped[str] = mapped_column(String(3))
+    carrier_id: Mapped[int] = mapped_column(Integer)
+    new_type: Mapped[str] = mapped_column(String(2))
+    route_type: Mapped[str] = mapped_column(String(1))
+    status: Mapped[str] = mapped_column(String(1))
+    description: Mapped[str] = mapped_column(String(512))
+    time_data: Mapped[float] = mapped_column(Numeric(5, 2))
+    time_display: Mapped[str] = mapped_column(String(30))
+    speed_ranking: Mapped[int] = mapped_column(Integer)
+    score_ranking: Mapped[int] = mapped_column(Integer)
+    for_shop: Mapped[int] = mapped_column(Integer)
+    total_order: Mapped[int] = mapped_column(Integer)
+    rate_ranking: Mapped[int] = mapped_column(Integer)
+    rate: Mapped[float] = mapped_column(Numeric(5, 2))
+    score: Mapped[float] = mapped_column(Numeric(3, 2))
+    star: Mapped[float] = mapped_column(Numeric(2, 1))
+    import_date: Mapped[str] = mapped_column(String(10))
 
-    __table_args__ = {'schema': 'db_schema'}
+    __table_args__ = (PrimaryKeyConstraint("id", name="data_api_pkey"), {"schema": "db_schema"})
+
+    @classmethod
+    async def find_by_batch(cls, db_session: AsyncSession, batch: int = 10):
+        stmt = select(cls).limit(batch)
+        result = await db_session.execute(stmt)
+        instances = result.scalars().all()
+
+        if instances is None:
+            return {
+                "error": True,
+                "message": "Resources not found",
+                "data": [],
+            }
+        else:
+            return {
+                "error": False,
+                "message": "",
+                "data": instances,
+            }
+
+    @classmethod
+    async def find_by_district(cls, db_session: AsyncSession, district_code: str = "001"):
+        stmt = select(cls).where(cls.receiver_district_code == district_code)
+        result = await db_session.execute(stmt)
+        instances = result.scalars().all()
+
+        if instances is None:
+            return {
+                "error": True,
+                "message": "Resources not found",
+                "data": [],
+            }
+        else:
+            return {
+                "error": False,
+                "message": "",
+                "data": instances,
+            }

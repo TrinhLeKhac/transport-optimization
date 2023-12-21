@@ -1,6 +1,9 @@
-from fastapi import Depends, APIRouter
-from sqlalchemy.orm import Session
+from typing import Annotated
+
+from fastapi import Depends, APIRouter, Body
 from sqlalchemy.exc import ProgrammingError, IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from scripts.api import schemas, models
 from scripts.api.database import *
 from scripts.api.utilities.helper import *
@@ -9,23 +12,16 @@ router = APIRouter()
 
 
 @router.post("")
-def get_data_zns(request_data: schemas.MessageZNSModel, db: Session = Depends(get_db)):
+async def get_data_zns(
+    request_data: Annotated[schemas.MessageZNSModel, Body(description="Data zns")],
+    db_session: AsyncSession = Depends(get_db)
+):
     try:
         data_dict = request_data.model_dump()
+        zns_inf = models.MessageZNS(**data_dict)
 
-        db_zns = models.MessageZNS(**data_dict)
-        db.add(db_zns)
-        db.commit()
-        db.refresh(db_zns)
-
-        return {
-            "error": False,
-            "message": "",
-            "data": {
-                "count": 1,
-                "zns": db_zns,
-            },
-        }
+        db_session.add(zns_inf)
+        await db_session.commit()
     except ProgrammingError as e:
         if 'relation "db_schema.zns" does not exist' in str(e):
             create_tbl_if_not_exists('db_schema', 'zns')
@@ -41,3 +37,12 @@ def get_data_zns(request_data: schemas.MessageZNSModel, db: Session = Depends(ge
                 "message": "Duplicate row already exists",
                 "data": {}
             }
+    else:
+        return {
+            "error": False,
+            "message": "",
+            "data": {
+                "count": 1,
+                "zns": zns_inf,
+            },
+        }
