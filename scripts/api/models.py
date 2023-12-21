@@ -34,7 +34,7 @@ class Order(Base):
     __tablename__ = "order"
 
     id: Mapped[int] = mapped_column(Integer, autoincrement=True)
-    order_code: Mapped[str] = mapped_column(String(100))
+    order_code: Mapped[str] = mapped_column(String(30))
     created_at: Mapped[str] = mapped_column(String(20))
     weight: Mapped[int] = mapped_column(Integer)
     sent_at: Mapped[str] = mapped_column(String(20))

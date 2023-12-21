@@ -25,7 +25,7 @@ class MessageZNSModel(BaseModel):
 
 class OrderModel(BaseModel):
 
-    order_code: constr(max_length=100, strict=True)
+    order_code: constr(max_length=30, strict=True)
     created_at: constr(max_length=20, strict=True)
     weight: conint(gt=0, strict=True)
     sent_at: constr(max_length=20, strict=True)
