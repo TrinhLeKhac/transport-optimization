@@ -24,7 +24,7 @@ def create_tbl_if_not_exists(schema_name, table_name):
                 message_count INTEGER,
                 star INTEGER,
                 feedbacks TEXT [],
-                note VARCHAR(100),
+                note VARCHAR(256),
                 submitted_at VARCHAR(20),
                 date VARCHAR(10)
             );
@@ -49,9 +49,9 @@ def create_tbl_if_not_exists(schema_name, table_name):
                 created_at VARCHAR(20),
                 weight INTEGER,
                 sent_at VARCHAR(20),
-                order_status VARCHAR(100),
+                order_status VARCHAR(256),
                 carrier_id SMALLINT,
-                carrier_status VARCHAR(100),
+                carrier_status VARCHAR(256),
                 sender_province VARCHAR(2),
                 sender_district VARCHAR(3),
                 receiver_province VARCHAR(2),
