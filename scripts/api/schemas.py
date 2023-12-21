@@ -58,7 +58,7 @@ class APIModel(BaseModel):
     route_type: constr(max_length=1, strict=True)
     status: constr(max_length=1, strict=True)
     description: constr(max_length=500, strict=True)
-    time_data: confloat(strict=True)
+    time_data: confloat(ge=0, le=100.00, strict=True)
     time_display: constr(max_length=30, strict=True)
     speed_ranking: conint(strict=True)
     score_ranking: conint(strict=True)
