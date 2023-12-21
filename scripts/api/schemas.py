@@ -9,12 +9,12 @@ class LoginModel(BaseModel):
 
 
 class MessageZNSModel(BaseModel):
-    receiver_province: constr(max_length=30, strict=True)
-    receiver_district: constr(max_length=30, strict=True)
+    receiver_province: constr(max_length=2, strict=True)
+    receiver_district: constr(max_length=3, strict=True)
     carrier_id: conint(strict=True)
     message_count: conint(strict=True)
     star: conint(ge=0, le=5, strict=True)
-    feedbacks: Union[List[constr(max_length=500, strict=True)], None] = None
+    feedbacks: Union[List[constr(max_length=100, strict=True)], None] = None
     note: Union[constr(max_length=100, strict=True), None] = None
     submitted_at: constr(max_length=20, strict=True)
     date: constr(max_length=10, strict=True)
@@ -29,13 +29,13 @@ class OrderModel(BaseModel):
     created_at: constr(max_length=20, strict=True)
     weight: conint(gt=0, strict=True)
     sent_at: constr(max_length=20, strict=True)
-    order_status: constr(max_length=30, strict=True)
+    order_status: constr(max_length=100, strict=True)
     carrier_id: conint(strict=True)
     carrier_status: constr(max_length=100, strict=True)
-    sender_province: constr(max_length=30, strict=True)
-    sender_district: constr(max_length=30, strict=True)
-    receiver_province: constr(max_length=30, strict=True)
-    receiver_district: constr(max_length=30, strict=True)
+    sender_province: constr(max_length=2, strict=True)
+    sender_district: constr(max_length=3, strict=True)
+    receiver_province: constr(max_length=2, strict=True)
+    receiver_district: constr(max_length=3, strict=True)
     delivery_count: conint(strict=True)
     pickup: constr(max_length=1, strict=True)
     barter: constr(max_length=1, strict=True)

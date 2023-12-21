@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from scripts.api.database import get_db
-from sqlalchemy.exc import ProgrammingError, IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import ProgrammingError, IntegrityError
 from scripts.api import schemas, models
 from scripts.api.utilities.helper import *
 

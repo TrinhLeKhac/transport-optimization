@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends, APIRouter, Body
-from sqlalchemy.exc import ProgrammingError, IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import ProgrammingError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from scripts.api import schemas, models
