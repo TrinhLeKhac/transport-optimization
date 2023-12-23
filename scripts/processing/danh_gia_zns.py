@@ -50,6 +50,20 @@ def xu_ly_danh_gia_zns(from_api=True):
         engine = create_engine(port)
         danh_gia_zns_df = pd.read_sql_query('select * from db_schema.zns', con=engine)
         danh_gia_zns_df['carrier'] = danh_gia_zns_df['carrier_id'].map(MAPPING_ID_CARRIER)
+        danh_gia_zns_df = danh_gia_zns_df.rename(columns={
+            'receiver_province': 'receiver_province_code',
+            'receiver_district': 'receiver_district_code'
+        })
+        danh_gia_zns_df = (
+            danh_gia_zns_df.merge(
+                PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
+                    'province': 'receiver_province',
+                    'district': 'receiver_district',
+                    'province_id': 'receiver_province_code',
+                    'district_id': 'receiver_district_code',
+                }), on=['receiver_province_code', 'receiver_district_code'], how='left'
+            )
+        )
         danh_gia_zns_df = danh_gia_zns_df[[
             'receiver_province', 'receiver_district', 'carrier',
             'message_count', 'star', 'feedbacks', 'note', 'submitted_at', 'date'
@@ -58,6 +72,7 @@ def xu_ly_danh_gia_zns(from_api=True):
             'receiver_province', 'receiver_district', 'carrier',
             'n_messages', 'n_stars', 'comment', 'review', 'reviewed_at', 'date'
         ]
+        # feedbacks dạng list, comment ở file transform ở dạng str => chuyển đổi
         danh_gia_zns_df['reviewed_at'] = pd.to_datetime(danh_gia_zns_df['reviewed_at'], errors='coerce')
         danh_gia_zns_df['date'] = pd.to_datetime(danh_gia_zns_df['date'], errors='coerce')
 
