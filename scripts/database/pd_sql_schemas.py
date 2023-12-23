@@ -1,31 +1,31 @@
 from sqlalchemy.types import NUMERIC, SMALLINT, INTEGER, VARCHAR, Boolean, TEXT, TIMESTAMP
 
 TABLE_SCHEMA = {
-    'buu_cuc_best': {
+    'tbl_buu_cuc_best': {
         'receiver_province': VARCHAR(length=30),
         'receiver_district': VARCHAR(length=30),
         'n_post_offices': SMALLINT,
         "import_time": TIMESTAMP,
     },
-    'buu_cuc_ghn': {
+    'tbl_buu_cuc_ghn': {
         'receiver_province': VARCHAR(length=30),
         'receiver_district': VARCHAR(length=30),
         'n_post_offices': SMALLINT,
         "import_time": TIMESTAMP,
     },
-    'buu_cuc_ghtk': {
+    'tbl_buu_cuc_ghtk': {
         'receiver_province': VARCHAR(length=30),
         'receiver_district': VARCHAR(length=30),
         'n_post_offices': SMALLINT,
         "import_time": TIMESTAMP,
     },
-    'buu_cuc_ninja_van': {
+    'tbl_buu_cuc_ninja_van': {
         'receiver_province': VARCHAR(length=30),
         'receiver_district': VARCHAR(length=30),
         'n_post_offices': SMALLINT,
         "import_time": TIMESTAMP,
     },
-    'chat_luong_noi_bo_njv': {
+    'tbl_clnb_ninja_van': {
         'receiver_province': VARCHAR(length=30),
         'receiver_district': VARCHAR(length=30),
         "njv_post_office": VARCHAR(length=100),
@@ -33,14 +33,14 @@ TABLE_SCHEMA = {
         "is_more_than_100": Boolean,
         "import_time": TIMESTAMP,
     },
-    'ngung_giao_nhan': {
+    'tbl_ngung_giao_nhan': {
         "receiver_province": VARCHAR(length=30),
         "receiver_district": VARCHAR(length=30),
         "carrier": VARCHAR(length=20),
         "status": VARCHAR(length=30),
         "import_time": TIMESTAMP,
     },
-    'phan_vung_nvc': {
+    'tbl_phan_vung_nvc': {
         "carrier": VARCHAR(length=20),
         "receiver_province": VARCHAR(length=30),
         "receiver_district": VARCHAR(length=30),
@@ -48,7 +48,7 @@ TABLE_SCHEMA = {
         "inner_region": VARCHAR(length=30),
         "import_time": TIMESTAMP,
     },
-    'order_type': {
+    'tbl_order_type': {
         'carrier_id': SMALLINT,
         'sender_province_code': VARCHAR(length=2),
         'sender_district_code': VARCHAR(length=3),
@@ -57,14 +57,14 @@ TABLE_SCHEMA = {
         'new_type': VARCHAR(length=2),
         'route_type': VARCHAR(length=1),
     },
-    'service_fee': {
+    'tbl_service_fee': {
         'carrier_id': SMALLINT,
         'new_type': VARCHAR(length=2),
         'pickup': VARCHAR(length=1),
         'weight': INTEGER,
         'service_fee': INTEGER,
     },
-    'data_api': {
+    'tbl_data_api': {
         'receiver_province_code': VARCHAR(length=2),
         'receiver_district_code': VARCHAR(length=3),
         'carrier_id': SMALLINT,
@@ -84,7 +84,7 @@ TABLE_SCHEMA = {
         "star": NUMERIC(2, 1),
         "import_date": VARCHAR(length=10),
     },
-    'data_visualization': {
+    'tbl_data_visualization': {
         'order_code': VARCHAR(length=30),
         'sender_province_code': VARCHAR(length=2),
         "sender_province": VARCHAR(length=30),

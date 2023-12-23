@@ -1,3 +1,4 @@
+import optparse
 import sys
 from pathlib import Path
 
@@ -228,5 +229,17 @@ def out_data_service_fee(show_logs=True):
 
 
 if __name__ == '__main__':
-    out_data_order_type()
-    out_data_service_fee()
+    parser = optparse.OptionParser(description="Running mode")
+    parser.add_option(
+        '-m', '--mode',
+        action="store", dest="mode",
+        help="mode string", default=True
+    )
+    options, args = parser.parse_args()
+    # print(options.mode)
+
+    if options.mode == 'init':
+        out_data_order_type()
+        out_data_service_fee()
+    elif options.mode == 'daily':
+        pass
