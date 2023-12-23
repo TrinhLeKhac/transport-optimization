@@ -62,5 +62,5 @@ def xu_ly_danh_gia_zns(from_api=True):
         danh_gia_zns_df['date'] = pd.to_datetime(danh_gia_zns_df['date'], errors='coerce')
 
         # 4. Lưu thông tin
-        danh_gia_zns_df.to_parquet(ROOT_PATH + '/processed_data/danh_gia_zns_from_api.parquet', index=False)
+        danh_gia_zns_df.to_parquet(ROOT_PATH + '/processed_data/danh_gia_zns.parquet', index=False)
 
