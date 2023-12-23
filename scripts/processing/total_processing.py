@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+import optparse
 
 ROOT_PATH = str(Path(__file__).parent.parent.parent)
 sys.path.append(ROOT_PATH)
@@ -14,7 +15,7 @@ from scripts.processing.phan_vung_nha_van_chuyen import xu_ly_phan_vung_nha_van_
 from scripts.processing.giao_dich import xu_ly_giao_dich, xu_ly_giao_dich_co_khoi_luong, tong_hop_thong_tin_giao_dich
 
 
-def total_processing():
+def total_processing(from_api=True):
 
     if not os.path.exists(ROOT_PATH + '/processed_data'):
         os.makedirs(ROOT_PATH + '/processed_data')
@@ -32,7 +33,7 @@ def total_processing():
     print('>>> Done\n')
 
     print('4. Xử lý data đánh giá ZNS...')
-    xu_ly_danh_gia_zns()
+    xu_ly_danh_gia_zns(from_api=from_api)
     print('>>> Done\n')
 
     print('5. Xử lý data ngưng giao nhận...')
@@ -43,18 +44,36 @@ def total_processing():
     xu_ly_phan_vung_nha_van_chuyen()
     print('>>> Done\n')
 
-    print('7. Xử lý data giao dịch...')
-    xu_ly_giao_dich()
-    print('>>> Done\n')
+    if from_api:
+        print('7. Tổng hợp thông tin giao dịch...')
+        tong_hop_thong_tin_giao_dich(from_api=from_api)
+        print('>>> Done\n')
+    else:
+        print('7. Xử lý data giao dịch...')
+        xu_ly_giao_dich()
+        print('>>> Done\n')
 
-    print('8. Xử lý data giao dịch có khối lượng...')
-    xu_ly_giao_dich_co_khoi_luong()
-    print('>>> Done\n')
+        print('8. Xử lý data giao dịch có khối lượng...')
+        xu_ly_giao_dich_co_khoi_luong()
+        print('>>> Done\n')
 
-    print('9. Tổng hợp thông tin giao dịch...')
-    tong_hop_thong_tin_giao_dich()
-    print('>>> Done\n')
+        print('9. Tổng hợp thông tin giao dịch...')
+        tong_hop_thong_tin_giao_dich(from_api=from_api)
+        print('>>> Done\n')
 
 
 if __name__ == '__main__':
-    total_processing()
+
+    parser = optparse.OptionParser(description="Running mode")
+    parser.add_option(
+        '-m', '--mode',
+        action="store", dest="mode",
+        help="mode string", default="excel"
+    )
+    options, args = parser.parse_args()
+    # print(options.mode)
+
+    if options.mode == 'api':
+        total_processing(from_api=True)
+    elif options.mode == 'excel':
+        total_processing(from_api=False)

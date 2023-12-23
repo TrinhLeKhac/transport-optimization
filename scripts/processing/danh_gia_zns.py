@@ -64,6 +64,3 @@ def xu_ly_danh_gia_zns(from_api=True):
         # 4. Lưu thông tin
         danh_gia_zns_df.to_parquet(ROOT_PATH + '/processed_data/danh_gia_zns_from_api.parquet', index=False)
 
-
-if __name__ == '__main__':
-    xu_ly_danh_gia_zns(from_api=True)

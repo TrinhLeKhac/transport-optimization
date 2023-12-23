@@ -325,6 +325,3 @@ def tong_hop_thong_tin_giao_dich(from_api=True):
         # 4. Lưu thông tin
         giao_dich_valid.to_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid_from_api.parquet', index=False)
 
-
-if __name__ == '__main__':
-    tong_hop_thong_tin_giao_dich(from_api=True)
