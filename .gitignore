@@ -3,5 +3,5 @@
 *.pyc
 *.xml
 /venv
-.env
+/.env
 **/__pycache__/
