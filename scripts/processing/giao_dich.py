@@ -322,6 +322,12 @@ def tong_hop_thong_tin_giao_dich(from_api=True):
             'delivery_count', 'pickup', 'barter',
             'carrier_delivered_at', 'picked_at', 'last_delivering_at', 'carrier_updated_at', 'date'
         ]]
+        giao_dich_valid['created_at'] = pd.to_datetime(giao_dich_valid['created_at'], errors='coerce')
+        giao_dich_valid['carrier_delivered_at'] = pd.to_datetime(giao_dich_valid['carrier_delivered_at'], errors='coerce')
+        giao_dich_valid['picked_at'] = pd.to_datetime(giao_dich_valid['picked_at'], errors='coerce')
+        giao_dich_valid['last_delivering_at'] = pd.to_datetime(giao_dich_valid['last_delivering_at'], errors='coerce')
+        giao_dich_valid['carrier_updated_at'] = pd.to_datetime(giao_dich_valid['carrier_updated_at'], errors='coerce')
+
         # 4. Lưu thông tin
         giao_dich_valid.to_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid_from_api.parquet', index=False)
 
