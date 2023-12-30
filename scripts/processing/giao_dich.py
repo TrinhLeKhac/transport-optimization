@@ -17,7 +17,7 @@ OLD_DATA_COLS = [
 NEW_DATA_COLS = [
     'created_at', 'order_code', 'carrier', 'carrier_status',
     'receiver_province', 'receiver_district', 'delivery_count',
-    'delivery_type', 'is_returned', 'finished_at',
+    'delivery_type', 'is_returned', 'carrier_delivered_at',
 ]
 
 
@@ -154,9 +154,9 @@ def xu_ly_giao_dich():
     best_df.loc[best_df['is_returned'] == '✅', 'is_returned'] = True
     best_df['is_returned'] = best_df['is_returned'].fillna(False)
     best_df['created_at'] = pd.to_datetime(best_df['created_at'], errors='coerce')
-    best_df['finished_at'] = pd.to_datetime(best_df['finished_at'], errors='coerce')
+    best_df['carrier_delivered_at'] = pd.to_datetime(best_df['carrier_delivered_at'], errors='coerce')
 
-    best_df['finished_at'] = best_df['finished_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    best_df['carrier_delivered_at'] = best_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
     best_df['created_at'] = best_df['created_at'].apply(lambda x: str(x)).apply(convert_datetime_type2)
 
     print('Xử lý giao dịch Ninja Van...')
@@ -169,9 +169,9 @@ def xu_ly_giao_dich():
     njv_df['is_returned'] = njv_df['is_returned'].fillna(False)
 
     njv_df['created_at'] = pd.to_datetime(njv_df['created_at'], errors='coerce')
-    njv_df['finished_at'] = pd.to_datetime(njv_df['finished_at'], errors='coerce')
+    njv_df['carrier_delivered_at'] = pd.to_datetime(njv_df['carrier_delivered_at'], errors='coerce')
 
-    njv_df['finished_at'] = njv_df['finished_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    njv_df['carrier_delivered_at'] = njv_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
 
     print('Xử lý giao dịch GHN...')
     ghn_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='GHN')
@@ -183,9 +183,9 @@ def xu_ly_giao_dich():
     ghn_df['is_returned'] = ghn_df['is_returned'].fillna(False)
 
     ghn_df['created_at'] = pd.to_datetime(ghn_df['created_at'], errors='coerce')
-    ghn_df['finished_at'] = pd.to_datetime(ghn_df['finished_at'], errors='coerce')
+    ghn_df['carrier_delivered_at'] = pd.to_datetime(ghn_df['carrier_delivered_at'], errors='coerce')
 
-    ghn_df['finished_at'] = ghn_df['finished_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    ghn_df['carrier_delivered_at'] = ghn_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
 
     print('Xử lý giao dịch Viettel Post...')
     vtp_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='VTP')
@@ -197,9 +197,9 @@ def xu_ly_giao_dich():
     vtp_df['is_returned'] = vtp_df['is_returned'].fillna(False)
 
     vtp_df['created_at'] = pd.to_datetime(vtp_df['created_at'], errors='coerce')
-    vtp_df['finished_at'] = pd.to_datetime(vtp_df['finished_at'], errors='coerce')
+    vtp_df['carrier_delivered_at'] = pd.to_datetime(vtp_df['carrier_delivered_at'], errors='coerce')
 
-    vtp_df['finished_at'] = vtp_df['finished_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    vtp_df['carrier_delivered_at'] = vtp_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
 
     print('Xử lý giao dịch SPX Express...')
     spx_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='SPX')
@@ -211,9 +211,9 @@ def xu_ly_giao_dich():
     spx_df['is_returned'] = spx_df['is_returned'].fillna(False)
 
     spx_df['created_at'] = pd.to_datetime(spx_df['created_at'], errors='coerce')
-    spx_df['finished_at'] = pd.to_datetime(spx_df['finished_at'], errors='coerce')
+    spx_df['carrier_delivered_at'] = pd.to_datetime(spx_df['carrier_delivered_at'], errors='coerce')
 
-    spx_df['finished_at'] = spx_df['finished_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    spx_df['carrier_delivered_at'] = spx_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
 
     print('Xử lý giao dịch GHTK...')
     ghtk_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='GHTK')
@@ -225,9 +225,9 @@ def xu_ly_giao_dich():
     ghtk_df['is_returned'] = ghtk_df['is_returned'].fillna(False)
 
     ghtk_df['created_at'] = pd.to_datetime(ghtk_df['created_at'], errors='coerce')
-    ghtk_df['finished_at'] = pd.to_datetime(ghtk_df['finished_at'], errors='coerce')
+    ghtk_df['carrier_delivered_at'] = pd.to_datetime(ghtk_df['carrier_delivered_at'], errors='coerce')
 
-    ghtk_df['finished_at'] = ghtk_df['finished_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    ghtk_df['carrier_delivered_at'] = ghtk_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
 
     print('Tổng hợp giao dịch...')
     giao_dich_df = pd.concat([best_df, njv_df, ghn_df, vtp_df, spx_df, ghtk_df], ignore_index=True)
@@ -302,7 +302,7 @@ def tong_hop_thong_tin_giao_dich(from_api=True):
             'receiver_province', 'receiver_district',
             'carrier_status', 'order_type', 'order_type_id', 'sys_order_type_id',
             'delivery_count', 'delivery_type',
-            'is_returned', 'finished_at',
+            'is_returned', 'carrier_delivered_at',
         ]]
 
         set_carrier = set(giao_dich_valid['carrier'].unique().tolist())
