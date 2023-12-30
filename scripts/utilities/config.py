@@ -339,3 +339,74 @@ for carrier, id in MAPPING_CARRIER_ID.items():
 
 CUSTOMER_BEST_CARRIER_DEFAULT = 'BEST Express'
 PARTNER_BEST_CARRIER_DEFAULT = 'BEST Express'
+
+CHUA_GIAO_STATUS = [
+    'Xuất hàng khỏi trung tâm khai thác (trung tâm chia chọn)',
+    'Trọng lượng bưu kiện',
+    'Giao hàng không thành công',
+    'Đến nơi sắp xếp hàng',
+    'Đang trung chuyển',
+    'Nhận hàng vào trung tâm khai thác (trung tâm chia chọn)',
+    'Đang chờ lên lịch lại',
+    'Nhận hàng vào bưu cục phát hàng',
+    'In Transit | Đang vận chuyển',
+    'Nhập kho',
+    'Đóng bảng kê đi',
+    'Nhận bảng kê đến',
+    'Lần đầu tiên giao hàng thất bại',
+    'Tồn - Khách hàng nghỉ, không có nhà',
+    'Nhận từ bưu tá - Bưu cục gốc',
+    'Chờ xác nhận giao lại',
+    'Xuất hàng đến trung tâm khai thác (trung tâm chia chọn)',
+    'Lấy hàng thành công',
+    'Tồn - Khách hàng đến bưu cục nhận',
+    'Phát tiếp',
+    'Trên các phương tiện cho giao hàng (RTS)',
+    'Sửa phiếu gửi',
+    'On Hold | Chờ giao lại',
+    'Chuyển tiếp bưu cục khác',
+    'Đang tương tác với người nhận',
+    'Đến Khu Phân Loại Hàng',
+]
+DANG_GIAO_STATUS = [
+    'Xuất hàng để đi giao',
+    'Giao bưu tá đi phát',
+    'Trên xe để giao hàng',
+    'Đang giao hàng',
+]
+HOAN_HANG_STATUS = [
+    'Trả hàng thành công',
+    'Trả lại cho người gửi',
+    'Returned | Trả hàng thành công',
+    'Trả lại cho người gửi được kích hoạt',
+    'xuất hàng khỏi trung tâm khai thác (trung tâm chia chọn) để trả về',
+    'Hoàn hàng thành công',
+    'Returning | Đang trả hàng',
+    'Thành công - Chuyển trả người gửi',
+    'Tồn - Thông báo chuyển hoàn bưu cục gốc',
+    'Nhận hàng vào trung tâm khai thác (trung tâm chia chọn) để trả về',
+    'Chuyển hoàn',
+    'Xuất hàng khỏi bưu cục phát để trả về',
+    'Đang trung chuyển hàng hoàn',
+    'Chuyển hoàn bưu cục gốc',
+    'Nhận hàng vào bưu cục trả hàng',
+    'Đang hoàn hàng',
+    'Bưu cục phát duyệt hoàn',
+    'Xác nhận chuyển hoàn',
+]
+THANH_CONG_STATUS = [
+    'Giao hàng thành công',
+    'Đã hoàn thành',
+    'Thành công - Phát thành công',
+    'Delivered | Giao hàng thành công',
+]
+THAT_LAC_STATUS = [
+    'Thất lạc',
+    'Hàng thất lạc',
+]
+KHONG_XET_STATUS = [
+    'Hủy đơn',
+    'Đã hủy',
+    'Đơn huỷ',
+    'Chờ lấy hàng',
+]

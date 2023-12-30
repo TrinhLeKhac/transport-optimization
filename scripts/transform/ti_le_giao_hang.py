@@ -57,16 +57,10 @@ def transform_data_ti_le_giao_hang():
 
     # 1. Đọc thông tin giao dịch valid
     giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet')
+    giao_dich_valid = giao_dich_valid[giao_dich_valid['carrier_status'].isin(THANH_CONG_STATUS + HOAN_HANG_STATUS)]
 
     # 2. Transform data hoàn hàng
-    hoan_hang = giao_dich_valid[giao_dich_valid['carrier_status'].isin([
-        'Trả hàng thành công',
-        'Trả lại cho người gửi',
-        'Returned | Trả hàng thành công',
-        'Hoàn hàng thành công',
-        'Đã đối soát công nợ trả hàng',
-        'Thành công - Chuyển trả người gửi'
-    ])].groupby(['receiver_province', 'receiver_district', 'carrier'])['order_code'].count().rename(
+    hoan_hang = giao_dich_valid[giao_dich_valid['carrier_status'].isin(HOAN_HANG_STATUS)].groupby(['receiver_province', 'receiver_district', 'carrier'])['order_code'].count().rename(
         'total_failed_order').reset_index()
 
     tong_don = giao_dich_valid.groupby(['receiver_province', 'receiver_district', 'carrier'])['order_code'].count().rename(

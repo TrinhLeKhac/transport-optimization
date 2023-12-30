@@ -177,14 +177,7 @@ def transform_data_thoi_gian_giao_hang_toan_trinh():
     giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet')
 
     # Xử lý data
-    giao_dich_thanh_cong = giao_dich_valid[giao_dich_valid['carrier_status'].isin([
-        'Giao hàng thành công',
-        'Đã hoàn thành',
-        'Delivered | Giao hàng thành công',
-        'Thành công - Phát thành công',
-        'Đã giao hàng/Chưa đối soát',
-        'Đã đối soát',
-    ])]
+    giao_dich_thanh_cong = giao_dich_valid[giao_dich_valid['carrier_status'].isin(THANH_CONG_STATUS)]
 
     giao_dich_thanh_cong = giao_dich_thanh_cong.loc[
         giao_dich_thanh_cong['carrier_delivered_at'].notna() & giao_dich_thanh_cong['created_at'].notna()]
