@@ -89,8 +89,8 @@ def xu_ly_phan_vung_nha_van_chuyen():
         phan_vung_nvc_final
             .merge(
             PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                'province_id': 'receiver_province_id',
-                'district_id': 'receiver_district_id',
+                'province_code': 'receiver_province_code',
+                'district_code': 'receiver_district_code',
                 'province': 'receiver_province',
                 'district': 'receiver_district'
             }), on=['receiver_province', 'receiver_district'], how='left')
@@ -101,7 +101,7 @@ def xu_ly_phan_vung_nha_van_chuyen():
     phan_vung_nvc_final['carrier_id'] = phan_vung_nvc_final['carrier'].map(MAPPING_CARRIER_ID)
     phan_vung_nvc_final = phan_vung_nvc_final[[
         'carrier_id', 'carrier',
-        'receiver_province_id', 'receiver_province', 'receiver_district_id', 'receiver_district',
+        'receiver_province_code', 'receiver_province', 'receiver_district_code', 'receiver_district',
         'outer_region_id', 'outer_region', 'inner_region_id', 'inner_region'
     ]]
 

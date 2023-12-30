@@ -59,8 +59,8 @@ def xu_ly_danh_gia_zns(from_api=True):
                 PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
                     'province': 'receiver_province',
                     'district': 'receiver_district',
-                    'province_id': 'receiver_province_code',
-                    'district_id': 'receiver_district_code',
+                    'province_code': 'receiver_province_code',
+                    'district_code': 'receiver_district_code',
                 }), on=['receiver_province_code', 'receiver_district_code'], how='left'
             )
         )

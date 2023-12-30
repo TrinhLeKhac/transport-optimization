@@ -8,8 +8,8 @@ from scripts.utilities.config import *
 from scripts.transform.total_transform import total_transform
 
 API_FULL_COLS = [
-    'receiver_province_id', 'receiver_province',
-    'receiver_district_id', 'receiver_district',
+    'receiver_province_code', 'receiver_province',
+    'receiver_district_code', 'receiver_district',
     'carrier_id', 'carrier', 'order_type',
     'order_type_id', 'sys_order_type_id', 'carrier_status', 'carrier_status_comment',
     'estimate_delivery_time_details', 'estimate_delivery_time',
@@ -31,7 +31,7 @@ API_FULL_COLS_RENAMED = [
 ]
 
 API_COLS = [
-    'receiver_province_id', 'receiver_district_id',
+    'receiver_province_code', 'receiver_district_code',
     'carrier_id', 'order_type_id', 'sys_order_type_id', 'carrier_status', 'carrier_status_comment',
     'estimate_delivery_time_details', 'estimate_delivery_time',
     'fastest_carrier_id', 'highest_score_carrier_id',
@@ -99,14 +99,14 @@ def customer_best_carrier(data_api_df):
     data_api_df['combine_col'] = data_api_df[["delivery_success_rate", "total_order"]].apply(tuple, axis=1)
 
     data_api_df["delivery_success_rate_id"] = \
-        data_api_df.groupby(["receiver_province_id", "receiver_district_id", "order_type_id"])["combine_col"].rank(
+        data_api_df.groupby(["receiver_province_code", "receiver_district_code", "order_type_id"])["combine_col"].rank(
             method="dense", ascending=False).astype(int)
 
     data_api_df['wscore'] = data_api_df['fastest_carrier_id'] * 1.4 + data_api_df['delivery_success_rate_id'] * 1.2 + \
                             data_api_df['highest_score_carrier_id']
 
     data_api_df["customer_best_carrier_id"] = \
-        data_api_df.groupby(["receiver_province_id", "receiver_district_id", "order_type_id"])["wscore"].rank(
+        data_api_df.groupby(["receiver_province_code", "receiver_district_code", "order_type_id"])["wscore"].rank(
             method="dense", ascending=True).astype(int)
 
     return data_api_df.drop(['combine_col', 'wscore'], axis=1)
@@ -258,8 +258,8 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
             PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
                 'province': 'receiver_province',
                 'district': 'receiver_district',
-                'province_id': 'receiver_province_id',
-                'district_id': 'receiver_district_id',
+                'province_code': 'receiver_province_code',
+                'district_code': 'receiver_district_code',
             }), on=['receiver_province', 'receiver_district'], how='left'
         )
     )
@@ -268,12 +268,12 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
     if show_logs:
         print('7. Thông tin nhà vận chuyển nhanh nhất, hiệu quả nhất')
     api_data_final["fastest_carrier_id"] = \
-        api_data_final.groupby(["receiver_province_id", "receiver_district_id", "order_type_id"])[
+        api_data_final.groupby(["receiver_province_code", "receiver_district_code", "order_type_id"])[
             "estimate_delivery_time_details"].rank(method="dense", ascending=True)
     api_data_final["fastest_carrier_id"] = api_data_final["fastest_carrier_id"].astype(int)
 
     api_data_final["highest_score_carrier_id"] = \
-        api_data_final.groupby(["receiver_province_id", "receiver_district_id", "order_type_id"])["score"].rank(
+        api_data_final.groupby(["receiver_province_code", "receiver_district_code", "order_type_id"])["score"].rank(
             method="dense", ascending=False)
     api_data_final["highest_score_carrier_id"] = api_data_final["highest_score_carrier_id"].astype(int)
 

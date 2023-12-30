@@ -34,7 +34,7 @@ def create_customer_tab():
             sender_province_code = (
                 province_district_df.loc[
                     province_district_df['province'] == opt_sender_province
-                ]['province_id'].values[0]
+                ]['province_code'].values[0]
             )
         with sender_district:
             opt_sender_district = st.selectbox(
@@ -48,7 +48,7 @@ def create_customer_tab():
             sender_district_code = (
                 province_district_df.loc[
                     province_district_df['district'] == opt_sender_district
-                ]['district_id'].values[0]
+                ]['district_code'].values[0]
             )
         with receiver_province:
             opt_receiver_province = st.selectbox(
@@ -59,7 +59,7 @@ def create_customer_tab():
             receiver_province_code = (
                 province_district_df.loc[
                     province_district_df['province'] == opt_receiver_province
-                ]['province_id'].values[0]
+                ]['province_code'].values[0]
             )
         with receiver_district:
             opt_receiver_district = st.selectbox(
@@ -73,7 +73,7 @@ def create_customer_tab():
             receiver_district_code = (
                 province_district_df.loc[
                     province_district_df['district'] == opt_receiver_district
-                ]['district_id'].values[0]
+                ]['district_code'].values[0]
             )
 
         opt_pickup, opt_weight = st.columns(2)

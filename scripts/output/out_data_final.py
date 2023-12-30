@@ -9,9 +9,9 @@ from scripts.utilities.config import *
 from scripts.output.out_data_api import out_data_api
 
 FINAL_FULL_COLS = [
-    'order_id',
-    'sender_province_id', 'sender_province', 'sender_district_id', 'sender_district',
-    'receiver_province_id', 'receiver_province', 'receiver_district_id', 'receiver_district',
+    'order_code',
+    'sender_province_code', 'sender_province', 'sender_district_code', 'sender_district',
+    'receiver_province_code', 'receiver_province', 'receiver_district_code', 'receiver_district',
     'carrier_id', 'carrier', 'order_type', 'order_type_id', 'sys_order_type_id',
     'weight', 'service_fee', 'delivery_type',
     'carrier_status', 'carrier_status_comment',
@@ -37,7 +37,7 @@ FINAL_FULL_COLS_RENAMED = [
     'price_ranking', 'speed_ranking', 'score_ranking',
 ]
 FINAL_COLS = [
-    'order_id', 'carrier_id', 'order_type_id', 'sys_order_type_id', 'service_fee',
+    'order_code', 'carrier_id', 'order_type_id', 'sys_order_type_id', 'service_fee',
     'carrier_status', 'carrier_status_comment',
     'estimate_delivery_time_details', 'estimate_delivery_time', 'total_order', 'delivery_success_rate',
     'customer_best_carrier_id', 'partner_best_carrier_id', 'score', 'star',
@@ -119,24 +119,24 @@ def type_of_system_delivery(s):
 
 def generate_sample_input(n_rows=1000):
     result_df = pd.DataFrame()
-    result_df['order_id'] = [
+    result_df['order_code'] = [
         ''.join(np.random.choice(list('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 12)) \
         + ''.join(np.random.choice(list('123456789'), 9))
         for i in range(n_rows)
     ]
-    result_df['sender_district_id'] = np.random.choice(PROVINCE_MAPPING_DISTRICT_DF['district_id'].tolist(), n_rows)
-    result_df['receiver_district_id'] = np.random.choice(PROVINCE_MAPPING_DISTRICT_DF['district_id'].tolist(), n_rows)
+    result_df['sender_district_code'] = np.random.choice(PROVINCE_MAPPING_DISTRICT_DF['district_code'].tolist(), n_rows)
+    result_df['receiver_district_code'] = np.random.choice(PROVINCE_MAPPING_DISTRICT_DF['district_code'].tolist(), n_rows)
     result_df = (
         result_df.merge(
-            PROVINCE_MAPPING_DISTRICT_DF[['province_id', 'district_id']].rename(columns={
-                'province_id': 'sender_province_id',
-                'district_id': 'sender_district_id'
-            }), on='sender_district_id', how='left')
+            PROVINCE_MAPPING_DISTRICT_DF[['province_code', 'district_code']].rename(columns={
+                'province_code': 'sender_province_code',
+                'district_code': 'sender_district_code'
+            }), on='sender_district_code', how='left')
             .merge(
-            PROVINCE_MAPPING_DISTRICT_DF[['province_id', 'district_id']].rename(columns={
-                'province_id': 'receiver_province_id',
-                'district_id': 'receiver_district_id'
-            }), on='receiver_district_id', how='left')
+            PROVINCE_MAPPING_DISTRICT_DF[['province_code', 'district_code']].rename(columns={
+                'province_code': 'receiver_province_code',
+                'district_code': 'receiver_district_code'
+            }), on='receiver_district_code', how='left')
     )
     result_df['weight'] = [
         np.random.choice(list(range(100, 50000, 100)))
@@ -149,8 +149,8 @@ def generate_sample_input(n_rows=1000):
     ]
 
     return result_df[[
-        'order_id', 'weight', 'delivery_type',
-        'sender_province_id', 'sender_district_id', 'receiver_province_id', 'receiver_district_id',
+        'order_code', 'weight', 'delivery_type',
+        'sender_province_code', 'sender_district_code', 'receiver_province_code', 'receiver_district_code',
     ]]
 
 
@@ -161,18 +161,18 @@ def generate_order_type(input_df, carriers=ACTIVE_CARRIER):
         result_df
             .merge(
             PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                'province_id': 'sender_province_id',
-                'district_id': 'sender_district_id',
+                'province_code': 'sender_province_code',
+                'district_code': 'sender_district_code',
                 'province': 'sender_province',
                 'district': 'sender_district'
-            }), on=['sender_province_id', 'sender_district_id'], how='left')
+            }), on=['sender_province_code', 'sender_district_code'], how='left')
             .merge(
             PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                'province_id': 'receiver_province_id',
-                'district_id': 'receiver_district_id',
+                'province_code': 'receiver_province_code',
+                'district_code': 'receiver_district_code',
                 'province': 'receiver_province',
                 'district': 'receiver_district'
-            }), on=['receiver_province_id', 'receiver_district_id'], how='left')
+            }), on=['receiver_province_code', 'receiver_district_code'], how='left')
     )
 
     phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
@@ -212,7 +212,7 @@ def combine_info_from_api(input_df, show_logs=False):
         'score', 'star', 'total_order'
     ]]
     api_data_final.columns = [
-        'receiver_province_id', 'receiver_district_id', 'carrier_id', 'order_type_id',
+        'receiver_province_code', 'receiver_district_code', 'carrier_id', 'order_type_id',
         'carrier_status', 'carrier_status_comment',
         'estimate_delivery_time_details', 'estimate_delivery_time',
         'customer_best_carrier_id',
@@ -223,7 +223,7 @@ def combine_info_from_api(input_df, show_logs=False):
     result_df = (
         input_df.merge(
             api_data_final,
-            on=['receiver_province_id', 'receiver_district_id', 'carrier_id', 'order_type_id'], how='left'
+            on=['receiver_province_code', 'receiver_district_code', 'carrier_id', 'order_type_id'], how='left'
         )
     )
     return result_df
@@ -292,27 +292,27 @@ def calculate_service_fee_v2(input_df):
 
 
 def calculate_notification(input_df):
-    re_nhat_df = input_df.groupby(['order_id'])['service_fee'].min().reset_index()
+    re_nhat_df = input_df.groupby(['order_code'])['service_fee'].min().reset_index()
     re_nhat_df['notification'] = 'Rẻ nhất'
 
     # Gắn ngược lại để lấy đủ row (trong trường hợp có nhiều carrier cùng mức giá
-    re_nhat_df = re_nhat_df.merge(input_df, on=['order_id', 'service_fee'], how='inner')
+    re_nhat_df = re_nhat_df.merge(input_df, on=['order_code', 'service_fee'], how='inner')
 
-    remain_df1 = merge_left_only(input_df, re_nhat_df, keys=['order_id', 'service_fee'])
+    remain_df1 = merge_left_only(input_df, re_nhat_df, keys=['order_code', 'service_fee'])
 
-    nhanh_nhat_df = remain_df1.groupby(['order_id'])['estimate_delivery_time_details'].min().reset_index()
+    nhanh_nhat_df = remain_df1.groupby(['order_code'])['estimate_delivery_time_details'].min().reset_index()
     nhanh_nhat_df['notification'] = 'Nhanh nhất'
-    nhanh_nhat_df = nhanh_nhat_df.merge(remain_df1, on=['order_id', 'estimate_delivery_time_details'],
+    nhanh_nhat_df = nhanh_nhat_df.merge(remain_df1, on=['order_code', 'estimate_delivery_time_details'],
                                         how='inner')
 
     remain_df2 = merge_left_only(remain_df1, nhanh_nhat_df,
-                                 keys=['order_id', 'estimate_delivery_time_details'])
+                                 keys=['order_code', 'estimate_delivery_time_details'])
 
-    hieu_qua_nhat_df = remain_df2.groupby(['order_id'])['score'].max().reset_index()
+    hieu_qua_nhat_df = remain_df2.groupby(['order_code'])['score'].max().reset_index()
     hieu_qua_nhat_df['notification'] = 'Dịch vụ tốt'
-    hieu_qua_nhat_df = hieu_qua_nhat_df.merge(remain_df2, on=['order_id', 'score'], how='inner')
+    hieu_qua_nhat_df = hieu_qua_nhat_df.merge(remain_df2, on=['order_code', 'score'], how='inner')
 
-    remain_df3 = merge_left_only(remain_df2, hieu_qua_nhat_df, keys=['order_id', 'score'])
+    remain_df3 = merge_left_only(remain_df2, hieu_qua_nhat_df, keys=['order_code', 'score'])
     remain_df3['notification'] = 'Bình thường'
 
     result_df = pd.concat([
@@ -327,7 +327,7 @@ def calculate_notification(input_df):
 
 def calculate_notification_v2(input_df):
     result_df = input_df.copy()
-    result_df["cheapest_carrier_id"] = result_df.groupby("order_id")["service_fee"].rank(method="dense", ascending=True)
+    result_df["cheapest_carrier_id"] = result_df.groupby("order_code")["service_fee"].rank(method="dense", ascending=True)
     result_df["cheapest_carrier_id"] = result_df["cheapest_carrier_id"].astype(int)
 
     return result_df
@@ -365,7 +365,7 @@ def partner_best_carrier(data_api_df):
     data_api_df['wscore'] = data_api_df['cheapest_carrier_id'] * 1.4 + data_api_df['delivery_success_rate_id'] * 1.2 + \
                             data_api_df['highest_score_carrier_id']
     data_api_df["partner_best_carrier_id"] = \
-        data_api_df.groupby(["order_id"])["wscore"].rank(
+        data_api_df.groupby(["order_code"])["wscore"].rank(
             method="dense", ascending=True).astype(int)
 
     return data_api_df.drop(['wscore'], axis=1)
@@ -375,29 +375,29 @@ def out_data_final(input_df=None, carriers=ACTIVE_CARRIER, show_logs=False):
     if input_df is None:
         giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet')
         giao_dich_valid = giao_dich_valid[[
-            'order_id', 'weight', 'delivery_type', 'sender_province', 'sender_district',
+            'order_code', 'weight', 'delivery_type', 'sender_province', 'sender_district',
             'receiver_province', 'receiver_district'
         ]]
         focus_df = (
             giao_dich_valid.merge(
                 PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                    'province_id': 'sender_province_id',
-                    'district_id': 'sender_district_id',
+                    'province_code': 'sender_province_code',
+                    'district_code': 'sender_district_code',
                     'province': 'sender_province',
                     'district': 'sender_district'
                 }), on=['sender_province', 'sender_district'], how='left')
                 .merge(
                 PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                    'province_id': 'receiver_province_id',
-                    'district_id': 'receiver_district_id',
+                    'province_code': 'receiver_province_code',
+                    'district_code': 'receiver_district_code',
                     'province': 'receiver_province',
                     'district': 'receiver_district',
                 }), on=['receiver_province', 'receiver_district'], how='left')
         )
 
         focus_df = focus_df[[
-            'order_id', 'weight', 'delivery_type', 'sender_province_id', 'sender_district_id',
-            'receiver_province_id', 'receiver_district_id'
+            'order_code', 'weight', 'delivery_type', 'sender_province_code', 'sender_district_code',
+            'receiver_province_code', 'receiver_district_code'
         ]]
         focus_df['delivery_type'] = focus_df['delivery_type'].fillna('Gửi Bưu Cục')
 

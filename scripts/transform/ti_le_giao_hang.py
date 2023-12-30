@@ -66,10 +66,10 @@ def transform_data_ti_le_giao_hang():
         'Hoàn hàng thành công',
         'Đã đối soát công nợ trả hàng',
         'Thành công - Chuyển trả người gửi'
-    ])].groupby(['receiver_province', 'receiver_district', 'carrier'])['order_id'].count().rename(
+    ])].groupby(['receiver_province', 'receiver_district', 'carrier'])['order_code'].count().rename(
         'total_failed_order').reset_index()
 
-    tong_don = giao_dich_valid.groupby(['receiver_province', 'receiver_district', 'carrier'])['order_id'].count().rename(
+    tong_don = giao_dich_valid.groupby(['receiver_province', 'receiver_district', 'carrier'])['order_code'].count().rename(
         'total_order').reset_index()
 
     ti_le_giao_hang = hoan_hang.merge(tong_don, on=['receiver_province', 'receiver_district', 'carrier'], how='right')
