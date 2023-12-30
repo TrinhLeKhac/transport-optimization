@@ -72,7 +72,7 @@ def xu_ly_danh_gia_zns(from_api=True):
             'receiver_province', 'receiver_district', 'carrier',
             'n_messages', 'n_stars', 'comment', 'review', 'reviewed_at', 'date'
         ]
-        # feedbacks dạng list, comment ở file transform ở dạng str => chuyển đổi
+
         danh_gia_zns_df['reviewed_at'] = pd.to_datetime(danh_gia_zns_df['reviewed_at'], errors='coerce')
         danh_gia_zns_df['date'] = pd.to_datetime(danh_gia_zns_df['date'], errors='coerce')
 

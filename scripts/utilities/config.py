@@ -13,7 +13,7 @@ TRONG_SO = {
     'Tiêu chí': 6,
     'Phân loại': {
         'Loại': -10,
-        '1 sao & Nhân viên không nhiệt tình': -10,
+        '1 sao & Đánh giá xấu': -10,
         'Nhiều hơn 1 lần đánh giá 1 sao': -8,
         'Đánh giá 5 sao trên 95% đơn': 9,
         'Không phát sinh đánh giá 1, 2, 3 sao': 8,
@@ -285,7 +285,7 @@ TRONG_SO = {
 #         'Tiêu chí': 4,
 #         'Phân loại': {
 #             'Loại': -10,
-#             '1 sao & Nhân viên không nhiệt tình': -8,
+#             '1 sao & Đánh giá xấu': -8,
 #             'Nhiều hơn 1 lần đánh giá 1 sao': -6,
 #             'Đánh giá 5 sao trên 95% đơn': 10,
 #             'Không phát sinh đánh giá 1, 2, 3 sao': 6,
