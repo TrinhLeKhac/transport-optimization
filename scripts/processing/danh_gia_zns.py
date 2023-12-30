@@ -27,6 +27,11 @@ def xu_ly_danh_gia_zns(from_api=True):
             'receiver_province', 'receiver_district', 'carrier',
             'n_messages', 'n_stars', 'comment', 'review', 'reviewed_at',
         ]
+        danh_gia_zns_df['comment'] = danh_gia_zns_df['comment'].str.split(', ')
+        danh_gia_zns_df['date'] = None
+
+        danh_gia_zns_df['reviewed_at'] = pd.to_datetime(danh_gia_zns_df['reviewed_at'], errors='coerce')
+        danh_gia_zns_df['date'] = pd.to_datetime(danh_gia_zns_df['date'], errors='coerce')
 
         # 2. Chuẩn hóa tên quận/huyện, tỉnh/thành
         danh_gia_zns_df = normalize_province_district(danh_gia_zns_df, tinh_thanh='receiver_province',
@@ -35,8 +40,6 @@ def xu_ly_danh_gia_zns(from_api=True):
         # 3. Check tên nhà vận chuyển đã được chuẩn hóa chưa
         danh_gia_zns_df = danh_gia_zns_df.loc[danh_gia_zns_df['carrier'] != 'SuperShip']
         danh_gia_zns_df.loc[danh_gia_zns_df['carrier'] == 'Shopee Express', 'carrier'] = 'SPX Express'
-
-        danh_gia_zns_df['reviewed_at'] = pd.to_datetime(danh_gia_zns_df['reviewed_at'], errors='coerce')
 
         set_carrier = set(danh_gia_zns_df['carrier'].unique().tolist())
         set_norm_full_carrier = set(MAPPING_CARRIER_ID.keys())

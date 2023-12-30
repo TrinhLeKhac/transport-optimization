@@ -14,24 +14,17 @@ def transform_data_danh_gia_zns(from_api=True):
 
     # Đọc thông tin data ZNS
     danh_gia_zns = pd.read_parquet(ROOT_PATH + '/processed_data/danh_gia_zns.parquet')
-    if not from_api:
-        danh_gia_zns['comment'] = danh_gia_zns['comment'].fillna('Đánh giá khác')
-        danh_gia_zns['comment'] = danh_gia_zns['comment'].apply(lambda s: unidecode(' '.join(s.split()).strip().lower()))
-        danh_gia_zns.loc[
-            danh_gia_zns['comment'].str.contains('nhan vien khong nhiet tinh'), 'comment'
-        ] = 'Đánh giá xấu'
-        danh_gia_zns.loc[danh_gia_zns['comment'] != 'Đánh giá xấu', 'comment'] = 'Đánh giá khác'
-    else:
-        comment = danh_gia_zns[['receiver_province', 'receiver_district', 'carrier', 'comment']].explode(
-            column='comment')
-        comment = comment.loc[comment['comment'].notna()]
-        comment.loc[comment['comment'].isin(BAD_COMMENTS), 'comment'] = 'Đánh giá xấu'
-        comment.loc[comment['comment'] != 'Đánh giá xấu', 'comment'] = 'Đánh giá khác'
-        comment = comment.sort_values(['comment'], ascending=False).drop_duplicates(['receiver_province', 'receiver_district', 'carrier'], keep='first')
-        danh_gia_zns = danh_gia_zns.drop('comment', axis=1).merge(
-            comment, on=['receiver_province', 'receiver_district', 'carrier'], how='left'
-        )
-        danh_gia_zns['comment'] = danh_gia_zns['comment'].fillna('Không có thông tin')
+
+    comment = danh_gia_zns[['receiver_province', 'receiver_district', 'carrier', 'comment']].explode(
+        column='comment')
+    comment = comment.loc[comment['comment'].notna()]
+    comment.loc[comment['comment'].isin(BAD_COMMENTS), 'comment'] = 'Đánh giá xấu'
+    comment.loc[comment['comment'] != 'Đánh giá xấu', 'comment'] = 'Đánh giá khác'
+    comment = comment.sort_values(['comment'], ascending=False).drop_duplicates(['receiver_province', 'receiver_district', 'carrier'], keep='first')
+    danh_gia_zns = danh_gia_zns.drop('comment', axis=1).merge(
+        comment, on=['receiver_province', 'receiver_district', 'carrier'], how='left'
+    )
+    danh_gia_zns['comment'] = danh_gia_zns['comment'].fillna('Không có thông tin')
 
     danh_gia_zns = danh_gia_zns[[
         'receiver_province', 'receiver_district',
