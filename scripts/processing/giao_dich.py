@@ -296,13 +296,27 @@ def tong_hop_thong_tin_giao_dich(from_api=True):
         giao_dich_valid['order_type_id'] = giao_dich_valid['order_type'].map(MAPPING_ORDER_TYPE_ID)
         giao_dich_valid['sys_order_type_id'] = giao_dich_valid.apply(type_of_system_delivery, axis=1)
 
+        giao_dich_valid['sent_at'] = None
+        giao_dich_valid['order_status'] = None
+        giao_dich_valid['picked_at'] = None
+        giao_dich_valid['carrier_updated_at'] = None
+        giao_dich_valid['last_delivering_at'] = None
+        giao_dich_valid['date'] = None
+
+        giao_dich_valid['created_at'] = pd.to_datetime(giao_dich_valid['created_at'], errors='coerce')
+        giao_dich_valid['sent_at'] = pd.to_datetime(giao_dich_valid['sent_at'], errors='coerce')
+        giao_dich_valid['picked_at'] = pd.to_datetime(giao_dich_valid['picked_at'], errors='coerce')
+        giao_dich_valid['carrier_updated_at'] = pd.to_datetime(giao_dich_valid['carrier_updated_at'], errors='coerce')
+        giao_dich_valid['last_delivering_at'] = pd.to_datetime(giao_dich_valid['last_delivering_at'], errors='coerce')
+        giao_dich_valid['carrier_delivered_at'] = pd.to_datetime(giao_dich_valid['carrier_delivered_at'],
+                                                                 errors='coerce')
         giao_dich_valid = giao_dich_valid[[
             'created_at', 'order_code', 'carrier', 'weight',
-            'sender_province', 'sender_district',
-            'receiver_province', 'receiver_district',
-            'carrier_status', 'order_type', 'order_type_id', 'sys_order_type_id',
-            'delivery_count', 'delivery_type',
-            'is_returned', 'carrier_delivered_at',
+            'sender_province', 'sender_district', 'receiver_province', 'receiver_district',
+            'sent_at', 'order_status', 'carrier_status',
+            'order_type', 'order_type_id', 'sys_order_type_id',
+            'delivery_count', 'delivery_type', 'is_returned',
+            'picked_at', 'carrier_updated_at', 'last_delivering_at', 'carrier_delivered_at', 'date',
         ]]
 
         set_carrier = set(giao_dich_valid['carrier'].unique().tolist())
@@ -315,18 +329,72 @@ def tong_hop_thong_tin_giao_dich(from_api=True):
         port = settings.SQLALCHEMY_DATABASE_URI
         engine = create_engine(port)
         giao_dich_valid = pd.read_sql_query('select * from db_schema.order', con=engine)
-        giao_dich_valid = giao_dich_valid[[
-            'order_code', 'created_at', 'weight', 'sent_at', 'carrier_status',
-            'carrier_id', 'carrier_status',
-            'sender_province', 'sender_district', 'receiver_province', 'receiver_district',
-            'delivery_count', 'pickup', 'barter',
-            'carrier_delivered_at', 'picked_at', 'last_delivering_at', 'carrier_updated_at', 'date'
-        ]]
+
+        giao_dich_valid['carrier'] = giao_dich_valid['carrier_id'].map(MAPPING_ID_CARRIER)
+        giao_dich_valid['delivery_type'] = giao_dich_valid['pickup'].map({'0': 'Gửi Bưu Cục', '1': 'Lấy Tận Nơi'})
+        giao_dich_valid['is_returned'] = giao_dich_valid['barter'].map({'0': False, '1': True})
+
+        giao_dich_valid = giao_dich_valid.rename(columns={
+            'sender_province': 'sender_province_code',
+            'sender_district': 'sender_district_code',
+            'receiver_province': 'receiver_province_code',
+            'receiver_district': 'receiver_district_code'
+        })
+        giao_dich_valid = (
+            giao_dich_valid.merge(
+                PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
+                    'province': 'sender_province',
+                    'district': 'sender_district',
+                    'province_code': 'sender_province_code',
+                    'district_code': 'sender_district_code',
+                }), on=['sender_province_code', 'sender_district_code'], how='left'
+            ).merge(
+                PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
+                    'province': 'receiver_province',
+                    'district': 'receiver_district',
+                    'province_code': 'receiver_province_code',
+                    'district_code': 'receiver_district_code',
+                }), on=['receiver_province_code', 'receiver_district_code'], how='left'
+            )
+        )
+
+        phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
+        phan_vung_nvc = phan_vung_nvc[
+            ['carrier', 'receiver_province', 'receiver_district', 'outer_region', 'inner_region']]
+
+        giao_dich_valid = (
+            giao_dich_valid.merge(
+                phan_vung_nvc.rename(columns={
+                    'receiver_province': 'sender_province',
+                    'receiver_district': 'sender_district',
+                    'outer_region': 'sender_outer_region',
+                    'inner_region': 'sender_inner_region',
+                }), on=['carrier', 'sender_province', 'sender_district'], how='left').merge(
+                phan_vung_nvc.rename(columns={
+                    'outer_region': 'receiver_outer_region',
+                    'inner_region': 'receiver_inner_region',
+                }), on=['carrier', 'receiver_province', 'receiver_district'], how='left')
+        )
+
+        giao_dich_valid['order_type'] = giao_dich_valid.apply(type_of_delivery, axis=1)
+        giao_dich_valid['order_type_id'] = giao_dich_valid['order_type'].map(MAPPING_ORDER_TYPE_ID)
+        giao_dich_valid['sys_order_type_id'] = giao_dich_valid.apply(type_of_system_delivery, axis=1)
+
         giao_dich_valid['created_at'] = pd.to_datetime(giao_dich_valid['created_at'], errors='coerce')
-        giao_dich_valid['carrier_delivered_at'] = pd.to_datetime(giao_dich_valid['carrier_delivered_at'], errors='coerce')
+        giao_dich_valid['sent_at'] = pd.to_datetime(giao_dich_valid['sent_at'], errors='coerce')
         giao_dich_valid['picked_at'] = pd.to_datetime(giao_dich_valid['picked_at'], errors='coerce')
-        giao_dich_valid['last_delivering_at'] = pd.to_datetime(giao_dich_valid['last_delivering_at'], errors='coerce')
         giao_dich_valid['carrier_updated_at'] = pd.to_datetime(giao_dich_valid['carrier_updated_at'], errors='coerce')
+        giao_dich_valid['last_delivering_at'] = pd.to_datetime(giao_dich_valid['last_delivering_at'], errors='coerce')
+        giao_dich_valid['carrier_delivered_at'] = pd.to_datetime(giao_dich_valid['carrier_delivered_at'],
+                                                                 errors='coerce')
+        giao_dich_valid = giao_dich_valid[[
+            'created_at', 'order_code', 'carrier', 'weight',
+            'sender_province', 'sender_district', 'receiver_province', 'receiver_district',
+            'sent_at', 'order_status', 'carrier_status',
+            'order_type', 'order_type_id', 'sys_order_type_id',
+            'delivery_count', 'delivery_type', 'is_returned',
+            'picked_at', 'carrier_updated_at', 'last_delivering_at', 'carrier_delivered_at', 'date',
+        ]]
 
         # 4. Lưu thông tin
         giao_dich_valid.to_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid_from_api.parquet', index=False)
