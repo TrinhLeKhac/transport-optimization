@@ -52,6 +52,13 @@ FINAL_COLS_RENAMED = [
 ]
 
 
+def approx(x):
+    if x%500 == 0:
+        return x
+    else:
+        return 500*(x//500 + 1)
+
+
 def type_of_delivery(s):
     if ((s['sender_outer_region'] == 'Miền Bắc') & (s['receiver_outer_region'] == 'Miền Nam')) \
             | ((s['sender_outer_region'] == 'Miền Nam') & (s['receiver_outer_region'] == 'Miền Bắc')):
@@ -291,6 +298,33 @@ def calculate_service_fee_v2(input_df):
     return result_df
 
 
+def calculate_service_fee_v3(input_df):
+    target_df = input_df.copy()
+    target_df.loc[target_df['weight'] > 50000, 'weight'] = 50000
+    target_df['weight'] = target_df['weight'].apply(approx)
+
+    cuoc_phi_df = pd.read_parquet(ROOT_PATH + '/processed_data/cuoc_phi.parquet')
+    cuoc_phi_df = cuoc_phi_df[['carrier', 'order_type', 'lt_or_eq', 'service_fee']].rename(columns={'lt_or_eq': 'weight'})
+
+    result_df = input_df.merge(cuoc_phi_df, on=['carrier', 'order_type', 'weight'], how='inner')
+
+    # Ninja Van lấy tận nơi cộng cước phí 1,500
+    result_df.loc[
+        result_df['carrier'].isin(['Ninja Van']) &
+        result_df['delivery_type'].isin(['Lấy Tận Nơi']),
+        'service_fee'
+    ] = result_df['service_fee'] + 1500
+
+    # GHN lấy tận nơi cộng cước phí 1,000
+    result_df.loc[
+        result_df['carrier'].isin(['GHN']) &
+        result_df['delivery_type'].isin(['Lấy Tận Nơi']),
+        'service_fee'
+    ] = result_df['service_fee'] + 1000
+
+    return result_df
+
+
 def calculate_notification(input_df):
     re_nhat_df = input_df.groupby(['order_code'])['service_fee'].min().reset_index()
     re_nhat_df['notification'] = 'Rẻ nhất'
@@ -415,11 +449,7 @@ def out_data_final(input_df=None, carriers=ACTIVE_CARRIER, show_logs=False):
     assert len(tmp_df2) == len(tmp_df1), 'Transform data sai'
 
     print('iii. Tính phí dịch vụ')
-    if input_df is None:
-        tmp_df3 = calculate_service_fee_v2(tmp_df2)
-    else:
-        tmp_df3 = calculate_service_fee(tmp_df2)
-    assert len(tmp_df3) == len(tmp_df2), 'Transform data sai'
+    tmp_df3 = calculate_service_fee_v3(tmp_df2)
 
     print('iv. Tính ranking nhà vận chuyển theo tiêu chí rẻ nhất')
     tmp_df4 = calculate_notification_v2(tmp_df3)
