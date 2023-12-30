@@ -15,8 +15,8 @@ OLD_DATA_COLS = [
 ]
 
 NEW_DATA_COLS = [
-    'created_at', 'order_code', 'carrier', 'order_status',
-    'receiver_province', 'receiver_district', 'n_deliveries',
+    'created_at', 'order_code', 'carrier', 'carrier_status',
+    'receiver_province', 'receiver_district', 'delivery_count',
     'delivery_type', 'is_returned', 'finished_at',
 ]
 
@@ -300,8 +300,8 @@ def tong_hop_thong_tin_giao_dich(from_api=True):
             'created_at', 'order_code', 'carrier', 'weight',
             'sender_province', 'sender_district',
             'receiver_province', 'receiver_district',
-            'order_status', 'order_type', 'order_type_id', 'sys_order_type_id',
-            'n_deliveries', 'delivery_type',
+            'carrier_status', 'order_type', 'order_type_id', 'sys_order_type_id',
+            'delivery_count', 'delivery_type',
             'is_returned', 'finished_at',
         ]]
 
@@ -316,7 +316,7 @@ def tong_hop_thong_tin_giao_dich(from_api=True):
         engine = create_engine(port)
         giao_dich_valid = pd.read_sql_query('select * from db_schema.order', con=engine)
         giao_dich_valid = giao_dich_valid[[
-            'order_code', 'created_at', 'weight', 'sent_at', 'order_status',
+            'order_code', 'created_at', 'weight', 'sent_at', 'carrier_status',
             'carrier_id', 'carrier_status',
             'sender_province', 'sender_district', 'receiver_province', 'receiver_district',
             'delivery_count', 'pickup', 'barter',

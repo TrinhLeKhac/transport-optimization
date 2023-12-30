@@ -59,7 +59,7 @@ def transform_data_ti_le_giao_hang():
     giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet')
 
     # 2. Transform data hoàn hàng
-    hoan_hang = giao_dich_valid[giao_dich_valid['order_status'].isin([
+    hoan_hang = giao_dich_valid[giao_dich_valid['carrier_status'].isin([
         'Trả hàng thành công',
         'Trả lại cho người gửi',
         'Returned | Trả hàng thành công',
