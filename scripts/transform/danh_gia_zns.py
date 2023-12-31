@@ -10,7 +10,7 @@ BAD_COMMENTS = [
 ]
 
 
-def transform_data_danh_gia_zns(from_api=True):
+def transform_data_danh_gia_zns():
 
     # Đọc thông tin data ZNS
     danh_gia_zns = pd.read_parquet(ROOT_PATH + '/processed_data/danh_gia_zns.parquet')

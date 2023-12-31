@@ -72,11 +72,18 @@ def get_data_viz(target_df):
     return total_analyze_df1, total_analyze_df2
 
 
+# @st.cache_data
+# def st_get_data_viz():
+    # data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_visualization.parquet')
+    # viz_df1, viz_df2 = get_data_viz(data_history_df)
+    # return viz_df1, viz_df2
+
+
 @st.cache_data
 def st_get_data_viz():
-    data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_visualization.parquet')
-    viz_df = get_data_viz(data_history_df)
-    return viz_df
+    viz_df1 = pd.read_parquet(ROOT_PATH + '/output/st_data_visualization_p1.parquet')
+    viz_df2 = pd.read_parquet(ROOT_PATH + '/output/st_data_visualization_p2.parquet')
+    return viz_df1, viz_df2
 
 
 # function support streamlit render
