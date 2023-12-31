@@ -5,18 +5,22 @@ from scripts.utilities.config import *
 def status_chat_luong_noi_bo_ninja_van(series, col1='delivery_success_rate', col2='is_more_than_100'):
     if series[col1] == 0:
         return 'Không có thông tin'
-    elif (series[col1] >= 0.95) & series[col2]:
-        return 'Ti lệ trên 95% và tổng số đơn giao hàng trên 100 đơn'
-    elif (series[col1] >= 0.9) & (series[col1] < 0.95) & series[col2]:
-        return 'Ti lệ trên 90% và tổng số đơn giao hàng trên 100 đơn'
-    elif (series[col1] < 0.9) & series[col2]:
-        return 'Ti lệ dưới 90% và tổng số đơn giao hàng trên 100 đơn'
-    elif (series[col1] >= 0.95) & (~series[col2]):
-        return 'Ti lệ trên 95% và tổng số đơn giao hàng dưới 100 đơn'
-    elif (series[col1] >= 0.9) & (series[col1] < 0.95) & (~series[col2]):
-        return 'Ti lệ trên 90% và tổng số đơn giao hàng dưới 100 đơn'
-    elif (series[col1] < 0.9) & (~series[col2]):
-        return 'Ti lệ dưới 90% và tổng số đơn giao hàng dưới 100 đơn'
+    elif (series[col1] > 0.98) & series[col2]:
+        return 'Ti lệ trên 98% và tổng số đơn giao hàng trên 100 đơn'
+    elif (series[col1] > 0.94) & (series[col1] <= 0.98) & series[col2]:
+        return 'Ti lệ trên 94% và tổng số đơn giao hàng trên 100 đơn'
+    elif (series[col1] > 0.91) & (series[col1] <= 0.94) & series[col2]:
+        return 'Ti lệ trên 91% và tổng số đơn giao hàng trên 100 đơn'
+    elif (series[col1] <= 0.91) & series[col2]:
+        return 'Ti lệ dưới 91% và tổng số đơn giao hàng trên 100 đơn'
+    elif (series[col1] > 0.98) & (~series[col2]):
+        return 'Ti lệ trên 98% và tổng số đơn giao hàng dưới 100 đơn'
+    elif (series[col1] > 0.94) & (series[col1] <= 0.98) & (~series[col2]):
+        return 'Ti lệ trên 94% và tổng số đơn giao hàng dưới 100 đơn'
+    elif (series[col1] > 0.91) & (series[col1] <= 0.94) & (~series[col2]):
+        return 'Ti lệ trên 91% và tổng số đơn giao hàng dưới 100 đơn'
+    elif (series[col1] <= 0.91) & (~series[col2]):
+        return 'Ti lệ dưới 91% và tổng số đơn giao hàng dưới 100 đơn'
 
 
 def transform_data_chat_luong_noi_bo():

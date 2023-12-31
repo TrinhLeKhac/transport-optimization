@@ -46,12 +46,14 @@ TRONG_SO = {
         'Tiêu chí': 3,
         'Phân loại': {
             'Ninja Van': {
-                'Ti lệ trên 95% và tổng số đơn giao hàng trên 100 đơn': 10,
-                'Ti lệ trên 95% và tổng số đơn giao hàng dưới 100 đơn': 8,
-                'Ti lệ trên 90% và tổng số đơn giao hàng trên 100 đơn': 4,
-                'Ti lệ trên 90% và tổng số đơn giao hàng dưới 100 đơn': 2,
-                'Ti lệ dưới 90% và tổng số đơn giao hàng dưới 100 đơn': -3,
-                'Ti lệ dưới 90% và tổng số đơn giao hàng trên 100 đơn': -6,
+                'Ti lệ trên 98% và tổng số đơn giao hàng trên 100 đơn': 10,
+                'Ti lệ trên 98% và tổng số đơn giao hàng dưới 100 đơn': 8,
+                'Ti lệ trên 94% và tổng số đơn giao hàng trên 100 đơn': 6,
+                'Ti lệ trên 94% và tổng số đơn giao hàng dưới 100 đơn': 3,
+                'Ti lệ trên 91% và tổng số đơn giao hàng dưới 100 đơn': -1,
+                'Ti lệ trên 91% và tổng số đơn giao hàng trên 100 đơn': -2,
+                'Ti lệ dưới 91% và tổng số đơn giao hàng dưới 100 đơn': -3,
+                'Ti lệ dưới 91% và tổng số đơn giao hàng trên 100 đơn': -6,
                 'Không có thông tin': 0,
             },
         }
@@ -317,7 +319,14 @@ OVERLOADING_SCORE_DICT = {
     'Có kho giao nhận': [-50]
 }
 
-ACTIVE_CARRIER = ['GHTK', 'GHN', 'Viettel Post', 'BEST Express', 'Ninja Van', 'SPX Express']
+ACTIVE_CARRIER = [
+    # 'GHTK',
+    'GHN',
+    'Viettel Post',
+    'BEST Express',
+    'Ninja Van',
+    'SPX Express'
+]
 MAPPING_CARRIER_ID = {
     'GHTK': 1,
     'GHN': 2,
