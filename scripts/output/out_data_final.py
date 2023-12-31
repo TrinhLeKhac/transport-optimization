@@ -184,18 +184,23 @@ def generate_order_type(input_df, carriers=ACTIVE_CARRIER):
     )
 
     phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
+    phan_vung_nvc = phan_vung_nvc[[
+        'carrier_id', 'receiver_province_code',
+        'receiver_district_code', 'outer_region', 'inner_region'
+    ]]
+
     result_df = (
         result_df.merge(
             phan_vung_nvc.rename(columns={
-                'receiver_province': 'sender_province',
-                'receiver_district': 'sender_district',
+                'receiver_province_code': 'sender_province_code',
+                'receiver_district_code': 'sender_district_code',
                 'outer_region': 'sender_outer_region',
                 'inner_region': 'sender_inner_region',
-            }), on=['carrier', 'sender_province', 'sender_district'], how='left').merge(
+            }), on=['carrier_id', 'sender_province_code', 'sender_district_code'], how='left').merge(
             phan_vung_nvc.rename(columns={
                 'outer_region': 'receiver_outer_region',
                 'inner_region': 'receiver_inner_region',
-            }), on=['carrier', 'receiver_province', 'receiver_district'], how='left')
+            }), on=['carrier_id', 'receiver_province_code', 'receiver_district_code'], how='left')
     )
     result_df['order_type'] = result_df.apply(type_of_delivery, axis=1)
     result_df['order_type_id'] = result_df['order_type'].map(MAPPING_ORDER_TYPE_ID)
@@ -300,6 +305,7 @@ def calculate_service_fee_v2(input_df):
 
 
 def calculate_service_fee_v3(input_df):
+
     target_df = input_df.copy()
     target_df.loc[target_df['weight'] > 50000, 'weight'] = 50000
     target_df['weight'] = target_df['weight'].apply(approx)
@@ -308,7 +314,7 @@ def calculate_service_fee_v3(input_df):
     cuoc_phi_df = cuoc_phi_df[['carrier', 'order_type', 'lt_or_eq', 'service_fee']].rename(
         columns={'lt_or_eq': 'weight'})
 
-    result_df = input_df.merge(cuoc_phi_df, on=['carrier', 'order_type', 'weight'], how='inner')
+    result_df = target_df.merge(cuoc_phi_df, on=['carrier', 'order_type', 'weight'], how='inner')
 
     # Ninja Van lấy tận nơi cộng cước phí 1,500
     result_df.loc[
@@ -454,6 +460,7 @@ def out_data_final(input_df=None, carriers=ACTIVE_CARRIER, show_logs=False):
 
     print('iii. Tính phí dịch vụ')
     tmp_df3 = calculate_service_fee_v3(tmp_df2)
+    assert len(tmp_df3) == len(tmp_df2), 'Transform data sai'
 
     print('iv. Tính ranking nhà vận chuyển theo tiêu chí rẻ nhất')
     tmp_df4 = calculate_notification_v2(tmp_df3)
