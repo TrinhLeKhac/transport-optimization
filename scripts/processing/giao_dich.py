@@ -310,6 +310,7 @@ def tong_hop_thong_tin_giao_dich(from_api=True):
         giao_dich_valid['last_delivering_at'] = pd.to_datetime(giao_dich_valid['last_delivering_at'], errors='coerce')
         giao_dich_valid['carrier_delivered_at'] = pd.to_datetime(giao_dich_valid['carrier_delivered_at'],
                                                                  errors='coerce')
+        giao_dich_valid['date'] = pd.to_datetime(giao_dich_valid['date'], errors='coerce')
         giao_dich_valid = giao_dich_valid[[
             'created_at', 'order_code', 'carrier', 'weight',
             'sender_province', 'sender_district', 'receiver_province', 'receiver_district',
@@ -387,6 +388,7 @@ def tong_hop_thong_tin_giao_dich(from_api=True):
         giao_dich_valid['last_delivering_at'] = pd.to_datetime(giao_dich_valid['last_delivering_at'], errors='coerce')
         giao_dich_valid['carrier_delivered_at'] = pd.to_datetime(giao_dich_valid['carrier_delivered_at'],
                                                                  errors='coerce')
+        giao_dich_valid['date'] = pd.to_datetime(giao_dich_valid['date'], errors='coerce')
         giao_dich_valid = giao_dich_valid[[
             'created_at', 'order_code', 'carrier', 'weight',
             'sender_province', 'sender_district', 'receiver_province', 'receiver_district',

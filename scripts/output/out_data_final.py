@@ -53,10 +53,10 @@ FINAL_COLS_RENAMED = [
 
 
 def approx(x):
-    if x%500 == 0:
+    if x % 500 == 0:
         return x
     else:
-        return 500*(x//500 + 1)
+        return 500 * (x // 500 + 1)
 
 
 def type_of_delivery(s):
@@ -132,7 +132,8 @@ def generate_sample_input(n_rows=1000):
         for i in range(n_rows)
     ]
     result_df['sender_district_code'] = np.random.choice(PROVINCE_MAPPING_DISTRICT_DF['district_code'].tolist(), n_rows)
-    result_df['receiver_district_code'] = np.random.choice(PROVINCE_MAPPING_DISTRICT_DF['district_code'].tolist(), n_rows)
+    result_df['receiver_district_code'] = np.random.choice(PROVINCE_MAPPING_DISTRICT_DF['district_code'].tolist(),
+                                                           n_rows)
     result_df = (
         result_df.merge(
             PROVINCE_MAPPING_DISTRICT_DF[['province_code', 'district_code']].rename(columns={
@@ -304,7 +305,8 @@ def calculate_service_fee_v3(input_df):
     target_df['weight'] = target_df['weight'].apply(approx)
 
     cuoc_phi_df = pd.read_parquet(ROOT_PATH + '/processed_data/cuoc_phi.parquet')
-    cuoc_phi_df = cuoc_phi_df[['carrier', 'order_type', 'lt_or_eq', 'service_fee']].rename(columns={'lt_or_eq': 'weight'})
+    cuoc_phi_df = cuoc_phi_df[['carrier', 'order_type', 'lt_or_eq', 'service_fee']].rename(
+        columns={'lt_or_eq': 'weight'})
 
     result_df = input_df.merge(cuoc_phi_df, on=['carrier', 'order_type', 'weight'], how='inner')
 
@@ -361,7 +363,8 @@ def calculate_notification(input_df):
 
 def calculate_notification_v2(input_df):
     result_df = input_df.copy()
-    result_df["cheapest_carrier_id"] = result_df.groupby("order_code")["service_fee"].rank(method="dense", ascending=True)
+    result_df["cheapest_carrier_id"] = result_df.groupby("order_code")["service_fee"].rank(method="dense",
+                                                                                           ascending=True)
     result_df["cheapest_carrier_id"] = result_df["cheapest_carrier_id"].astype(int)
 
     return result_df
@@ -408,6 +411,7 @@ def partner_best_carrier(data_api_df):
 def out_data_final(input_df=None, carriers=ACTIVE_CARRIER, show_logs=False):
     if input_df is None:
         giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet')
+        giao_dich_valid = giao_dich_valid.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
         giao_dich_valid = giao_dich_valid[[
             'order_code', 'weight', 'delivery_type', 'sender_province', 'sender_district',
             'receiver_province', 'receiver_district'

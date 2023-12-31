@@ -57,6 +57,7 @@ def transform_data_ti_le_giao_hang():
 
     # 1. Đọc thông tin giao dịch valid
     giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet')
+    giao_dich_valid = giao_dich_valid.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
     giao_dich_valid = giao_dich_valid[giao_dich_valid['carrier_status'].isin(THANH_CONG_STATUS + HOAN_HANG_STATUS)]
 
     # 2. Transform data hoàn hàng
