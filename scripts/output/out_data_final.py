@@ -553,5 +553,5 @@ def get_data_viz(target_df):
 
 
 if __name__ == '__main__':
-    target_df = out_data_final()
+    target_df = out_data_final(carriers=ACTIVE_CARRIER+['SuperShip'])
     get_data_viz(target_df)

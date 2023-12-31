@@ -5,12 +5,13 @@ def xu_ly_phan_vung_nha_van_chuyen():
     # 1. Đọc thông tin raw
     phan_vung_nvc = pd.read_excel(ROOT_PATH + '/input/Phân Vùng Ghép SuperShip.xlsx')
 
-    phan_vung_nvc = phan_vung_nvc.iloc[3:, 2:17]
+    phan_vung_nvc = phan_vung_nvc.iloc[3:, 2:19]
     phan_vung_nvc.columns = [
         'receiver_province', 'receiver_district', 'short_receiver_district',
         'ghn_outer_region', 'ghn_inner_region', 'njv_outer_region', 'njv_inner_region',
         'vtp_outer_region', 'vtp_inner_region', 'spx_outer_region', 'spx_inner_region',
         'best_outer_region', 'best_inner_region', 'ghtk_outer_region', 'ghtk_inner_region',
+        'supership_outer_region', 'supership_inner_region',
     ]
     phan_vung_nvc = phan_vung_nvc.drop('short_receiver_district', axis=1)
 
@@ -63,7 +64,15 @@ def xu_ly_phan_vung_nha_van_chuyen():
     })
     ghtk['carrier'] = 'GHTK'
 
-    phan_vung_nvc_final = pd.concat([ghn, njv, vtp, spx, best, ghtk], ignore_index=True)
+    supership = phan_vung_nvc[[
+        'receiver_province', 'receiver_district',
+        'supership_outer_region', 'supership_inner_region']].rename(columns={
+        'supership_outer_region': 'outer_region',
+        'supership_inner_region': 'inner_region'
+    })
+    supership['carrier'] = 'SuperShip'
+
+    phan_vung_nvc_final = pd.concat([ghn, njv, vtp, spx, best, ghtk, supership], ignore_index=True)
     phan_vung_nvc_final = phan_vung_nvc_final[
         ['carrier', 'receiver_province', 'receiver_district', 'outer_region', 'inner_region']]
     phan_vung_nvc_final['inner_region'] = phan_vung_nvc_final['inner_region'].map({
