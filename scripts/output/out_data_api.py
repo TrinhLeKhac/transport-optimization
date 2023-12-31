@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+
 ROOT_PATH = str(Path(__file__).parent.parent.parent)
 sys.path.append(ROOT_PATH)
 
@@ -19,9 +20,9 @@ API_FULL_COLS = [
     'delivery_success_rate', 'score', 'star',
 ]
 API_FULL_COLS_RENAMED = [
-    'receiver_province_code', 'receiver_province', 
+    'receiver_province_code', 'receiver_province',
     'receiver_district_code', 'receiver_district',
-    'carrier_id', 'carrier', 'order_type', 
+    'carrier_id', 'carrier', 'order_type',
     'new_type', 'route_type', 'status', 'description',
     'time_data', 'time_display',
     'for_shop',
@@ -68,6 +69,25 @@ def round_value(x):
     return '{} - {} ngày'.format(th1, th2)
 
 
+def get_agg(
+        target_df,
+        partition_cols=['receiver_province_code', 'receiver_district_code', 'new_type'],
+        target_col='time_data',
+        n_top=3,
+        asc=True
+):
+    result_df = (
+        target_df[partition_cols + [target_col]]
+            .sort_values(partition_cols + [target_col], ascending=[True, True, True, asc])
+            .groupby(partition_cols)
+            .head(n_top)
+            .groupby(partition_cols)
+            .mean()
+            .reset_index()
+    )
+    return result_df
+
+
 def customer_best_carrier_old(data_api_df, threshold=15):
     df1 = data_api_df.loc[data_api_df['total_order'] > threshold]
     df2 = data_api_df.loc[(data_api_df['total_order'] >= 1) & (data_api_df['total_order'] <= threshold)]
@@ -95,7 +115,6 @@ def customer_best_carrier_old(data_api_df, threshold=15):
 
 
 def customer_best_carrier(data_api_df):
-
     data_api_df['combine_col'] = data_api_df[["delivery_success_rate", "total_order"]].apply(tuple, axis=1)
 
     data_api_df["delivery_success_rate_id"] = \
@@ -209,7 +228,8 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
         print('4. Xủ lý score')
     score_df_list = []
 
-    for focus_df in [ngung_giao_nhan, danh_gia_zns, ti_le_giao_hang, chat_luong_noi_bo, thoi_gian_giao_hang, kho_giao_nhan]:
+    for focus_df in [ngung_giao_nhan, danh_gia_zns, ti_le_giao_hang, chat_luong_noi_bo, thoi_gian_giao_hang,
+                     kho_giao_nhan]:
         target_df = focus_df.copy()
         target_df['weight_score'] = target_df['score'] * target_df['criteria_weight']
         score_df_list.append(target_df[['receiver_province', 'receiver_district', 'carrier', 'weight_score']])
@@ -250,7 +270,8 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
     api_data_final['carrier_status_comment'] = api_data_final['carrier_status_comment'].fillna('Bình thường')
     api_data_final['carrier_status'] = 0
     api_data_final.loc[api_data_final['carrier_status_comment'] == 'Quá tải', 'carrier_status'] = 1
-    api_data_final.loc[~api_data_final['carrier_status_comment'].isin(['Bình thường', 'Quá tải', 'Không có đơn hàng']), 'carrier_status'] = 2
+    api_data_final.loc[~api_data_final['carrier_status_comment'].isin(
+        ['Bình thường', 'Quá tải', 'Không có đơn hàng']), 'carrier_status'] = 2
 
     api_data_final['carrier_id'] = api_data_final['carrier'].map(MAPPING_CARRIER_ID)
     api_data_final = (
@@ -298,7 +319,6 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
     if return_full_cols_df:
         api_data_final = api_data_final[API_FULL_COLS]
         api_data_final.columns = API_FULL_COLS_RENAMED
-        return api_data_final
     else:
         api_data_final = api_data_final[API_COLS]
         api_data_final.columns = API_COLS_RENAMED
@@ -311,6 +331,73 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
     if show_logs:
         print('>>> Done\n')
 
+    return api_data_final
+
+
+def assign_supership_carrier(df_api):
+
+    # 1. Get analytics of top 3 carrier
+    time_data = get_agg(df_api, target_col='time_data', n_top=3, asc=True)
+    rate = get_agg(df_api, target_col='rate', n_top=3, asc=False)
+    score = get_agg(df_api, target_col='score', n_top=3, asc=False)
+    star = get_agg(df_api, target_col='star', n_top=3, asc=False)
+
+    total_order = get_agg(df_api, target_col='total_order', asc=False)
+    total_order['total_order'] = total_order['total_order'].astype(int)
+
+    # 2. Assign infor to SuperShip
+    df_supership = (
+        time_data.merge(rate, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
+        .merge(score, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
+        .merge(star, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
+        .merge(total_order, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
+    )
+
+    df_supership['carrier_id'] = 13
+    df_supership['route_type'] = df_supership['new_type'].map(
+        dict(zip(
+            [str(i) for i in MAPPING_ORDER_TYPE_ID_ROUTE_TYPE.keys()],
+            [str(i) for i in MAPPING_ORDER_TYPE_ID_ROUTE_TYPE.values()]
+        ))
+    )
+    df_supership['status'] = '0'
+    df_supership['description'] = 'Bình thường'
+    df_supership['time_display'] = df_supership['time_data'].map(round_value)
+
+    # 3. Recalculating metrics speed_ranking, score_ranking, rate_ranking, for_shop
+    df_api_full = pd.concat([df_api, df_supership], ignore_index=True)
+    df_api_full["speed_ranking"] = \
+        df_api_full.groupby(["receiver_province_code", "receiver_district_code", "new_type"])[
+            "time_data"].rank(method="dense", ascending=True)
+    df_api_full["speed_ranking"] = df_api_full["speed_ranking"].astype(int)
+
+    df_api_full["score_ranking"] = \
+        df_api_full.groupby(["receiver_province_code", "receiver_district_code", "new_type"])["score"].rank(
+            method="dense", ascending=False)
+    df_api_full["score_ranking"] = df_api_full["score_ranking"].astype(int)
+
+    df_api_full['combine_col'] = df_api_full[["rate", "total_order"]].apply(tuple, axis=1)
+
+    df_api_full["rate_ranking"] = \
+        df_api_full.groupby(["receiver_province_code", "receiver_district_code", "new_type"])["combine_col"].rank(
+            method="dense", ascending=False).astype(int)
+
+    df_api_full['wscore'] = df_api_full['speed_ranking'] * 1.4 + df_api_full['rate_ranking'] * 1.2 + df_api_full['score_ranking']
+
+    df_api_full["for_shop"] = \
+        df_api_full.groupby(["receiver_province_code", "receiver_district_code", "new_type"])["wscore"].rank(
+            method="dense", ascending=True).astype(int)
+    df_api_full = df_api_full.drop(['combine_col', 'wscore'], axis=1)
+
+    df_api_full['time_data'] = np.round(df_api_full['time_data'], 2)
+    df_api_full['rate'] = np.round(df_api_full['rate'], 2)
+    df_api_full['score'] = np.round(df_api_full['score'], 2)
+    df_api_full['star'] = np.round(df_api_full['star'], 1)
+
+    # 4. Save data
+    df_api_full.to_parquet(ROOT_PATH + '/output/data_api.parquet', index=False)
+
 
 if __name__ == '__main__':
-    out_data_api()
+    df_api = out_data_api()
+    assign_supership_carrier(df_api)

@@ -340,6 +340,7 @@ MAPPING_CARRIER_ID = {
     'SPX Express': 10,
     'NETCO Post': 11,
     'TikiNOW Smart Logistics': 12,
+    'SuperShip': 13,
 }
 
 MAPPING_ID_CARRIER = {}
