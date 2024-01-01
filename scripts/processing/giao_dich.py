@@ -231,57 +231,57 @@ def xu_ly_giao_dich():
     ghtk_df['carrier_delivered_at'] = ghtk_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
 
     print('Tổng hợp giao dịch...')
-    giao_dich_df = pd.concat([best_df, njv_df, ghn_df, vtp_df, spx_df, ghtk_df], ignore_index=True)
+    raw_order_df = pd.concat([best_df, njv_df, ghn_df, vtp_df, spx_df, ghtk_df], ignore_index=True)
 
     print('Lưu thông tin...')
-    giao_dich_df.to_parquet(ROOT_PATH + '/processed_data/giao_dich_tong.parquet', index=False)
+    raw_order_df.to_parquet(ROOT_PATH + '/processed_data/raw_order.parquet', index=False)
 
 
 def xu_ly_giao_dich_co_khoi_luong():
-    giao_dich_co_khoi_luong_df = pd.read_excel(ROOT_PATH + '/input/Đơn Có Khối Lượng.xlsx', sheet_name='Combined')
+    order_with_weight_df = pd.read_excel(ROOT_PATH + '/input/Đơn Có Khối Lượng.xlsx', sheet_name='Combined')
 
-    giao_dich_co_khoi_luong_df = giao_dich_co_khoi_luong_df[['Mã Đơn SuperShip', 'Khối Lượng', 'Kho Hàng']]
-    giao_dich_co_khoi_luong_df.columns = ['order_code', 'weight', 'storage_address']
+    order_with_weight_df = order_with_weight_df[['Mã Đơn SuperShip', 'Khối Lượng', 'Kho Hàng']]
+    order_with_weight_df.columns = ['order_code', 'weight', 'storage_address']
 
     print('Lưu thông tin...')
-    giao_dich_co_khoi_luong_df.to_parquet(ROOT_PATH + '/processed_data/giao_dich_co_khoi_luong.parquet', index=False)
+    order_with_weight_df.to_parquet(ROOT_PATH + '/processed_data/order_with_weight.parquet', index=False)
 
 
 def tong_hop_thong_tin_giao_dich(from_api=True, n_days_back=30):
     if not from_api:
         print('Đọc thông tin giao dịch và giao dịch có khối lượng...')
-        giao_dich_tong_df = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_tong.parquet')
-        giao_dich_co_khoi_luong_df = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_co_khoi_luong.parquet')
+        raw_order_df = pd.read_parquet(ROOT_PATH + '/processed_data/raw_order.parquet')
+        order_with_weight_df = pd.read_parquet(ROOT_PATH + '/processed_data/order_with_weight.parquet')
 
         print('Combine thông tin giao dịch')
-        giao_dich_valid_df = giao_dich_tong_df.merge(giao_dich_co_khoi_luong_df, on='order_code', how='inner')
-        print('Số giao dịch hợp lệ: ', len(giao_dich_valid_df))
+        order_df = raw_order_df.merge(order_with_weight_df, on='order_code', how='inner')
+        print('Số giao dịch hợp lệ: ', len(order_df))
 
         print('Tách địa chỉ tỉnh/thành, quận/huyện lấy hàng từ kho nhận')
-        giao_dich_valid_df['sender_province'] = giao_dich_valid_df['storage_address'].str.split(', ').str[-1]
-        giao_dich_valid_df['sender_district'] = giao_dich_valid_df['storage_address'].str.split(', ').str[-2]
+        order_df['sender_province'] = order_df['storage_address'].str.split(', ').str[-1]
+        order_df['sender_district'] = order_df['storage_address'].str.split(', ').str[-2]
 
         print('Chuẩn hóa thông tin tỉnh/thành, quận/huyện lấy hàng...')
-        giao_dich_valid = normalize_province_district(giao_dich_valid_df, tinh_thanh='sender_province',
+        order_df = normalize_province_district(order_df, tinh_thanh='sender_province',
                                                       quan_huyen='sender_district')
 
         print('Chuẩn hóa thông tin tỉnh/thành, quận/huyện giao hàng...')
-        giao_dich_valid = normalize_province_district(giao_dich_valid, tinh_thanh='receiver_province',
+        order_df = normalize_province_district(order_df, tinh_thanh='receiver_province',
                                                       quan_huyen='receiver_district')
 
-        giao_dich_valid = giao_dich_valid[
-            giao_dich_valid['sender_province'].notna()
-            & giao_dich_valid['sender_district'].notna()
-            & giao_dich_valid['receiver_province'].notna()
-            & giao_dich_valid['receiver_district'].notna()
+        valid_order_df = order_df[
+            order_df['sender_province'].notna()
+            & order_df['sender_district'].notna()
+            & order_df['receiver_province'].notna()
+            & order_df['receiver_district'].notna()
             ]
-        print('Số giao dịch sau khi chuẩn hóa tỉnh/thành, quận/huyện: ', len(giao_dich_valid))
+        print('Số giao dịch sau khi chuẩn hóa tỉnh/thành, quận/huyện: ', len(valid_order_df))
 
         print('Tính toán loại vận chuyển từ địa chỉ giao và nhận...')
         phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
         phan_vung_nvc = phan_vung_nvc[['carrier', 'receiver_province', 'receiver_district', 'outer_region', 'inner_region']]
-        giao_dich_valid = (
-            giao_dich_valid.merge(
+        valid_order_df = (
+            valid_order_df.merge(
                 phan_vung_nvc.rename(columns={
                     'receiver_province': 'sender_province',
                     'receiver_district': 'sender_district',
@@ -293,26 +293,26 @@ def tong_hop_thong_tin_giao_dich(from_api=True, n_days_back=30):
                     'inner_region': 'receiver_inner_region',
                 }), on=['carrier', 'receiver_province', 'receiver_district'], how='left')
         )
-        giao_dich_valid['order_type'] = giao_dich_valid.apply(type_of_delivery, axis=1)
-        giao_dich_valid['order_type_id'] = giao_dich_valid['order_type'].map(MAPPING_ORDER_TYPE_ID)
-        giao_dich_valid['sys_order_type_id'] = giao_dich_valid.apply(type_of_system_delivery, axis=1)
+        valid_order_df['order_type'] = valid_order_df.apply(type_of_delivery, axis=1)
+        valid_order_df['order_type_id'] = valid_order_df['order_type'].map(MAPPING_ORDER_TYPE_ID)
+        valid_order_df['sys_order_type_id'] = valid_order_df.apply(type_of_system_delivery, axis=1)
 
-        giao_dich_valid['sent_at'] = None
-        giao_dich_valid['order_status'] = None
-        giao_dich_valid['picked_at'] = None
-        giao_dich_valid['carrier_updated_at'] = None
-        giao_dich_valid['last_delivering_at'] = None
-        giao_dich_valid['date'] = None
+        valid_order_df['sent_at'] = None
+        valid_order_df['order_status'] = None
+        valid_order_df['picked_at'] = None
+        valid_order_df['carrier_updated_at'] = None
+        valid_order_df['last_delivering_at'] = None
+        valid_order_df['date'] = None
 
-        giao_dich_valid['created_at'] = pd.to_datetime(giao_dich_valid['created_at'], errors='coerce')
-        giao_dich_valid['sent_at'] = pd.to_datetime(giao_dich_valid['sent_at'], errors='coerce')
-        giao_dich_valid['picked_at'] = pd.to_datetime(giao_dich_valid['picked_at'], errors='coerce')
-        giao_dich_valid['carrier_updated_at'] = pd.to_datetime(giao_dich_valid['carrier_updated_at'], errors='coerce')
-        giao_dich_valid['last_delivering_at'] = pd.to_datetime(giao_dich_valid['last_delivering_at'], errors='coerce')
-        giao_dich_valid['carrier_delivered_at'] = pd.to_datetime(giao_dich_valid['carrier_delivered_at'],
+        valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
+        valid_order_df['sent_at'] = pd.to_datetime(valid_order_df['sent_at'], errors='coerce')
+        valid_order_df['picked_at'] = pd.to_datetime(valid_order_df['picked_at'], errors='coerce')
+        valid_order_df['carrier_updated_at'] = pd.to_datetime(valid_order_df['carrier_updated_at'], errors='coerce')
+        valid_order_df['last_delivering_at'] = pd.to_datetime(valid_order_df['last_delivering_at'], errors='coerce')
+        valid_order_df['carrier_delivered_at'] = pd.to_datetime(valid_order_df['carrier_delivered_at'],
                                                                  errors='coerce')
-        giao_dich_valid['date'] = pd.to_datetime(giao_dich_valid['date'], errors='coerce')
-        giao_dich_valid = giao_dich_valid[[
+        valid_order_df['date'] = pd.to_datetime(valid_order_df['date'], errors='coerce')
+        valid_order_df = valid_order_df[[
             'created_at', 'order_code', 'carrier', 'weight',
             'sender_province', 'sender_district', 'receiver_province', 'receiver_district',
             'sent_at', 'order_status', 'carrier_status',
@@ -321,29 +321,29 @@ def tong_hop_thong_tin_giao_dich(from_api=True, n_days_back=30):
             'picked_at', 'carrier_updated_at', 'last_delivering_at', 'carrier_delivered_at', 'date',
         ]]
 
-        set_carrier = set(giao_dich_valid['carrier'].unique().tolist())
+        set_carrier = set(valid_order_df['carrier'].unique().tolist())
         set_norm_full_carrier = set(MAPPING_CARRIER_ID.keys())
         assert set_carrier - set_norm_full_carrier == set(), 'Ops, Tên nhà vận chuyển chưa được chuẩn hóa'
 
         print('Lưu thông tin...')
-        giao_dich_valid.to_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet', index=False)
+        valid_order_df.to_parquet(ROOT_PATH + '/processed_data/order.parquet', index=False)
     else:
         port = settings.SQLALCHEMY_DATABASE_URI
         engine = create_engine(port)
-        giao_dich_valid = pd.read_sql_query('select * from db_schema.order', con=engine)
+        valid_order_df = pd.read_sql_query('select * from db_schema.order', con=engine)
 
-        giao_dich_valid['carrier'] = giao_dich_valid['carrier_id'].map(MAPPING_ID_CARRIER)
-        giao_dich_valid['delivery_type'] = giao_dich_valid['pickup'].map({'0': 'Gửi Bưu Cục', '1': 'Lấy Tận Nơi'})
-        giao_dich_valid['is_returned'] = giao_dich_valid['barter'].map({'0': False, '1': True})
+        valid_order_df['carrier'] = valid_order_df['carrier_id'].map(MAPPING_ID_CARRIER)
+        valid_order_df['delivery_type'] = valid_order_df['pickup'].map({'0': 'Gửi Bưu Cục', '1': 'Lấy Tận Nơi'})
+        valid_order_df['is_returned'] = valid_order_df['barter'].map({'0': False, '1': True})
 
-        giao_dich_valid = giao_dich_valid.rename(columns={
+        valid_order_df = valid_order_df.rename(columns={
             'sender_province': 'sender_province_code',
             'sender_district': 'sender_district_code',
             'receiver_province': 'receiver_province_code',
             'receiver_district': 'receiver_district_code'
         })
-        giao_dich_valid = (
-            giao_dich_valid.merge(
+        valid_order_df = (
+            valid_order_df.merge(
                 PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
                     'province': 'sender_province',
                     'district': 'sender_district',
@@ -364,8 +364,8 @@ def tong_hop_thong_tin_giao_dich(from_api=True, n_days_back=30):
         phan_vung_nvc = phan_vung_nvc[
             ['carrier', 'receiver_province', 'receiver_district', 'outer_region', 'inner_region']]
 
-        giao_dich_valid = (
-            giao_dich_valid.merge(
+        valid_order_df = (
+            valid_order_df.merge(
                 phan_vung_nvc.rename(columns={
                     'receiver_province': 'sender_province',
                     'receiver_district': 'sender_district',
@@ -378,19 +378,19 @@ def tong_hop_thong_tin_giao_dich(from_api=True, n_days_back=30):
                 }), on=['carrier', 'receiver_province', 'receiver_district'], how='left')
         )
 
-        giao_dich_valid['order_type'] = giao_dich_valid.apply(type_of_delivery, axis=1)
-        giao_dich_valid['order_type_id'] = giao_dich_valid['order_type'].map(MAPPING_ORDER_TYPE_ID)
-        giao_dich_valid['sys_order_type_id'] = giao_dich_valid.apply(type_of_system_delivery, axis=1)
+        valid_order_df['order_type'] = valid_order_df.apply(type_of_delivery, axis=1)
+        valid_order_df['order_type_id'] = valid_order_df['order_type'].map(MAPPING_ORDER_TYPE_ID)
+        valid_order_df['sys_order_type_id'] = valid_order_df.apply(type_of_system_delivery, axis=1)
 
-        giao_dich_valid['created_at'] = pd.to_datetime(giao_dich_valid['created_at'], errors='coerce')
-        giao_dich_valid['sent_at'] = pd.to_datetime(giao_dich_valid['sent_at'], errors='coerce')
-        giao_dich_valid['picked_at'] = pd.to_datetime(giao_dich_valid['picked_at'], errors='coerce')
-        giao_dich_valid['carrier_updated_at'] = pd.to_datetime(giao_dich_valid['carrier_updated_at'], errors='coerce')
-        giao_dich_valid['last_delivering_at'] = pd.to_datetime(giao_dich_valid['last_delivering_at'], errors='coerce')
-        giao_dich_valid['carrier_delivered_at'] = pd.to_datetime(giao_dich_valid['carrier_delivered_at'],
+        valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
+        valid_order_df['sent_at'] = pd.to_datetime(valid_order_df['sent_at'], errors='coerce')
+        valid_order_df['picked_at'] = pd.to_datetime(valid_order_df['picked_at'], errors='coerce')
+        valid_order_df['carrier_updated_at'] = pd.to_datetime(valid_order_df['carrier_updated_at'], errors='coerce')
+        valid_order_df['last_delivering_at'] = pd.to_datetime(valid_order_df['last_delivering_at'], errors='coerce')
+        valid_order_df['carrier_delivered_at'] = pd.to_datetime(valid_order_df['carrier_delivered_at'],
                                                                  errors='coerce')
-        giao_dich_valid['date'] = pd.to_datetime(giao_dich_valid['date'], errors='coerce')
-        giao_dich_valid = giao_dich_valid[[
+        valid_order_df['date'] = pd.to_datetime(valid_order_df['date'], errors='coerce')
+        valid_order_df = valid_order_df[[
             'created_at', 'order_code', 'carrier', 'weight',
             'sender_province', 'sender_district', 'receiver_province', 'receiver_district',
             'sent_at', 'order_status', 'carrier_status',
@@ -400,12 +400,12 @@ def tong_hop_thong_tin_giao_dich(from_api=True, n_days_back=30):
         ]]
 
         # Chỉ lấy thông tin giao dịch từ n_days_back trở lại
-        giao_dich_valid = giao_dich_valid.loc[
-            giao_dich_valid['created_at'] >=
+        valid_order_df = valid_order_df.loc[
+            valid_order_df['created_at'] >=
             (datetime.strptime(datetime.now().strftime('%F'), '%Y-%m-%d') - timedelta(days=n_days_back))
         ]
-        giao_dich_valid = giao_dich_valid.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
+        valid_order_df = valid_order_df.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
 
         # 4. Lưu thông tin
-        giao_dich_valid.to_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet', index=False)
+        valid_order_df.to_parquet(ROOT_PATH + '/processed_data/order.parquet', index=False)
 
