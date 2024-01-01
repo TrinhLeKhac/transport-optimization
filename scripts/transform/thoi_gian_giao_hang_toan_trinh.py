@@ -175,7 +175,6 @@ def score_thoi_gian_giao_hang(tong_don, thoi_gian_giao_tb, loai_van_chuyen):
 def transform_data_thoi_gian_giao_hang_toan_trinh():
     # Đọc thông tin giao dịch valid
     giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet')
-    giao_dich_valid = giao_dich_valid.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
 
     # Xử lý data
     giao_dich_thanh_cong = giao_dich_valid[giao_dich_valid['carrier_status'].isin(THANH_CONG_STATUS)]

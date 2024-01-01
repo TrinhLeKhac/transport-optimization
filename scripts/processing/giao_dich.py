@@ -1,4 +1,5 @@
 import sys
+from datetime import timedelta
 from pathlib import Path
 
 ROOT_PATH = str(Path(__file__).parent.parent.parent)
@@ -246,7 +247,7 @@ def xu_ly_giao_dich_co_khoi_luong():
     giao_dich_co_khoi_luong_df.to_parquet(ROOT_PATH + '/processed_data/giao_dich_co_khoi_luong.parquet', index=False)
 
 
-def tong_hop_thong_tin_giao_dich(from_api=True):
+def tong_hop_thong_tin_giao_dich(from_api=True, n_days_back=30):
     if not from_api:
         print('Đọc thông tin giao dịch và giao dịch có khối lượng...')
         giao_dich_tong_df = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_tong.parquet')
@@ -397,6 +398,13 @@ def tong_hop_thong_tin_giao_dich(from_api=True):
             'delivery_count', 'delivery_type', 'is_returned',
             'picked_at', 'carrier_updated_at', 'last_delivering_at', 'carrier_delivered_at', 'date',
         ]]
+
+        # Chỉ lấy thông tin giao dịch từ n_days_back trở lại
+        giao_dich_valid = giao_dich_valid.loc[
+            giao_dich_valid['created_at'] >=
+            (datetime.strptime(datetime.now().strftime('%F'), '%Y-%m-%d') - timedelta(days=n_days_back))
+        ]
+        giao_dich_valid = giao_dich_valid.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
 
         # 4. Lưu thông tin
         giao_dich_valid.to_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet', index=False)

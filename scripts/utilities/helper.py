@@ -6,7 +6,7 @@ from unidecode import unidecode
 from scripts.utilities.config import *
 import streamlit as st
 from functools import reduce
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import time
 import re
 import os

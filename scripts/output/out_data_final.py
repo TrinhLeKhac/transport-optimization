@@ -305,7 +305,6 @@ def calculate_service_fee_v2(input_df):
 
 
 def calculate_service_fee_v3(input_df):
-
     target_df = input_df.copy()
     target_df.loc[target_df['weight'] > 50000, 'weight'] = 50000
     target_df['weight'] = target_df['weight'].apply(approx)
@@ -417,7 +416,6 @@ def partner_best_carrier(data_api_df):
 def out_data_final(input_df=None, carriers=ACTIVE_CARRIER, show_logs=False):
     if input_df is None:
         giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/giao_dich_combine_valid.parquet')
-        giao_dich_valid = giao_dich_valid.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
         giao_dich_valid = giao_dich_valid[[
             'order_code', 'weight', 'delivery_type', 'sender_province', 'sender_district',
             'receiver_province', 'receiver_district'
@@ -553,5 +551,6 @@ def get_data_viz(target_df):
 
 
 if __name__ == '__main__':
-    target_df = out_data_final(carriers=ACTIVE_CARRIER+['SuperShip'])
+    # target_df = out_data_final(carriers=ACTIVE_CARRIER + ['SuperShip'])  # Assign phan_vung_nha_van_chuyen + cuoc_phi
+    target_df = out_data_final()
     get_data_viz(target_df)
