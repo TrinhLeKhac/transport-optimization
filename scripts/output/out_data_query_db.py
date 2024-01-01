@@ -226,6 +226,7 @@ def out_data_service_fee(show_logs=True):
 
     service_fee_df = service_fee_df[['carrier_id', 'new_type', 'pickup', 'weight', 'price']]
     service_fee_df.to_parquet(ROOT_PATH + '/output/service_fee.parquet', index=False)
+    print('-' * 100)
 
 
 if __name__ == '__main__':

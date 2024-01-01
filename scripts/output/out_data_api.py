@@ -321,7 +321,7 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
         api_data_final.to_parquet(ROOT_PATH + '/output/data_api.parquet', index=False)
     if show_logs:
         print('>>> Done\n')
-
+    print('-' * 100)
     return api_data_final
 
 
@@ -389,9 +389,9 @@ def assign_supership_carrier(df_api):
 
     # 4. Save data
     df_api_full.to_parquet(ROOT_PATH + '/output/data_api.parquet', index=False)
+    print('-' * 100)
 
 
 if __name__ == '__main__':
     df_api = out_data_api()
-    print('-'*100)
     assign_supership_carrier(df_api)
