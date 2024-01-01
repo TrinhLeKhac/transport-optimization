@@ -28,7 +28,7 @@ def transform_data_danh_gia_zns():
 
     danh_gia_zns = danh_gia_zns[[
         'receiver_province', 'receiver_district',
-        'carrier', 'comment', 'n_stars'
+        'carrier', 'comment', 'n_stars', 'reviewed_at'
     ]]
 
     # Tách nhóm loại bỏ
@@ -113,21 +113,34 @@ def transform_data_danh_gia_zns():
     danh_gia_zns_filter4 = merge_left_only(danh_gia_zns_filter3, zns_5_sao,
                                            keys=['receiver_province', 'receiver_district', 'carrier'])
 
-    # Tách nhóm còn lại
-    zns_have_1_2_3_sao = (
-        # có 1, 2, 3 sao
+    # Tách nhóm 1, 2 sao đánh giá gần đây
+    max_time = danh_gia_zns['reviewed_at'].max()
+    zns_have_1_2_sao_recently = (
         danh_gia_zns_filter4.loc[
-            danh_gia_zns_filter4['n_stars'].isin([1, 2, 3])]
-        [['receiver_province', 'receiver_district', 'carrier']]
+            danh_gia_zns_filter4['n_stars'].isin([1, 2])
+            & (danh_gia_zns_filter4['reviewed_at'] >= (max_time - timedelta(days=5)))
+            ][['receiver_province', 'receiver_district', 'carrier']]
         .drop_duplicates()
     )
-    zns_have_1_2_3_sao['status'] = 'Bình thường'
+    zns_have_1_2_sao_recently['status'] = 'Đánh giá 1, 2 sao gần đây (<= 5 ngày)'
+
+    danh_gia_zns_filter5 = merge_left_only(danh_gia_zns_filter4, zns_have_1_2_sao_recently,
+                                           keys=['receiver_province', 'receiver_district', 'carrier'])
 
     # chỉ có 4, 5 sao
-    danh_gia_zns_filter5 = merge_left_only(danh_gia_zns_filter4, zns_have_1_2_3_sao,
-                                           keys=['receiver_province', 'receiver_district', 'carrier'])
-    only_4_5_sao = danh_gia_zns_filter5[['receiver_province', 'receiver_district', 'carrier']].drop_duplicates()
+    only_4_5_sao = (
+        danh_gia_zns_filter5.loc[
+            danh_gia_zns_filter5['n_stars'].isin([4, 5])]
+        [['receiver_province', 'receiver_district', 'carrier']]
+            .drop_duplicates()
+    )
     only_4_5_sao['status'] = 'Không phát sinh đánh giá 1, 2, 3 sao'
+
+    # Còn lại
+    danh_gia_zns_filter6 = merge_left_only(danh_gia_zns_filter5, only_4_5_sao,
+                                           keys=['receiver_province', 'receiver_district', 'carrier'])
+    other = danh_gia_zns_filter6[['receiver_province', 'receiver_district', 'carrier']].drop_duplicates()
+    other['status'] = 'Bình thường'
 
     # Tổng hợp thông tin
     final_zns = pd.concat([
@@ -135,8 +148,9 @@ def transform_data_danh_gia_zns():
         zns_1_sao_type_1,
         zns_1_sao_type_2,
         zns_5_sao,
-        zns_have_1_2_3_sao,
-        only_4_5_sao
+        zns_have_1_2_sao_recently,
+        only_4_5_sao,
+        other,
     ])[['receiver_province', 'receiver_district', 'carrier', 'status']].reset_index(drop=True)
 
     # Fill thông tin default

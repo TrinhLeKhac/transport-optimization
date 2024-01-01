@@ -15,6 +15,7 @@ TRONG_SO = {
             'Loại': -10,
             '1 sao & Đánh giá xấu': -10,
             'Nhiều hơn 1 lần đánh giá 1 sao': -8,
+            'Đánh giá 1, 2 sao gần đây (<= 5 ngày)': -8,
             'Đánh giá 5 sao trên 95% đơn': 9,
             'Không phát sinh đánh giá 1, 2, 3 sao': 8,
             'Bình thường': 4,
