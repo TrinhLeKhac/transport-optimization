@@ -15,6 +15,66 @@ def idx_tieu_chi_3(nvc_df, delivery_success_rate_col='modified_delivery_success_
     return list_idx + extra_idx
 
 
+def _get_delivery_success_rate(df_order):
+    hoan_hang = df_order[df_order['carrier_status'].isin(HOAN_HANG_STATUS)].groupby(
+        ['receiver_province', 'receiver_district', 'carrier'])['order_code'].count().rename(
+        'total_failed_order').reset_index()
+    tong_don = df_order.groupby(['receiver_province', 'receiver_district', 'carrier'])['order_code'].count().rename(
+        'total_order').reset_index()
+    ti_le_giao_hang = hoan_hang.merge(tong_don, on=['receiver_province', 'receiver_district', 'carrier'], how='right')
+    ti_le_giao_hang['total_failed_order'] = ti_le_giao_hang['total_failed_order'].fillna(0).astype(int)
+    ti_le_giao_hang['delivery_success_rate'] = 1 - ti_le_giao_hang['total_failed_order'] / ti_le_giao_hang[
+        'total_order']
+
+    return ti_le_giao_hang[['receiver_province', 'receiver_district', 'carrier', 'delivery_success_rate']]
+
+
+def get_delivery_success_rate(df_order, ndate, n_days_back=30):
+
+    nstep = n_days_back // 3
+
+    df_order1 = df_order.loc[df_order['created_at'] >= (ndate - timedelta(days=nstep))]
+    df_order2 = df_order.loc[
+        (df_order['created_at'] >= (ndate - timedelta(days=2*nstep)))
+        & (df_order['created_at'] < (ndate - timedelta(days=nstep)))
+        ]
+    df_order3 = df_order.loc[
+        (df_order['created_at'] >= (ndate - timedelta(days=3*nstep)))
+        & (df_order['created_at'] < (ndate - timedelta(days=2*nstep)))
+        ]
+    assert len(df_order1) + len(df_order2) + len(df_order3) == len(df_order), 'Ops, something wrong!'
+
+    result_df1 = _get_delivery_success_rate(df_order1)
+    result_df1.columns = ['receiver_province', 'receiver_district', 'carrier', 'delivery_success_rate1']
+
+    result_df2 = _get_delivery_success_rate(df_order2)
+    result_df2.columns = ['receiver_province', 'receiver_district', 'carrier', 'delivery_success_rate2']
+
+    result_df3 = _get_delivery_success_rate(df_order3)
+    result_df3.columns = ['receiver_province', 'receiver_district', 'carrier', 'delivery_success_rate3']
+
+    result_df = (
+        result_df1.merge(result_df2, on=['receiver_province', 'receiver_district', 'carrier'], how='outer')
+        .merge(result_df3, on=['receiver_province', 'receiver_district', 'carrier'], how='outer')
+        .fillna(0)
+    )
+    result_df['delivery_success_rate'] = (
+        (
+            result_df['delivery_success_rate1'] * 1.5
+            + result_df['delivery_success_rate2'] * 1.2
+            + result_df['delivery_success_rate3']
+        ) /
+        (
+            1.5 * np.where(result_df['delivery_success_rate1'], 1, 0)
+            + 1.2 * np.where(result_df['delivery_success_rate2'], 1, 0) +
+            1 * np.where(result_df['delivery_success_rate3'], 1, 0)
+        )
+    )
+    result_df['delivery_success_rate'] = result_df['delivery_success_rate'].fillna(0)
+
+    return result_df
+
+
 def score_ti_le_giao_hang(tong_don, ti_le_thanh_cong):
     # group 1
     if (tong_don >= 30) and (ti_le_thanh_cong > 0.95):
@@ -53,22 +113,37 @@ def score_ti_le_giao_hang(tong_don, ti_le_thanh_cong):
         return 'Trường hợp khác'
 
 
-def transform_data_ti_le_giao_hang():
+def transform_data_ti_le_giao_hang(n_days_back=30):
+
+    ndate = datetime.strptime(datetime.now().strftime('%F'), '%Y-%m-%d')
 
     # 1. Đọc thông tin giao dịch valid
-    giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
-    giao_dich_valid = giao_dich_valid[giao_dich_valid['carrier_status'].isin(THANH_CONG_STATUS + HOAN_HANG_STATUS)]
+    df_order = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
+    df_order = df_order.loc[df_order['created_at'] >= (ndate - timedelta(days=n_days_back))]
+    df_order = df_order[df_order['carrier_status'].isin(THANH_CONG_STATUS + HOAN_HANG_STATUS)]
 
-    # 2. Transform data hoàn hàng
-    hoan_hang = giao_dich_valid[giao_dich_valid['carrier_status'].isin(HOAN_HANG_STATUS)].groupby(['receiver_province', 'receiver_district', 'carrier'])['order_code'].count().rename(
+    # 2.1 Transform data hoàn hàng
+    hoan_hang = df_order[df_order['carrier_status'].isin(HOAN_HANG_STATUS)].groupby(['receiver_province', 'receiver_district', 'carrier'])['order_code'].count().rename(
         'total_failed_order').reset_index()
 
-    tong_don = giao_dich_valid.groupby(['receiver_province', 'receiver_district', 'carrier'])['order_code'].count().rename(
+    tong_don = df_order.groupby(['receiver_province', 'receiver_district', 'carrier'])['order_code'].count().rename(
         'total_order').reset_index()
 
     ti_le_giao_hang = hoan_hang.merge(tong_don, on=['receiver_province', 'receiver_district', 'carrier'], how='right')
     ti_le_giao_hang['total_failed_order'] = ti_le_giao_hang['total_failed_order'].fillna(0).astype(int)
-    ti_le_giao_hang['delivery_success_rate'] = 1 - ti_le_giao_hang['total_failed_order'] / ti_le_giao_hang['total_order']
+    # ti_le_giao_hang['delivery_success_rate'] = 1 - ti_le_giao_hang['total_failed_order'] / ti_le_giao_hang['total_order']
+    # ti_le_giao_hang['modified_delivery_success_rate'] = ti_le_giao_hang['delivery_success_rate']
+
+    # 2.2 Tính tỉ lệ giao hàng có trọng sô
+    result_df = get_delivery_success_rate(df_order, ndate)
+
+    ti_le_giao_hang = (
+        ti_le_giao_hang.merge(
+            result_df[['receiver_province', 'receiver_district', 'carrier', 'delivery_success_rate']],
+            on=['receiver_province', 'receiver_district', 'carrier'],
+            how='left'
+        )
+    )
     ti_le_giao_hang['modified_delivery_success_rate'] = ti_le_giao_hang['delivery_success_rate']
 
     # 3.1 Tiêu chí loại 1
