@@ -273,6 +273,16 @@ TRONG_SO = {
             'Không có bưu cục trong tỉnh': -50
         }
     },
+    'Đơn tồn đọng': {
+        'Tiêu chí': 20,
+        'Phân loại': {
+            'Tồn đọng trên 10 đơn đối với 1 loại hình vận chuyển': -2,
+            'Tồn đọng trên 10 đơn đối với 2 loại hình vận chuyển': -5,
+            'Tồn đọng trên 10 đơn đối với 3 loại hình vận chuyển': -8,
+            'Tồn đọng trên 10 đơn đối với 4 loại hình vận chuyển': -10,
+            'Không có thông tin': 0,
+        }
+    },
 }
 
 MAPPING_TIEU_CHI_ID = {
@@ -316,7 +326,8 @@ OVERLOADING_SCORE_DICT = {
     'Tỉ lệ giao hàng': [-10],
     'Chất lượng nội bộ': [-6],
     'Thời gian giao hàng': [-10],
-    'Có kho giao nhận': [-50]
+    'Có kho giao nhận': [-50],
+    'Đơn tồn đọng': [-5, -8, -10],
 }
 
 ACTIVE_CARRIER = [

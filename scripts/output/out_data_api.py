@@ -158,10 +158,7 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
     qua_tai6 = qua_tai6[['receiver_province', 'receiver_district', 'carrier', 'status']].rename(
         columns={'status': 'carrier_status_comment'})
 
-    qua_tai7 = don_ton_dong.groupby([
-        'receiver_province', 'receiver_district', 'carrier'
-    ])['order_type'].apply(lambda x: ', '.join(x)).reset_index()
-    qua_tai7['carrier_status_comment'] = 'Nghẽn đơn (' + qua_tai7['order_type'] + ' )'
+    qua_tai7 = don_ton_dong.loc[don_ton_dong['score'].isin(OVERLOADING_SCORE_DICT['Đơn tồn đọng'])]
     qua_tai7 = qua_tai7[['receiver_province', 'receiver_district', 'carrier', 'carrier_status_comment']]
 
     qua_tai = pd.concat([qua_tai1, qua_tai2, qua_tai3, qua_tai4, qua_tai5, qua_tai6, qua_tai7])
@@ -170,7 +167,7 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
         qua_tai.groupby([
             'receiver_province', 'receiver_district', 'carrier'
         ])['carrier_status_comment'].apply(lambda x: ' + '.join(x))
-            .reset_index()
+        .reset_index()
     )
 
     if show_logs:
@@ -223,7 +220,7 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
     score_df_list = []
 
     for focus_df in [ngung_giao_nhan, danh_gia_zns, ti_le_giao_hang, chat_luong_noi_bo, thoi_gian_giao_hang,
-                     kho_giao_nhan]:
+                     kho_giao_nhan, don_ton_dong]:
         target_df = focus_df.copy()
         target_df['weight_score'] = target_df['score'] * target_df['criteria_weight']
         score_df_list.append(target_df[['receiver_province', 'receiver_district', 'carrier', 'weight_score']])
@@ -233,8 +230,8 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
         'weight_score'].mean().reset_index()
     score_final = score_final.rename(columns={'weight_score': 'score'})
 
-    q_lower = score_final['score'].quantile(0.005)
-    q_upper = score_final['score'].quantile(0.995)
+    q_lower = score_final['score'].quantile(0.002)
+    q_upper = score_final['score'].quantile(0.998)
 
     score_final.loc[score_final['score'] < q_lower, 'score'] = q_lower
     score_final.loc[score_final['score'] > q_upper, 'score'] = q_upper

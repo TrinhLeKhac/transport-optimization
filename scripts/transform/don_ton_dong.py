@@ -2,6 +2,15 @@ from scripts.utilities.helper import *
 from scripts.utilities.config import *
 
 
+def score_ton_dong(n_order_type, threshold=10):
+    if n_order_type in [1, 2, 3, 4]:
+        return f'Tồn đọng trên {threshold} đơn đối với {n_order_type} loại hình vận chuyển'
+    elif n_order_type >= 5:
+        return f'Tồn đọng trên {threshold} đơn đối với 4++ loại hình vận chuyển'
+    else:
+        return 'Không có thông tin'
+
+
 def get_don_ton_dong():
     ndate = datetime.strptime(datetime.now().strftime('%F'), '%Y-%m-%d')
 
@@ -36,4 +45,27 @@ def get_khu_vuc_ton_dong(threshold=10):
         n_order_late=('is_late', 'sum')).reset_index()
     don_ton_dong = df_order_analytic.loc[df_order_analytic['n_order_late'] >= threshold]
 
-    return don_ton_dong[['receiver_province', 'receiver_district', 'carrier', 'order_type']]
+    nghen_don = don_ton_dong.groupby([
+        'receiver_province', 'receiver_district', 'carrier'
+    ])['order_type'].apply(lambda x: ', '.join(x)).reset_index()
+    nghen_don['carrier_status_comment'] = 'Nghẽn đơn (' + nghen_don['order_type'] + ' )'
+
+    don_ton_dong_final = don_ton_dong.groupby(['receiver_province', 'receiver_district', 'carrier']).agg(
+        n_order_type=('order_type', 'nunique')).reset_index()
+    don_ton_dong_final = don_ton_dong_final.merge(nghen_don, on=['receiver_province', 'receiver_district', 'carrier'],
+                                                  how='inner')
+    don_ton_dong_final['status'] = don_ton_dong_final['n_order_type'].map(
+        lambda s: score_ton_dong(s, threshold=threshold))
+
+    don_ton_dong_final = (
+        PROVINCE_MAPPING_DISTRICT_CROSS_CARRIER_DF.merge(
+            don_ton_dong_final, on=['receiver_province', 'receiver_district', 'carrier'], how='left'
+        )
+    )
+    don_ton_dong_final['status'] = don_ton_dong_final['status'].fillna('Không có thông tin')
+    don_ton_dong_final['carrier_status_comment'] = don_ton_dong_final['carrier_status_comment'].fillna('Bình thường')
+    don_ton_dong_final['score'] = don_ton_dong_final['status'].map(TRONG_SO['Đơn tồn đọng']['Phân loại'])
+    don_ton_dong_final['criteria'] = 'Đơn tồn đọng'
+    don_ton_dong_final['criteria_weight'] = TRONG_SO['Đơn tồn đọng']['Tiêu chí']
+
+    return don_ton_dong_final[['receiver_province', 'receiver_district', 'carrier', 'carrier_status_comment', 'status', 'score', 'criteria', 'criteria_weight']]
