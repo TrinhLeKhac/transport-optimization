@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from config import settings
 
 
-def xu_ly_danh_gia_zns(from_api=True):
+def xu_ly_danh_gia_zns(from_api=True, n_days_back=30):
     if not from_api:
         # 1. Đọc dữ liệu
         danh_gia_zns_df = pd.read_excel(ROOT_PATH + '/input/Đánh Giá ZNS.xlsx')
@@ -78,6 +78,11 @@ def xu_ly_danh_gia_zns(from_api=True):
 
         danh_gia_zns_df['reviewed_at'] = pd.to_datetime(danh_gia_zns_df['reviewed_at'], errors='coerce')
         danh_gia_zns_df['date'] = pd.to_datetime(danh_gia_zns_df['date'], errors='coerce')
+
+        danh_gia_zns_df = danh_gia_zns_df.loc[
+            danh_gia_zns_df['reviewed_at'] >=
+            (datetime.strptime(datetime.now().strftime('%F'), '%Y-%m-%d') - timedelta(days=n_days_back))
+        ]
 
         # 4. Lưu thông tin
         danh_gia_zns_df.to_parquet(ROOT_PATH + '/processed_data/danh_gia_zns.parquet', index=False)
