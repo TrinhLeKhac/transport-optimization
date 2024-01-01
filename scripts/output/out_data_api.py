@@ -49,19 +49,6 @@ API_COLS_RENAMED = [
     'rate', 'score', 'star',
 ]
 
-THOI_GIAN_GIAO_HANG_DEFAULT = {
-    'Nội Thành Tỉnh': '1.75 - 2.25 ngày',
-    'Ngoại Thành Tỉnh': '1.75 - 2.25 ngày',
-    'Nội Thành Tp.HCM - HN': '1.75 - 2.25 ngày',
-    'Ngoại Thành Tp.HCM - HN': '1.75 - 2.25 ngày',
-    'Nội Miền Tp.HCM - HN': '0.75 - 1.25 ngày',
-    'Nội Miền': '1.75 - 2.25 ngày',
-    'Cận Miền': '2.75 - 3.25 ngày',
-    'Liên Miền Tp.HCM - HN': '2.75 - 3.25 ngày',
-    'Liên Miền Đặc Biệt': '2.75 - 3.25 ngày',
-    'Cách Miền': '3.75 - 4.25 ngày',
-}
-
 
 def round_value(x):
     th1 = round(x - 0.25, 1)
@@ -137,7 +124,7 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
     (
         ngung_giao_nhan, danh_gia_zns,
         ti_le_giao_hang, chat_luong_noi_bo,
-        thoi_gian_giao_hang, kho_giao_nhan,
+        thoi_gian_giao_hang, kho_giao_nhan, don_ton_dong
     ) = total_transform(show_logs=False)
 
     if show_logs:
@@ -170,7 +157,14 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
     qua_tai6 = kho_giao_nhan.loc[kho_giao_nhan['score'].isin(OVERLOADING_SCORE_DICT['Có kho giao nhận'])]
     qua_tai6 = qua_tai6[['receiver_province', 'receiver_district', 'carrier', 'status']].rename(
         columns={'status': 'carrier_status_comment'})
-    qua_tai = pd.concat([qua_tai1, qua_tai2, qua_tai3, qua_tai4, qua_tai5, qua_tai6])
+
+    qua_tai7 = don_ton_dong.groupby([
+        'receiver_province', 'receiver_district', 'carrier'
+    ])['order_type'].apply(lambda x: ', '.join(x)).reset_index()
+    qua_tai7['carrier_status_comment'] = 'Nghẽn đơn (' + qua_tai7['order_type'] + ' )'
+    qua_tai7 = qua_tai7[['receiver_province', 'receiver_district', 'carrier', 'carrier_status_comment']]
+
+    qua_tai = pd.concat([qua_tai1, qua_tai2, qua_tai3, qua_tai4, qua_tai5, qua_tai6, qua_tai7])
 
     qua_tai = (
         qua_tai.groupby([
@@ -336,6 +330,7 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
 
 def assign_supership_carrier(df_api):
 
+    print('Assigning SuperShip carrier...')
     # 1. Get analytics of top 3 carrier
     time_data = get_agg(df_api, target_col='time_data', n_top=3, asc=True)
     rate = get_agg(df_api, target_col='rate', n_top=3, asc=False)
@@ -393,6 +388,7 @@ def assign_supership_carrier(df_api):
     df_api_full['rate'] = np.round(df_api_full['rate'], 2)
     df_api_full['score'] = np.round(df_api_full['score'], 2)
     df_api_full['star'] = np.round(df_api_full['star'], 1)
+    print('Shape after assigning: ', len(df_api_full))
 
     # 4. Save data
     df_api_full.to_parquet(ROOT_PATH + '/output/data_api.parquet', index=False)
@@ -400,4 +396,5 @@ def assign_supership_carrier(df_api):
 
 if __name__ == '__main__':
     df_api = out_data_api()
+    print('-'*100)
     assign_supership_carrier(df_api)

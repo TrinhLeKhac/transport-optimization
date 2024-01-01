@@ -343,6 +343,19 @@ MAPPING_CARRIER_ID = {
     'SuperShip': 13,
 }
 
+THOI_GIAN_GIAO_HANG_DEFAULT = {
+    'Nội Thành Tỉnh': '1.75 - 2.25 ngày',
+    'Ngoại Thành Tỉnh': '1.75 - 2.25 ngày',
+    'Nội Thành Tp.HCM - HN': '1.75 - 2.25 ngày',
+    'Ngoại Thành Tp.HCM - HN': '1.75 - 2.25 ngày',
+    'Nội Miền Tp.HCM - HN': '0.75 - 1.25 ngày',
+    'Nội Miền': '1.75 - 2.25 ngày',
+    'Cận Miền': '2.75 - 3.25 ngày',
+    'Liên Miền Tp.HCM - HN': '2.75 - 3.25 ngày',
+    'Liên Miền Đặc Biệt': '2.75 - 3.25 ngày',
+    'Cách Miền': '3.75 - 4.25 ngày',
+}
+
 MAPPING_ID_CARRIER = {}
 for carrier, id in MAPPING_CARRIER_ID.items():
     MAPPING_ID_CARRIER[id] = carrier

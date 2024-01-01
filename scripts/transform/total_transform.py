@@ -1,5 +1,8 @@
 import sys
 from pathlib import Path
+
+from scripts.transform.don_ton_dong import get_khu_vuc_ton_dong
+
 ROOT_PATH = str(Path(__file__).parent.parent.parent)
 sys.path.append(ROOT_PATH)
 
@@ -49,10 +52,16 @@ def total_transform(show_logs=True):
     if show_logs:
         print('>>> Done\n')
 
+    if show_logs:
+        print('7. Transform data khu vực bị dồn đơn hàng...')
+    don_ton_dong = get_khu_vuc_ton_dong()
+    if show_logs:
+        print('>>> Done\n')
+
     return (
         ngung_giao_nhan, danh_gia_zns,
         ti_le_giao_hang, chat_luong_noi_bo,
-        thoi_gian_giao_hang, kho_giao_nhan,
+        thoi_gian_giao_hang, kho_giao_nhan, don_ton_dong
     )
 
 
