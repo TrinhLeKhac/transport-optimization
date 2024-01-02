@@ -77,9 +77,9 @@ def get_data_viz(target_df):
 
 # @st.cache_data
 # def st_get_data_viz():
-    # data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_visualization.parquet')
-    # viz_df1, viz_df2 = get_data_viz(data_history_df)
-    # return viz_df1, viz_df2
+# data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_visualization.parquet')
+# viz_df1, viz_df2 = get_data_viz(data_history_df)
+# return viz_df1, viz_df2
 
 
 @st.cache_data
@@ -120,7 +120,7 @@ def get_st_dataframe_from_db(
                 ORDER BY tbl_fee.price ASC
             ) AS smallint) AS price_ranking
             FROM db_schema.tbl_order_type tbl_ord
-            INNER JOIN db_schema.tbl_data_api tbl_api
+            INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api
             ON tbl_ord.carrier_id = tbl_api.carrier_id --6
             AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code
             AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code --713

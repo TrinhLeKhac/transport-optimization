@@ -32,7 +32,7 @@ def execute_query(
                 ORDER BY tbl_fee.price ASC
             ) AS smallint) AS price_ranking
             FROM db_schema.tbl_order_type tbl_ord
-            INNER JOIN db_schema.tbl_data_api tbl_api
+            INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api
             ON tbl_ord.carrier_id = tbl_api.carrier_id --6
             AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code
             AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code --713
