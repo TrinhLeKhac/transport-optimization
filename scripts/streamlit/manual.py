@@ -5,15 +5,6 @@ from scripts.streamlit.streamlit_helper import *
 import scripts.streamlit.redirect as rd
 
 
-def click_button(step):
-    if step == 'process':
-        st.session_state['data_state'] = True
-    elif step == 'out_data_api':
-        st.session_state['api_state'] = True
-    elif step == 'out_data_viz':
-        st.session_state['viz_state'] = True
-
-
 def create_manual_tab():
 
     st.info(

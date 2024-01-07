@@ -71,16 +71,31 @@ def score_sidebar(total_analyze_df):
 def error_by_score(total_analyze_df, threshold=0.75):
     viz_df = total_analyze_df[total_analyze_df['score'] == threshold]
     viz_df1 = viz_df.groupby('carrier')['n_errors'].sum().reset_index()
-    fig = px.bar(viz_df1, x='carrier', y='n_errors', color='carrier', text='n_errors', template='seaborn')
+
+    carriers = viz_df1['carrier'].tolist()
+
+    fig = go.Figure()
+    bar_width = 0.5
+    fig.add_trace(
+        go.Bar(
+            x=carriers,
+            y=viz_df1['n_errors'],
+            width=bar_width,
+            text=viz_df1['n_errors'],
+            marker_color=['#2596BE']*len(carriers),
+            # marker_color=px.colors.sequential.YlOrRd_r[0:len(carriers)],
+        )
+    )
+
     fig.update_layout(
         xaxis=dict(title='Nhà vận chuyển', categoryorder='total descending'),
         yaxis=dict(title='Tổng số lỗi'),
-        legend=dict(
-            orientation='h',
-            y=1.12,
-            x=0.15
-        ),
-        legend_title='',
+        # legend=dict(
+        #     orientation='h',
+        #     y=1.12,
+        #     x=0.15
+        # ),
+        # legend_title='',
         height=500,
         # width=800
     )
@@ -93,38 +108,58 @@ def detail_error_by_carrier(total_analyze_df, opt_carrier, type_viz='error_type'
         (total_analyze_df['score'] == threshold)
         & (total_analyze_df['carrier'] == opt_carrier)
         ].groupby(type_viz)['n_errors'].sum().reset_index()
-    fig = px.bar(viz_df, x=type_viz, y='n_errors', color=type_viz, text='n_errors', template='seaborn')
-    fig.update_layout(
-        xaxis=dict(title='', tickvals=[], categoryorder='total descending'),
-        yaxis=dict(title='Số lỗi theo category'),
-        legend=dict(
+    categories = viz_df[type_viz].tolist()
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Bar(
+            x=viz_df['n_errors'],
+            y=categories,
+            text=viz_df['n_errors'],
             orientation='h',
-            y=1.12,
-            x=x_legend_position,
-        ),
-        legend_title='',
+            marker_color=['#2596BE']*len(categories),
+        )
+    )
+
+    fig.update_layout(
+        xaxis=dict(title='Tổng số lỗi'),
+        yaxis=dict(categoryorder='total descending'),
         height=500,
-        # width=800,
     )
     return fig
 
 
 def analyze_by_carrier(total_analyze_df, type_viz='n_orders', threshold=0.75):
+
     viz_df = total_analyze_df[total_analyze_df['score'] == threshold]
     categories = sorted(viz_df['carrier'].unique())
-    groups = sorted(viz_df['quality'].unique())
+    groups = ['good', 'bad']  # sorted(viz_df['quality'].unique())
+    colors = {
+        'good': '#2596BE',
+        'bad': 'firebrick'
+    }
 
     fig = go.Figure()
-    bar_width = 0.4
+    bar_width = 0.3
     for i, group in enumerate(groups):
         group_data = viz_df[viz_df['quality'] == group]
         positions = [pos + i * bar_width for pos in range(len(categories))]
-        fig.add_trace(go.Bar(x=positions, y=group_data[type_viz], name=group, width=bar_width))
+        fig.add_trace(
+            go.Bar(
+                x=positions,
+                y=group_data[type_viz],
+                name=group,
+                width=bar_width,
+                marker_color=colors[group]
+            )
+        )
 
     if type_viz == 'n_orders':
         y_title = 'Số đơn hàng'
     elif type_viz == 'monetary':
-        y_title = 'Số tiền'
+        y_title = 'Tổng tiền'
+    else:
+        y_title = ''
 
     fig.update_layout(
         xaxis=dict(tickvals=[pos + (len(groups) - 1) * bar_width / 2 for pos in range(len(categories))],
