@@ -372,6 +372,10 @@ MAPPING_ID_CARRIER = {}
 for carrier, id in MAPPING_CARRIER_ID.items():
     MAPPING_ID_CARRIER[id] = carrier
 
+MAPPING_ID_ORDER_TYPE = {}
+for order_type, id in MAPPING_ORDER_TYPE_ID.items():
+    MAPPING_ID_ORDER_TYPE[id] = order_type
+
 CUSTOMER_BEST_CARRIER_DEFAULT = 'BEST Express'
 PARTNER_BEST_CARRIER_DEFAULT = 'BEST Express'
 

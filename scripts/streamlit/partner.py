@@ -6,15 +6,17 @@ from plotly.subplots import make_subplots
 
 
 def draw_fee_error(total_analyze_df):
-    st.markdown(
+    fee_err_div, fee_err_info = st.columns([3, 2])
+    fee_err_info.info(
         """
-        **Chart này mô tả tương quan giữa đường chi phí và lỗi khi thay đổi score**
-        * Thông tin:
-            * Đường chi phí tỉ lệ thuận với score 
-            * Số lỗi phát sinh tỉ lệ nghịch với score
-            * Điểm tối ưu là giao nhau giữa 2 đường chi phí và lỗi
-    """
+        **Chart này mô tả tương quan giữa đường biểu diễn :red[chi phí] và :red[lỗi] khi thay đổi score**  
+        👉 Đường :red[**chi phí**] tỉ lệ thuận với :red[**score**]  
+        👉 Số :red[**lỗi phát sinh**] tỉ lệ nghịch với :red[**score**]    
+        👉 :red[***Điểm tối ưu là giao nhau giữa 2 đường chi phí và lỗi***]   
+        """
     )
+    # ----------------------------------------------------------------------------------------------
+
     viz_df = total_analyze_df[['score', 'monetary', 'total_error']].drop_duplicates()
 
     # subfig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -40,25 +42,29 @@ def draw_fee_error(total_analyze_df):
         yaxis=dict(title='Tổng tiền cước'),
         yaxis2=dict(title='Tổng lỗi', overlaying='y', side='right'),
     )
-    st.plotly_chart(fig)
+    fee_err_div.plotly_chart(fig)
 
 
 def score_sidebar(total_analyze_df):
-    st.markdown(
+    slider_div, _, div_info = st.columns([2, 1, 2])
+    div_info.info(
         """
-        **Kéo thanh slidebar để chọn ngưỡng score mong muốn**
-        * Thông tin:
-            * Score được tính theo công thức: score = 0.5 + slidebar_value * 0.05 
+        **Kéo thanh :red[slidebar] để chọn ngưỡng :red[score] mong muốn**  
+        👉 Công thức: :red[*score = 0.5 + slidebar_value * 0.05*]  
     """
     )
-    slider_num = st.slider("", min_value=1, max_value=100, value=100)
+    slider_num = slider_div.slider("", min_value=1, max_value=100, value=70)
 
     _th = 0.5 + slider_num * 0.005
-    st.markdown('Score: ' + str(_th)[:5])
+    slider_div.info(f'**Score: :red[{str(_th)[:5]}]**')
 
     viz_df = total_analyze_df[total_analyze_df['score'] == _th]
-    st.markdown('Tổng số đơn trên ngưỡng lọc: ' + str(viz_df['n_good_order'].values[0]))
-    st.markdown('Tổng số đơn dưới ngưỡng lọc: ' + str(viz_df['n_bad_order'].values[0]))
+    slider_div.info(
+        f"""
+        Tổng số đơn :red[**trên**] ngưỡng lọc: :red[**{str(viz_df['n_good_order'].values[0])}**]     
+        Tổng số đơn :red[**dưới**] ngưỡng lọc: :red[**{str(viz_df['n_bad_order'].values[0])}**]     
+        """
+    )
     return _th
 
 
@@ -140,48 +146,47 @@ def analyze_by_carrier(total_analyze_df, type_viz='n_orders', threshold=0.75):
 def create_partner_tab():
     interactive = st.container()
     with interactive:
-        # 1. Toggle thông tin
-        _, toggle_div, _ = st.columns([1, 2, 1])
-        with toggle_div:
-            toggle = st.toggle('Thông tin', key='toggle_partner_tab')
-            if toggle:
-                st.markdown(
-                    """
-                    **Modules này hỗ trợ chọn score tối ưu vận chuyển một cách trực quan dựa vào thống kê lỗi và chi phí**
-                    * Thông tin:
-                        * Chart tương quan chi phí - lỗi.
-                        * Chart hiển thị lỗi chi tiết của NVC.
-                    * Tiêu chí chọn đơn:
-                        * Nếu tồn tại ít nhất 1 NVC có điểm >= ngưỡng, chọn NVC có cước phí nhỏ nhất.
-                        * Nếu tất cả các NVC có điểm < ngưỡng, chọn NVC có score cao nhất.
-                """
-                )
+        # 1. Info
+        st.info(
+            """
+            **Modules này hỗ trợ chọn :red[score tối ưu vận chuyển] một cách trực quan dựa vào thống kê :red[lỗi] và :red[chi phí]**
+            * Thông tin:  
+            👉 Chart tương quan chi phí - lỗi    
+            👉 Chart hiển thị lỗi chi tiết của NVC    
+            * Tiêu chí chọn đơn:  
+            👉 Nếu tồn tại ít nhất 1 NVC có điểm >= ngưỡng, chọn NVC có cước phí nhỏ nhất  
+            👉 Nếu tất cả các NVC có điểm < ngưỡng, chọn NVC có score cao nhất  
+        """
+        )
+        st.divider()
+        # ----------------------------------------------------------------------------------------------
 
         total_analyze_df1, total_analyze_df2 = st_get_data_viz()
 
         # 2. Tương quan chi phí - lỗi
-        _, fee_err_div, _ = st.columns([1, 2, 1])
-        with fee_err_div:
-            draw_fee_error(total_analyze_df1)
-        st.markdown("---")
+        draw_fee_error(total_analyze_df1)
+        st.divider()
+        # ----------------------------------------------------------------------------------------------
 
         # 3.Điều chỉnh theo score
-        _, score_div, _ = st.columns([1, 4, 1])
-        with score_div:
-            _th = score_sidebar(total_analyze_df1)
-        st.markdown("---")
+        # _, score_div, _ = st.columns([1, 4, 1])
+        # with score_div:
+        _th = score_sidebar(total_analyze_df1)
+        st.divider()
+        # ----------------------------------------------------------------------------------------------
 
-        # 4. Chọn NVC
-        info_err_div, _, select_div = st.columns([2, 1, 1])
-        with info_err_div:
-            st.markdown(
-                """
-                **Thống kê lỗi của NVC theo từng ngưỡng chọn score**
-                * Thông tin:
-                    * Chart bên trái: Tổng số lỗi của NVC.
-                    * Chart bên phải: Phân bố chi tiết lỗi của 1 NVC theo loại vận chuyển hoặc category lỗi.
+        # 4. Thống kê lỗi Nhà vận chuyển
+
+        # 4.1 Info
+        select_div, _, info_err_div = st.columns([1, 1, 2])
+        info_err_div.info(
             """
-            )
+            **Thống kê lỗi của NVC theo :red[ngưỡng score]**
+            * Thông tin:  
+            👉 Chart bên trái: :red[**Tổng số lỗi**] của Nhà vận chuyển  
+            👉 Chart bên phải: :red[**Chi tiết lỗi**] của Nhà vận chuyển theo :red[**loại vận chuyển**] hoặc :red[**category lỗi**]  
+        """
+        )
         with select_div:
             viz_df = total_analyze_df1[total_analyze_df1['score'] == _th]
             opt_carrier = st.selectbox(
@@ -195,7 +200,7 @@ def create_partner_tab():
                 key='type_viz',
             )
 
-        error_by_score_div, _, detail_error_by_carrier_div = st.columns([4, 1, 5])
+        detail_error_by_carrier_div, _, error_by_score_div = st.columns([4, 1, 4])
 
         fig_error_by_score = error_by_score(total_analyze_df1, threshold=_th)
 
@@ -211,36 +216,37 @@ def create_partner_tab():
 
         fig_detail_error_by_score.update_layout(yaxis=dict(anchor='x'), barmode='stack')
 
-        # 5. Thống kê tổng lỗi NVC theo score
+        # 4.2 Thống kê tổng lỗi NVC theo score
         with error_by_score_div:
             st.plotly_chart(fig_error_by_score)
 
-        # 6. Thống kê lỗi chi tiết của NVC theo score
+        # 4.3 Thống kê lỗi chi tiết của NVC theo score
         with detail_error_by_carrier_div:
             st.plotly_chart(fig_detail_error_by_score)
 
-        st.markdown("---")
+        st.divider()
+        # ----------------------------------------------------------------------------------------------
+        # 5. Thống kê trên/dưới ngưỡng score
 
-        _, info_order_fee_div, _ = st.columns([1, 2, 1])
-        with info_order_fee_div:
-            st.markdown(
-                """
-                **Thống kê chi tiết lượng đơn hàng trên và dưới ngưỡng lọc score của từng NVC**
-                * Thông tin:
-                    * Chart bên trái: Phân bố đơn hàng.
-                    * Chart bên phải: Phân bố cước phí.
+        # 5.1 Info
+        st.info(
             """
-            )
+            **Thống kê chi tiết :red[số đơn hàng + số tiền] theo ngưỡng lọc score của từng NVC**
+            * Thông tin:  
+            👉 Chart bên trái: Phân bố :red[**đơn hàng**]  
+            👉 Chart bên phải: Phân bố :red[**cước phí**]  
+        """
+        )
         analyze_by_order_div, _, analyze_by_money_div = st.columns([4, 1, 4])
 
         fig_order_by_carrier = analyze_by_carrier(total_analyze_df2, type_viz='n_orders', threshold=_th)
         fig_monatary_by_carrier = analyze_by_carrier(total_analyze_df2, type_viz='monetary', threshold=_th)
         fig_monatary_by_carrier.update_layout(yaxis=dict(anchor='x'), barmode='stack')
 
-        # 7. Thống kê đơn theo nhà vận chuyển
+        # 5.2. Thống kê đơn theo nhà vận chuyển
         with analyze_by_order_div:
             st.plotly_chart(fig_order_by_carrier)
 
-        # 8. Thống kê tiền theo nhà vận chuyển
+        # 5.3. Thống kê tiền theo nhà vận chuyển
         with analyze_by_money_div:
             st.plotly_chart(fig_monatary_by_carrier)

@@ -4,10 +4,14 @@ cookie:
   name: streamlit_cookie_name
 credentials:
   names:
+    thao:
+      email: thao52@gmail.com
+      password: '123'
+      username: thao
     trinh:
       email: emperorfire52@gmail.com
-      username: superai_supership
       password: Trinh@SuperShip#24
+      username: superai_supership
 preauthorized:
   emails:
-    - emperorfire5252@gmail.com
+  - emperorfire5252@gmail.com
