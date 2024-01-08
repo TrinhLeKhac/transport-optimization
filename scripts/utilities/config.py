@@ -275,7 +275,7 @@ TRONG_SO = {
         }
     },
     'Đơn tồn đọng': {
-        'Tiêu chí': 20,
+        'Tiêu chí': 10,
         'Phân loại': {
             'Tồn đọng trên 10 đơn đối với 1 loại hình vận chuyển': -2,
             'Tồn đọng trên 10 đơn đối với 2 loại hình vận chuyển': -5,
