@@ -449,3 +449,12 @@ KHONG_XET_STATUS = [
     'Đơn huỷ',
     'Chờ lấy hàng',
 ]
+
+STATUS_MAPPING = {
+    'Chưa giao hàng': CHUA_GIAO_STATUS,
+    'Đang giao': DANG_GIAO_STATUS,
+    'Hoàn hàng': HOAN_HANG_STATUS,
+    'Thành công': THANH_CONG_STATUS,
+    'Thất lạc': THAT_LAC_STATUS,
+    'Không xét': KHONG_XET_STATUS
+}

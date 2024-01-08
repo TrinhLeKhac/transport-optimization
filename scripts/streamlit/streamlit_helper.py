@@ -9,6 +9,34 @@ def st_get_province_mapping_district():
     return pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
 
 
+@st.cache_data
+def st_get_data_zns():
+    return pd.read_parquet(ROOT_PATH + '/processed_data/danh_gia_zns.parquet')
+
+
+@st.cache_data
+def st_get_data_order():
+    df_order = pd.read_parquet(
+        ROOT_PATH + '/processed_data/order.parquet', columns=[
+            'created_at',
+            'order_code',
+            'carrier',
+            'weight',
+            'sender_province',
+            'sender_district',
+            'receiver_province',
+            'receiver_district',
+            'carrier_status',
+            'order_type',
+            'delivery_type',
+            'picked_at',
+            'last_delivering_at',
+            'carrier_delivered_at'
+        ]
+    )
+    return df_order
+
+
 def _get_data_viz(target_df, threshold=0.6):
     good_df = target_df.loc[target_df['score'] >= threshold].sort_values(['order_code', 'price'],
                                                                          ascending=[True, True]).drop_duplicates(
@@ -73,13 +101,6 @@ def get_data_viz(target_df):
     total_analyze_df2 = pd.concat(analyze_df2_list, ignore_index=True)
 
     return total_analyze_df1, total_analyze_df2
-
-
-# @st.cache_data
-# def st_get_data_viz():
-# data_history_df = pd.read_parquet(ROOT_PATH + '/output/data_visualization.parquet')
-# viz_df1, viz_df2 = get_data_viz(data_history_df)
-# return viz_df1, viz_df2
 
 
 @st.cache_data

@@ -8,6 +8,7 @@ sys.path.append(ROOT_PATH)
 from scripts.streamlit.manual import create_manual_tab
 from scripts.streamlit.customer import create_customer_tab
 from scripts.streamlit.partner import create_partner_tab
+from scripts.streamlit.analytic import create_analytic_tab
 from scripts.streamlit.authenticator import Authenticator
 
 st.set_page_config(
@@ -45,12 +46,14 @@ st.markdown("""
             background-color: #2596BE;
         }
     </style>""", unsafe_allow_html=True)
-tab1, tab2, tab3 = st.tabs(["Manual", "Customer", "Partner"])
+tab1, tab2, tab3, tab4 = st.tabs(["Manual", "Customer", "Analytic", "Partner"])
 with tab1:
     create_manual_tab()
 with tab2:
     create_customer_tab()
 with tab3:
+    create_analytic_tab()
+with tab4:
     create_partner_tab()
 # elif st.session_state["authentication_status"] is False:
 #     st.sidebar.error('Username/password is incorrect')

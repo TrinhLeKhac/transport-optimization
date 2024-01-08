@@ -69,7 +69,7 @@ def create_customer_tab():
         sender_province_field, sender_district_field = st.columns(2)
         sender_province_field.selectbox(
             ":blue[**Tỉnh/Thành Phố của Người Gửi**]",
-            options=(PROVINCE_MAPPING_DISTRICT_DF['province'].unique().tolist()),
+            options=(PROVINCE_MAPPING_DISTRICT_DF['province'].unique()),
             key='sender_province',
         )
         sender_district_field.selectbox(
@@ -84,7 +84,7 @@ def create_customer_tab():
         receiver_province_field, receiver_district_field = st.columns(2)
         receiver_province_field.selectbox(
             ":blue[**Tỉnh/Thành Phố của Người Nhận**]",
-            options=(PROVINCE_MAPPING_DISTRICT_DF['province'].unique().tolist()),
+            options=(PROVINCE_MAPPING_DISTRICT_DF['province'].unique()),
             key='receiver_province',
         )
         receiver_district_field.selectbox(
