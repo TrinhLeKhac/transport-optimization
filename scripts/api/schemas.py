@@ -66,7 +66,7 @@ class APIModel(BaseModel):
     total_order: conint(strict=True)
     rate_ranking: conint(strict=True)
     rate: confloat(ge=0, le=100.00, strict=True)
-    score: confloat(ge=0, le=1.00, strict=True)
+    score: confloat(ge=0, le=5.00, strict=True)
     star: confloat(ge=0, le=5.0, strict=True)
     import_date: constr(max_length=10, strict=True)
 
@@ -92,7 +92,7 @@ class APIResultModel(BaseModel):
     time_data: confloat(ge=0, le=100.00, strict=True)
     time_display: constr(max_length=30, strict=True)
     rate: confloat(ge=0, le=100.00, strict=True)
-    score: confloat(ge=0, le=1.00, strict=True)
+    score: confloat(ge=0, le=5.00, strict=True)
     star: confloat(ge=0, le=5.0, strict=True)
     for_shop: int
     for_partner: int

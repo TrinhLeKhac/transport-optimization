@@ -167,7 +167,7 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
         qua_tai.groupby([
             'receiver_province', 'receiver_district', 'carrier'
         ])['carrier_status_comment'].apply(lambda x: ' + '.join(x))
-        .reset_index()
+            .reset_index()
     )
 
     if show_logs:
@@ -236,6 +236,7 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
     score_final.loc[score_final['score'] < q_lower, 'score'] = q_lower
     score_final.loc[score_final['score'] > q_upper, 'score'] = q_upper
     score_final['score'] = (score_final['score'] - q_lower) / (q_upper - q_lower)
+    score_final['score'] = score_final['score'] * 5  # Change score to range 0-5
     score_final['score'] = np.round(score_final['score'], 2)
 
     if show_logs:
@@ -326,7 +327,6 @@ def out_data_api(return_full_cols_df=False, show_logs=True):
 
 
 def assign_supership_carrier(df_api):
-
     print('Assigning SuperShip carrier...')
     # 1. Get analytics of top 3 carrier
     time_data = get_agg(df_api, target_col='time_data', n_top=3, asc=True)
@@ -340,9 +340,9 @@ def assign_supership_carrier(df_api):
     # 2. Assign infor to SuperShip
     df_supership = (
         time_data.merge(rate, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
-        .merge(score, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
-        .merge(star, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
-        .merge(total_order, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
+            .merge(score, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
+            .merge(star, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
+            .merge(total_order, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
     )
 
     df_supership['carrier_id'] = 13
@@ -374,7 +374,8 @@ def assign_supership_carrier(df_api):
         df_api_full.groupby(["receiver_province_code", "receiver_district_code", "new_type"])["combine_col"].rank(
             method="dense", ascending=False).astype(int)
 
-    df_api_full['wscore'] = df_api_full['speed_ranking'] * 1.4 + df_api_full['rate_ranking'] * 1.2 + df_api_full['score_ranking']
+    df_api_full['wscore'] = df_api_full['speed_ranking'] * 1.4 + df_api_full['rate_ranking'] * 1.2 + df_api_full[
+        'score_ranking']
 
     df_api_full["for_shop"] = \
         df_api_full.groupby(["receiver_province_code", "receiver_district_code", "new_type"])["wscore"].rank(

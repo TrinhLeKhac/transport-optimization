@@ -408,4 +408,3 @@ def tong_hop_thong_tin_giao_dich(from_api=True, n_days_back=30):
 
         # 4. Lưu thông tin
         valid_order_df.to_parquet(ROOT_PATH + '/processed_data/order.parquet', index=False)
-
