@@ -16,7 +16,8 @@ def get_don_ton_dong():
 
     loai_van_chuyen_df = pd.DataFrame(THOI_GIAN_GIAO_HANG_DEFAULT.items(),
                                       columns=['order_type', 'default_delivery_time'])
-    loai_van_chuyen_df['default_delivery_time_details'] = [48, 48, 48, 48, 24, 48, 72, 72, 72, 108]
+    # Thêm 12h vào default chuyển time set đơn tồn đọng
+    loai_van_chuyen_df['default_delivery_time_details'] = [48 + 12, 48 + 12, 48 + 12, 48 + 12, 24 + 12, 48 + 12, 72 + 12, 72 + 12, 72 + 12, 108 + 12]
 
     df_order = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
     df_order = df_order.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
