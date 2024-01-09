@@ -533,7 +533,7 @@ def _get_data_viz(target_df, threshold=0.6):
 
 
 def get_data_viz(target_df):
-    thresholds = np.linspace(0.5, 1, 101)
+    thresholds = np.linspace(2.5, 5, 101)  # Thay đổi lại khi range score change từ [0-1] -> [0-5]
     analyze_df1_list = []
     analyze_df2_list = []
 
