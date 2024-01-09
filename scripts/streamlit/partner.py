@@ -50,12 +50,12 @@ def score_sidebar(total_analyze_df):
     div_info.info(
         """
         **Kéo thanh :red[slidebar] để chọn ngưỡng :red[score] mong muốn**  
-        👉 Công thức: :red[*score = 0.5 + slidebar_value * 0.05*]  
+        👉 Công thức: :red[*score = 2.5 + slidebar_value * 0.025*]  
     """
     )
-    slider_num = slider_div.slider("", min_value=1, max_value=100, value=70)
+    slider_num = slider_div.slider("", min_value=0, max_value=100, value=70)
 
-    _th = 0.5 + slider_num * 0.005
+    _th = 2.5 + slider_num * 0.025
     slider_div.info(f'**Score: :red[{str(_th)[:5]}]**')
 
     viz_df = total_analyze_df[total_analyze_df['score'] == _th]
