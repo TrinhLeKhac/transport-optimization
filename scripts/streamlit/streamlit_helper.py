@@ -1,3 +1,5 @@
+import io
+
 import psycopg2
 
 from config import settings
@@ -35,6 +37,23 @@ def st_get_data_order():
         ]
     )
     return df_order
+
+
+@st.cache_data(experimental_allow_widgets=True)
+def save_excel(df, key):
+    # buffer to use for excel writer
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False)
+
+    buffer.seek(0)  # Move the buffer position to the beginning before downloading
+    st.download_button(
+        label="📥 Download data as Excel",
+        data=buffer,
+        file_name='data.xlsx',
+        mime='application/vnd.ms-excel',
+        key=key
+    )
 
 
 @st.cache_data

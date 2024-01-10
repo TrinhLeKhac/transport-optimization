@@ -329,7 +329,8 @@ def create_analytic_tab():
         """)
 
         # ----------------------------------------------------------------------------------------------
-        with st.expander(":blue[**Show chi tiết data filter theo điều kiện ở trên**]"):
+        div_5_6, div_1_6 = st.columns([5, 1])
+        with div_5_6.expander(":blue[**Show chi tiết data filter theo điều kiện ở trên**]"):
             st.dataframe(
                 filter_order_df8[[
                     'created_at', 'order_code', 'carrier', 'weight', 'carrier_status',
@@ -338,6 +339,8 @@ def create_analytic_tab():
                 hide_index=True,
                 use_container_width=True
             )
+        with div_1_6:
+            save_excel(filter_order_df8, key='filter_order')
         st.info(
             f"""
             **:red[Thời gian giao hàng estimate] :blue[ở API được tính dựa trên:]**     
@@ -382,15 +385,20 @@ def create_analytic_tab():
             & (total_order_df['receiver_district'] == st.session_state['success_rate_receiver_district'])
             & (total_order_df['carrier'] == st.session_state['success_rate_carrier'])
         ]
+
         success_df = filter_success_rate_total_order_df.loc[
             filter_success_rate_total_order_df['carrier_status'].isin(THANH_CONG_STATUS)
         ]
+
         failed_df = filter_success_rate_total_order_df.loc[
             filter_success_rate_total_order_df['carrier_status'].isin(HOAN_HANG_STATUS)
         ]
+
+        # ----------------------------------------------------------------------------------------------
         div_3, _, _ = st.columns(3)
         div_3.info(f"👉 Số đơn :red[**hoàn hàng**]: :red[**{len(success_df)}**]")
-        with st.expander(":blue[**Show chi tiết đơn hàng**] :red[**giao thành công**] :blue[**theo điều kiện lọc**]"):
+        div_5_6, div_1_6 = st.columns([5, 1])
+        with div_5_6.expander(":blue[**Show chi tiết đơn hàng**] :red[**giao thành công**] :blue[**theo điều kiện lọc**]"):
             st.dataframe(
                 success_df[[
                     'created_at', 'order_code', 'carrier', 'weight', 'carrier_status',
@@ -399,9 +407,14 @@ def create_analytic_tab():
                 hide_index=True,
                 use_container_width=True
             )
+        with div_1_6:
+            save_excel(success_df, key='success')
+
+        # ----------------------------------------------------------------------------------------------
         div_3, _, _ = st.columns(3)
         div_3.info(f"👉 Số đơn :red[**hoàn hàng**]: :red[**{len(failed_df)}**]")
-        with st.expander(":blue[**Show chi tiết đơn hàng**] :red[**hoàn hàng**] :blue[**theo điều kiện lọc**]"):
+        div_5_6, div_1_6 = st.columns([5, 1])
+        with div_5_6.expander(":blue[**Show chi tiết đơn hàng**] :red[**hoàn hàng**] :blue[**theo điều kiện lọc**]"):
             st.dataframe(
                 failed_df[[
                     'created_at', 'order_code', 'carrier', 'weight', 'carrier_status',
@@ -410,5 +423,8 @@ def create_analytic_tab():
                 hide_index=True,
                 use_container_width=True
             )
+        with div_1_6:
+            save_excel(failed_df, key='failed')
+        # ----------------------------------------------------------------------------------------------
         div_3, _, _ = st.columns(3)
         div_3.info(f"👉 :red[**Tỉ lệ giao thành công**]: :red[**{round(len(success_df)/(len(success_df) + len(failed_df))*100, 2)}%**]")
