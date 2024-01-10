@@ -1,4 +1,7 @@
 from pathlib import Path
+
+import pandas as pd
+
 ROOT_PATH = str(Path(__file__).parent.parent.parent)
 
 TRONG_SO = {
@@ -287,12 +290,12 @@ TRONG_SO = {
 }
 
 MAPPING_TIEU_CHI_ID = {
-    'Ngưng giao nhận': 1, 
-    'Đánh giá ZNS': 2, 
+    'Ngưng giao nhận': 1,
+    'Đánh giá ZNS': 2,
     'Tỉ lệ giao hàng': 3,
     'Chất lượng nội bộ': 4,
     'Thời gian giao hàng': 5,
-    'Có kho giao nhận': 6,  
+    'Có kho giao nhận': 6,
 }
 
 MAPPING_ORDER_TYPE_ID = {
@@ -344,7 +347,7 @@ MAPPING_CARRIER_ID = {
     'GHN': 2,
     'J&T Express': 3,
     'Viettel Post': 4,
-    'VNPost':  5,
+    'VNPost': 5,
     'BEST Express': 6,
     'Ninja Van': 7,
     'Snappy Express': 8,
@@ -458,3 +461,10 @@ STATUS_MAPPING = {
     'Thất lạc': THAT_LAC_STATUS,
     'Không xét': KHONG_XET_STATUS
 }
+
+DF_STATUS_MAPPING = pd.DataFrame(data={
+    'carrier_status': CHUA_GIAO_STATUS + DANG_GIAO_STATUS + HOAN_HANG_STATUS + THANH_CONG_STATUS + THAT_LAC_STATUS + KHONG_XET_STATUS,
+    'status': ['Chưa giao hàng'] * len(CHUA_GIAO_STATUS) + ['Đang giao'] * len(DANG_GIAO_STATUS) +
+              ['Hoàn hàng'] * len(HOAN_HANG_STATUS) + ['Thành công'] * len(THANH_CONG_STATUS) +
+              ['Thất lạc'] * len(THAT_LAC_STATUS) + ['Không xét'] * len(KHONG_XET_STATUS)
+})
