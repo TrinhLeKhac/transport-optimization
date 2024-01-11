@@ -81,8 +81,21 @@ def xu_ly_bang_gia_cuoc():
     ghtk_df['carrier'] = 'GHTK'
     ghtk_df['carrier_id'] = 1
 
+    # 2.7 Tách lấy thông tin bảng giá cước SuperShip và xử lý
+    supership_df = pd.concat([bang_gia_cuoc_df.iloc[1:21, :2], bang_gia_cuoc_df.iloc[1:21, 62:72]], axis=1).reset_index(
+        drop=True)
+    supership_df.columns = COLUMNS_CUOC_PHI
+    for i in range(80):
+        supership_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
+                                       54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
+                                       54 + 5 * int(i / 2),
+                                       54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
+                                       54 + 5 * int(i / 2)]
+    supership_df['carrier'] = 'SuperShip'
+    supership_df['carrier_id'] = 13
+
     # 3. Tổng hợp thông tin
-    cuoc_phi_df = pd.concat([ninja_van_df, best_df, shopee_express_df, ghn_df, viettel_post_df, ghtk_df],
+    cuoc_phi_df = pd.concat([ninja_van_df, best_df, shopee_express_df, ghn_df, viettel_post_df, ghtk_df, supership_df],
                             ignore_index=True)
     cuoc_phi_df = cuoc_phi_df[['carrier_id', 'carrier'] + COLUMNS_CUOC_PHI]
     cuoc_phi_df = cuoc_phi_df.set_index(['carrier_id', 'carrier', 'gt', 'lt_or_eq'])
