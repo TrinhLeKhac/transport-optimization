@@ -149,6 +149,105 @@ def normalize_province_district(target_df, tinh_thanh='tinh_thanh', quan_huyen='
     return target_df
 
 
+def type_of_delivery(s):
+
+    if ((s['sender_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['receiver_province'] in ['Thành phố Hà Nội', 'Thành phố Đà Nẵng'])) \
+            | ((s['sender_province'] == 'Thành phố Hà Nội') & (
+            s['receiver_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Đà Nẵng'])) \
+            | ((s['receiver_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['sender_province'] in ['Thành phố Hà Nội', 'Thành phố Đà Nẵng'])) \
+            | ((s['receiver_province'] == 'Thành phố Hà Nội') & (
+            s['sender_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Đà Nẵng'])):
+        return 'Liên Miền Đặc Biệt'
+
+    elif ((s['sender_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['receiver_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
+            | (
+            (s['sender_province'] == 'Thành phố Hà Nội') & (s['receiver_outer_region'] in ['Miền Trung', 'Miền Nam'])):
+        return 'Liên Miền Tp.HCM - HN'
+
+    elif ((s['sender_outer_region'] == 'Miền Bắc') & (s['receiver_outer_region'] == 'Miền Nam')) \
+            | ((s['sender_outer_region'] == 'Miền Nam') & (s['receiver_outer_region'] == 'Miền Bắc')):
+        return 'Cách Miền'
+
+    elif ((s['sender_outer_region'] == 'Miền Bắc') & (s['receiver_outer_region'] == 'Miền Trung')) \
+            | ((s['sender_outer_region'] == 'Miền Trung') & (s['receiver_outer_region'] == 'Miền Nam')) \
+            | ((s['sender_outer_region'] == 'Miền Trung') & (s['receiver_outer_region'] == 'Miền Bắc')) \
+            | ((s['sender_outer_region'] == 'Miền Nam') & (s['receiver_outer_region'] == 'Miền Trung')):
+        return 'Cận Miền'
+
+    elif ((s['sender_province'] != s['receiver_province'])
+          & (s['sender_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội'])):
+        return 'Nội Miền Tp.HCM - HN'
+
+    elif s['sender_province'] != s['receiver_province']:
+        return 'Nội Miền'
+
+    elif (s['receiver_inner_region'] == 'Nội Thành') \
+            & (s['receiver_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội']):
+        return 'Nội Thành Tp.HCM - HN'
+
+    elif (s['receiver_inner_region'] == 'Nội Thành') \
+            & (s['receiver_province'] not in ['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội']):
+        return 'Nội Thành Tỉnh'
+
+    elif (s['receiver_inner_region'] == 'Ngoại Thành') \
+            & (s['receiver_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội']):
+        return 'Ngoại Thành Tp.HCM - HN'
+
+    elif (s['receiver_inner_region'] == 'Ngoại Thành') \
+            & (s['receiver_province'] not in ['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội']):
+        return 'Ngoại Thành Tỉnh'
+
+
+def type_of_system_delivery(s):
+
+    if (s['sender_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội']) \
+            & (s['sender_province'] == s['receiver_province']):
+        return 1
+
+    elif ((s['sender_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['receiver_province'] in ['Thành phố Hà Nội', 'Thành phố Đà Nẵng'])) \
+            | ((s['sender_province'] == 'Thành phố Hà Nội') & (
+            s['receiver_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Đà Nẵng'])) \
+            | ((s['receiver_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['sender_province'] in ['Thành phố Hà Nội', 'Thành phố Đà Nẵng'])) \
+            | ((s['receiver_province'] == 'Thành phố Hà Nội') & (
+            s['sender_province'] in ['Thành phố Hồ Chí Minh', 'Thành phố Đà Nẵng'])):
+        return 2
+
+    elif ((s['sender_province'] == 'Thành phố Hồ Chí Minh') & (s['receiver_outer_region'] == 'Miền Nam')) \
+            | ((s['sender_province'] == 'Thành phố Hà Nội') & (s['receiver_outer_region'] == 'Miền Bắc')) \
+            | ((s['receiver_province'] == 'Thành phố Hồ Chí Minh') & (s['sender_outer_region'] == 'Miền Nam')) \
+            | ((s['receiver_province'] == 'Thành phố Hà Nội') & (s['sender_outer_region'] == 'Miền Bắc')):
+        return 3
+
+    elif ((s['sender_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['receiver_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
+            | (
+            (s['sender_province'] == 'Thành phố Hà Nội') & (s['receiver_outer_region'] in ['Miền Trung', 'Miền Nam'])) \
+            | ((s['receiver_province'] == 'Thành phố Hồ Chí Minh') & (
+            s['sender_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
+            | (
+            (s['receiver_province'] == 'Thành phố Hà Nội') & (s['sender_outer_region'] in ['Miền Trung', 'Miền Nam'])):
+        return 4
+
+    elif s['sender_province'] == s['receiver_province']:
+        return 5
+
+    elif s['sender_outer_region'] == s['receiver_outer_region']:
+        return 6
+
+    elif ((s['sender_outer_region'] == 'Miền Bắc') & (s['receiver_outer_region'] in ['Miền Trung', 'Miền Nam'])) \
+            | ((s['sender_outer_region'] == 'Miền Trung') & (s['receiver_outer_region'] in ['Miền Bắc', 'Miền Nam'])) \
+            | ((s['sender_outer_region'] == 'Miền Nam') & (s['receiver_outer_region'] in ['Miền Bắc', 'Miền Trung'])) \
+            | ((s['receiver_outer_region'] == 'Miền Bắc') & (s['sender_outer_region'] in ['Miền Trung', 'Miền Nam'])) \
+            | ((s['receiver_outer_region'] == 'Miền Trung') & (s['sender_outer_region'] in ['Miền Bắc', 'Miền Nam'])) \
+            | ((s['receiver_outer_region'] == 'Miền Nam') & (s['sender_outer_region'] in ['Miền Bắc', 'Miền Trung'])):
+        return 7
+
+
 def transform_dict(g):
     return pd.Series({
         'ninja_van_stt': dict(zip(g['loai'], g['ninja_van_score'])),

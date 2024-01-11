@@ -99,28 +99,28 @@ def out_data_order_type(show_logs=True):
     ] = 5
 
     input_df.loc[
-        (input_df['receiver_inner_region_id'] == 0) \
+        (input_df['receiver_inner_region_id'] == 0)
         & (input_df['receiver_province_code'].isin(['79', '01']))
         & (input_df['order_type_id'] == -1),
         'order_type_id'
     ] = 3
 
     input_df.loc[
-        (input_df['receiver_inner_region_id'] == 0) \
+        (input_df['receiver_inner_region_id'] == 0)
         & (~input_df['receiver_province_code'].isin(['79', '01']))
         & (input_df['order_type_id'] == -1),
         'order_type_id'
     ] = 1
 
     input_df.loc[
-        (input_df['receiver_inner_region_id'] == 1) \
+        (input_df['receiver_inner_region_id'] == 1)
         & (input_df['receiver_province_code'].isin(['79', '01']))
         & (input_df['order_type_id'] == -1),
         'order_type_id'
     ] = 4
 
     input_df.loc[
-        (input_df['receiver_inner_region_id'] == 1) \
+        (input_df['receiver_inner_region_id'] == 1)
         & (~input_df['receiver_province_code'].isin(['79', '01']))
         & (input_df['order_type_id'] == -1),
         'order_type_id'
