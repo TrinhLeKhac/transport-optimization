@@ -1,21 +1,11 @@
 import datetime
-
-from plotly.subplots import make_subplots
-
 from scripts.streamlit.streamlit_helper import *
 import streamlit as st
 import plotly.express as px
-import plotly.graph_objects as go
 
 
-def draw_n_zns_message(zns_df, province, district, n_stars, r_date):
-    filter_zns_df = zns_df.loc[
-        (zns_df['receiver_province'] == province)
-        & (zns_df['receiver_district'] == district)
-        & (zns_df['n_stars'] == n_stars)
-        & (zns_df['reviewed_at'].dt.date >= r_date[0])
-        & (zns_df['reviewed_at'].dt.date <= r_date[1])
-        ]
+def draw_n_zns_message(filter_zns_df):
+
     viz_df = filter_zns_df['carrier'].value_counts().reset_index()
 
     fig = px.pie(viz_df, values='count', names='carrier', height=300)
@@ -27,19 +17,13 @@ def draw_n_zns_message(zns_df, province, district, n_stars, r_date):
             "margin": {"l": 0, "r": 0, "t": 0, "b": 0}
         }
     )
-    return fig, len(filter_zns_df)
+    return fig
 
 
-def draw_n_zns_comment(zns_df, province, district, carrier):
-    filter_zns_df = zns_df.loc[
-        (zns_df['receiver_province'] == province)
-        & (zns_df['receiver_district'] == district)
-        & (zns_df['carrier'] == carrier)
-        ]
+def draw_n_zns_comment(filter_zns_df):
+
     viz_df = filter_zns_df['comment'].value_counts().reset_index()
-
     fig = px.pie(viz_df, values='count', names='comment', height=300)
-    # fig.update_xaxes(tickwidth=1, range=(1, 8.2))
     fig.update_traces(textposition='inside', textinfo='value')
     fig.update_layout(
         {
@@ -47,7 +31,7 @@ def draw_n_zns_comment(zns_df, province, district, carrier):
             "margin": {"l": 0, "r": 0, "t": 15, "b": 0}
         }
     )
-    return fig, len(filter_zns_df)
+    return fig
 
 
 def draw_order(filter_order_df):
@@ -56,7 +40,7 @@ def draw_order(filter_order_df):
     fig = px.pie(viz_df, values='count', names='carrier')
     fig.update_traces(textposition='inside', textinfo='label+value')
     fig.update_layout(showlegend=False)
-    return fig, len(filter_order_df), filter_order_df['order_type'].values[0]
+    return fig
 
 
 def create_analytic_tab():
@@ -88,45 +72,42 @@ def create_analytic_tab():
             options=total_zns_df['receiver_province'].unique().tolist(),
             key='zns_province',
         )
+        filter_zns_df1 = total_zns_df.loc[
+            (total_zns_df['receiver_province'] == st.session_state['zns_province'])
+        ]
         opt_zns_mess_district.selectbox(
-            ":blue[**Chọn Quận/Huyệni**]",
-            options=total_zns_df.loc[
-                (total_zns_df['receiver_province'] == st.session_state['zns_province'])
-            ]['receiver_district'].unique().tolist(),
+            ":blue[**Chọn Quận/Huyện**]",
+            options=filter_zns_df1['receiver_district'].unique().tolist(),
             key='zns_district',
         )
         opt_zns_mess_star, opt_zns_mess_range_date = chart_zns_message.columns([2, 3])
+        filter_zns_df2 = filter_zns_df1.loc[
+            (filter_zns_df1['receiver_district'] == st.session_state['zns_district'])
+        ]
         opt_zns_mess_star.selectbox(
-            ":blue[**Chọn số sao đánh giá**]",
-            options=total_zns_df.loc[
-                (total_zns_df['receiver_province'] == st.session_state['zns_province'])
-                & (total_zns_df['receiver_district'] == st.session_state['zns_district'])
-                ]['n_stars'].unique().tolist(),
+            ":blue[**Chọn Số Sao Đánh Giá**]",
+            options=filter_zns_df2['n_stars'].unique().tolist(),
             key='zns_star',
         )
-        filter_zns_df = total_zns_df.loc[
-            (total_zns_df['receiver_province'] == st.session_state['zns_province'])
-            & (total_zns_df['receiver_district'] == st.session_state['zns_district'])
-            & (total_zns_df['n_stars'] == st.session_state['zns_star'])
-            ]
+        filter_zns_df3 = filter_zns_df2.loc[
+            (filter_zns_df2['n_stars'] == st.session_state['zns_star'])
+        ]
         opt_zns_mess_range_date.slider(
-            label=":blue[**Chọn khoảng thời gian**]",
-            min_value=filter_zns_df['reviewed_at'].min().date(),
-            max_value=filter_zns_df['reviewed_at'].max().date(),
+            label=":blue[**Chọn Khoảng Thời Gian**]",
+            min_value=filter_zns_df3['reviewed_at'].min().date(),
+            max_value=filter_zns_df3['reviewed_at'].max().date()+timedelta(days=1),
             step=timedelta(days=1),
             key='zns_range_date',
-            value=(filter_zns_df['reviewed_at'].min().date(), filter_zns_df['reviewed_at'].max().date())
+            value=(filter_zns_df3['reviewed_at'].min().date(), filter_zns_df3['reviewed_at'].max().date())
         )
-        fig_zns_mess_by_carrier, len_zns_mess = draw_n_zns_message(
-            total_zns_df,
-            province=st.session_state['zns_province'],
-            district=st.session_state['zns_district'],
-            n_stars=st.session_state['zns_star'],
-            r_date=st.session_state['zns_range_date']
-        )
+        filter_zns_df4 = filter_zns_df3.loc[
+            (filter_zns_df3['reviewed_at'].dt.date >= st.session_state['zns_range_date'][0])
+            & (filter_zns_df3['reviewed_at'].dt.date <= st.session_state['zns_range_date'][1])
+        ]
+        fig_zns_mess_by_carrier = draw_n_zns_message(filter_zns_df4)
 
         chart_zns_message.plotly_chart(fig_zns_mess_by_carrier)
-        chart_zns_message.info(f'Tổng số đánh giá: :red[**{len_zns_mess}**]')
+        chart_zns_message.info(f'Tổng số đánh giá: :red[**{len(filter_zns_df4)}**]')
 
         # ----------------------------------------------------------------------------------------------
 
@@ -138,30 +119,29 @@ def create_analytic_tab():
             options=comment_zns_df['receiver_province'].unique().tolist(),
             key='zns_province2',
         )
+        filter_comment_zns_df1 = comment_zns_df.loc[
+            (comment_zns_df['receiver_province'] == st.session_state['zns_province2'])
+        ]
         opt_zns_com_district.selectbox(
-            ":blue[**Chọn Quận/Huyệni**]",
-            options=comment_zns_df.loc[
-                (comment_zns_df['receiver_province'] == st.session_state['zns_province2'])
-            ]['receiver_district'].unique().tolist(),
+            ":blue[**Chọn Quận/Huyện**]",
+            options=filter_comment_zns_df1['receiver_district'].unique().tolist(),
             key='zns_district2',
         )
+        filter_comment_zns_df2 = filter_comment_zns_df1.loc[
+            (filter_comment_zns_df1['receiver_district'] == st.session_state['zns_district2'])
+        ]
         chart_zns_comment.selectbox(
-            ":blue[**Chọn nhà vận chuyển**]",
-            options=comment_zns_df.loc[
-                (comment_zns_df['receiver_province'] == st.session_state['zns_province2'])
-                & (comment_zns_df['receiver_district'] == st.session_state['zns_district2'])
-                ]['carrier'].unique().tolist(),
+            ":blue[**Chọn Nhà Vận Chuyển**]",
+            options=filter_comment_zns_df2['carrier'].unique().tolist(),
             key='zns_carrier',
         )
-        fig_zns_com_by_carrier, len_zns_com = draw_n_zns_comment(
-            comment_zns_df,
-            province=st.session_state['zns_province2'],
-            district=st.session_state['zns_district2'],
-            carrier=st.session_state['zns_carrier'],
-        )
+        filter_comment_zns_df3 = filter_comment_zns_df2.loc[
+            (filter_comment_zns_df2['carrier'] == st.session_state['zns_carrier'])
+        ]
+        fig_zns_com_by_carrier = draw_n_zns_comment(filter_comment_zns_df3)
 
         chart_zns_comment.plotly_chart(fig_zns_com_by_carrier)
-        chart_zns_comment.info(f'Tổng số comment: :red[**{len_zns_com}**]')
+        chart_zns_comment.info(f'Tổng số comment: :red[**{len(filter_comment_zns_df3)}**]')
 
         st.divider()
         # ----------------------------------------------------------------------------------------------
@@ -223,8 +203,7 @@ def create_analytic_tab():
 
         opt_carrier_status, opt_weight_range = chart_order.columns(2)
         opt_carrier_status.selectbox(
-            ":blue[**Chọn trạng thái đơn hàng**]",
-            # options=('Chưa giao hàng', 'Đang giao', 'Hoàn hàng', 'Thành công', 'Thất lạc', 'Không xét'),
+            ":blue[**Chọn Trạng Thái Đơn Hàng**]",
             options=options_carrier_status,
             key='order_carrier_status',
         )
@@ -235,9 +214,9 @@ def create_analytic_tab():
                     ]['carrier_status'])
         ]
         opt_weight_range.slider(
-            label=":blue[**Chọn khoảng khối lượng đơn**]",
-            min_value=100,
-            max_value=filter_order_df5['weight'].max(),
+            label=":blue[**Chọn Khoảng Khối Lượng Đơn**]",
+            min_value=filter_order_df5['weight'].min(),
+            max_value=filter_order_df5['weight'].max() + 100,
             step=100,
             key='order_weight_range',
             value=(filter_order_df5['weight'].min(), filter_order_df5['weight'].max())
@@ -249,9 +228,9 @@ def create_analytic_tab():
         try:
             opt_created_at_range, opt_delivery_type = chart_order.columns(2)
             opt_created_at_range.slider(
-                label=":blue[**Chọn khoảng thời gian tạo đơn (created_at)**]",
+                label=":blue[**Chọn Khoảng Thời Gian Tạo Đơn (created_at)**]",
                 min_value=total_order_df['created_at'].min().date(),
-                max_value=total_order_df['created_at'].max().date(),
+                max_value=total_order_df['created_at'].max().date() + timedelta(days=1),
                 step=timedelta(days=1),
                 key='order_created_at_range',
                 value=(filter_order_df6['created_at'].min().date(), filter_order_df6['created_at'].max().date())
@@ -268,15 +247,15 @@ def create_analytic_tab():
             )
             filter_order_df8 = filter_order_df7.loc[
                 filter_order_df7['delivery_type'] == st.session_state['order_delivery_type']]
-            fig_order_by_carrier, len_order_by_carrier, odr_type = draw_order(filter_order_df8)
+            fig_order_by_carrier = draw_order(filter_order_df8)
 
             chart_order.plotly_chart(fig_order_by_carrier)
             chart_order.info(f"""
-                Tổng số đơn: :red[**{len_order_by_carrier}**]  
-                Loại vận chuyển: :red[**{odr_type}**]  
+                Tổng số đơn: :red[**{len(filter_order_df8)}**]  
+                Loại vận chuyển: :red[**{filter_order_df8['order_type'].values[0]}**]  
             """)
         except:
-            st.error('Chọn range khác')
+            chart_order.error('Với điều kiện lọc trên, không có dữ liệu nào thỏa mãn')
 
         # ----------------------------------------------------------------------------------------------
         # 3.2 Thống kê đơn hàng tồn đọng
@@ -312,7 +291,7 @@ def create_analytic_tab():
             filter_ton_dong_df1['receiver_district'] == st.session_state['stuck_receiver_district']
             ]
         chart_stuck.selectbox(
-            ":blue[**Chọn Quận/Huyện Nhận**]",
+            ":blue[**Chọn Hình Thức Vận Chuyển (order_type)**]",
             options=filter_ton_dong_df2['order_type'].unique().tolist(),
             key='stuck_order_type',
         )
@@ -330,7 +309,7 @@ def create_analytic_tab():
 
         # ----------------------------------------------------------------------------------------------
         div_5_6, div_1_6 = st.columns([5, 1])
-        with div_5_6.expander(":blue[**Show chi tiết data filter theo điều kiện ở trên**]"):
+        with div_5_6.expander(":blue[**Show chi tiết data theo điều kiện lọc**]"):
             st.dataframe(
                 filter_order_df8[[
                     'created_at', 'order_code', 'carrier', 'weight', 'carrier_status',
@@ -341,6 +320,7 @@ def create_analytic_tab():
             )
         with div_1_6:
             save_excel(filter_order_df8, key='filter_order')
+
         st.info(
             f"""
             **:red[Thời gian giao hàng estimate] :blue[ở API được tính dựa trên:]**     
