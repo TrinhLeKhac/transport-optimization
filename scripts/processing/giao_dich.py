@@ -142,7 +142,8 @@ def xu_ly_giao_dich_co_khoi_luong():
     order_with_weight_df.to_parquet(ROOT_PATH + '/processed_data/order_with_weight.parquet', index=False)
 
 
-def tong_hop_thong_tin_giao_dich(from_api=True, n_days_back=30):
+def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
+    run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
     if not from_api:
         print('Đọc thông tin giao dịch và giao dịch có khối lượng...')
         raw_order_df = pd.read_parquet(ROOT_PATH + '/processed_data/raw_order.parquet')
@@ -297,7 +298,7 @@ def tong_hop_thong_tin_giao_dich(from_api=True, n_days_back=30):
         # Chỉ lấy thông tin giao dịch từ n_days_back trở lại
         valid_order_df = valid_order_df.loc[
             valid_order_df['created_at'] >=
-            (datetime.strptime(datetime.now().strftime('%F'), '%Y-%m-%d') - timedelta(days=n_days_back))
+            (run_date - timedelta(days=n_days_back))
         ]
         valid_order_df = valid_order_df.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
 

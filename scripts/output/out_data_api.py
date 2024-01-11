@@ -1,3 +1,4 @@
+import optparse
 import sys
 from pathlib import Path
 
@@ -118,14 +119,14 @@ def customer_best_carrier(data_api_df):
     return data_api_df.drop(['combine_col', 'wscore'], axis=1)
 
 
-def out_data_api(return_full_cols_df=False, show_logs=True):
+def out_data_api(run_date_str, return_full_cols_df=False, show_logs=True):
     if show_logs:
         print('1. Transform dữ liệu...')
     (
         ngung_giao_nhan, danh_gia_zns,
         ti_le_giao_hang, chat_luong_noi_bo,
         thoi_gian_giao_hang, kho_giao_nhan, don_ton_dong
-    ) = total_transform(show_logs=False)
+    ) = total_transform(run_date_str, show_logs=False)
 
     if show_logs:
         print('2. Tính toán quận huyện quá tải')
@@ -394,5 +395,12 @@ def assign_supership_carrier(df_api):
 
 
 if __name__ == '__main__':
-    df_api = out_data_api()
+    parser = optparse.OptionParser(description="Running mode")
+    parser.add_option(
+        '-r', '--run_date',
+        action="store", dest="run_date",
+        help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
+    )
+    options, args = parser.parse_args()
+    df_api = out_data_api(options.run_date)
     assign_supership_carrier(df_api)

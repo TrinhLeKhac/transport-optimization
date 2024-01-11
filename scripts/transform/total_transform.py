@@ -1,4 +1,6 @@
+import optparse
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from scripts.transform.don_ton_dong import get_khu_vuc_ton_dong
@@ -14,7 +16,7 @@ from scripts.transform.thoi_gian_giao_hang_toan_trinh import transform_data_thoi
 from scripts.transform.ti_le_giao_hang import transform_data_ti_le_giao_hang
 
 
-def total_transform(show_logs=True):
+def total_transform(run_date_str, show_logs=True):
 
     if show_logs:
         print('1. Transform data kho giao nhận...')
@@ -30,7 +32,7 @@ def total_transform(show_logs=True):
 
     if show_logs:
         print('3. Transform data tỉ lệ giao hàng...')
-    ti_le_giao_hang = transform_data_ti_le_giao_hang()
+    ti_le_giao_hang = transform_data_ti_le_giao_hang(run_date_str)
     if show_logs:
         print('>>> Done\n')
 
@@ -54,7 +56,7 @@ def total_transform(show_logs=True):
 
     if show_logs:
         print('7. Transform data khu vực bị dồn đơn hàng...')
-    don_ton_dong = get_khu_vuc_ton_dong()
+    don_ton_dong = get_khu_vuc_ton_dong(run_date_str)
     if show_logs:
         print('>>> Done\n')
 
@@ -66,4 +68,11 @@ def total_transform(show_logs=True):
 
 
 if __name__ == '__main__':
-    total_transform(show_logs=True)
+    parser = optparse.OptionParser(description="Running mode")
+    parser.add_option(
+        '-r', '--run_date',
+        action="store", dest="run_date",
+        help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
+    )
+    options, args = parser.parse_args()
+    total_transform(options.run_date, show_logs=True)

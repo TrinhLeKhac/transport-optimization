@@ -29,18 +29,18 @@ def _get_delivery_success_rate(df_order):
     return ti_le_giao_hang[['receiver_province', 'receiver_district', 'carrier', 'delivery_success_rate']]
 
 
-def get_delivery_success_rate(df_order, ndate, n_days_back=30):
-
+def get_delivery_success_rate(df_order, run_date_str, n_days_back=30):
+    run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
     nstep = n_days_back // 3
 
-    df_order1 = df_order.loc[df_order['created_at'] >= (ndate - timedelta(days=nstep))]
+    df_order1 = df_order.loc[df_order['created_at'] >= (run_date - timedelta(days=nstep))]
     df_order2 = df_order.loc[
-        (df_order['created_at'] >= (ndate - timedelta(days=2*nstep)))
-        & (df_order['created_at'] < (ndate - timedelta(days=nstep)))
+        (df_order['created_at'] >= (run_date - timedelta(days=2*nstep)))
+        & (df_order['created_at'] < (run_date - timedelta(days=nstep)))
         ]
     df_order3 = df_order.loc[
-        (df_order['created_at'] >= (ndate - timedelta(days=3*nstep)))
-        & (df_order['created_at'] < (ndate - timedelta(days=2*nstep)))
+        (df_order['created_at'] >= (run_date - timedelta(days=3*nstep)))
+        & (df_order['created_at'] < (run_date - timedelta(days=2*nstep)))
         ]
     assert len(df_order1) + len(df_order2) + len(df_order3) == len(df_order), 'Ops, something wrong!'
 
@@ -113,13 +113,12 @@ def score_ti_le_giao_hang(tong_don, ti_le_thanh_cong):
         return 'Trường hợp khác'
 
 
-def transform_data_ti_le_giao_hang(n_days_back=30):
-
-    ndate = datetime.strptime(datetime.now().strftime('%F'), '%Y-%m-%d')
+def transform_data_ti_le_giao_hang(run_date_str, n_days_back=30):
+    run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
 
     # 1. Đọc thông tin giao dịch valid
     df_order = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
-    df_order = df_order.loc[df_order['created_at'] >= (ndate - timedelta(days=n_days_back))]
+    df_order = df_order.loc[df_order['created_at'] >= (run_date - timedelta(days=n_days_back))]
     df_order = df_order[df_order['carrier_status'].isin(THANH_CONG_STATUS + HOAN_HANG_STATUS)]
 
     # 2.1 Transform data hoàn hàng
@@ -135,7 +134,7 @@ def transform_data_ti_le_giao_hang(n_days_back=30):
     # ti_le_giao_hang['modified_delivery_success_rate'] = ti_le_giao_hang['delivery_success_rate']
 
     # 2.2 Tính tỉ lệ giao hàng có trọng sô
-    result_df = get_delivery_success_rate(df_order, ndate)
+    result_df = get_delivery_success_rate(df_order, run_date)
 
     ti_le_giao_hang = (
         ti_le_giao_hang.merge(

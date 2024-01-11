@@ -11,8 +11,8 @@ def score_ton_dong(n_order_type, threshold=10):
         return 'Không có thông tin'
 
 
-def get_don_ton_dong(n_days_back=30):
-    ndate = datetime.strptime(datetime.now().strftime('%F'), '%Y-%m-%d')
+def get_don_ton_dong(run_date_str, n_days_back=30):
+    run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
 
     loai_van_chuyen_df = pd.DataFrame(THOI_GIAN_GIAO_HANG_DEFAULT.items(),
                                       columns=['order_type', 'default_delivery_time'])
@@ -20,7 +20,7 @@ def get_don_ton_dong(n_days_back=30):
 
     df_order = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
     df_order = df_order.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
-    df_order = df_order.loc[df_order['created_at'] >= (ndate - timedelta(days=n_days_back))]
+    df_order = df_order.loc[df_order['created_at'] >= (run_date - timedelta(days=n_days_back))]
     df_order = df_order[[
         'order_code', 'carrier', 'receiver_province', 'receiver_district',
         'order_type', 'picked_at', 'last_delivering_at'
@@ -38,8 +38,8 @@ def get_don_ton_dong(n_days_back=30):
     return df_order
 
 
-def get_khu_vuc_ton_dong(threshold=10):
-    df_order = get_don_ton_dong()
+def get_khu_vuc_ton_dong(run_date_str, threshold=10):
+    df_order = get_don_ton_dong(run_date_str)
 
     df_order_analytic = df_order.groupby(['receiver_province', 'receiver_district', 'carrier', 'order_type']).agg(
         n_order_late=('is_late', 'sum')).reset_index()

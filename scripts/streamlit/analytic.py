@@ -43,7 +43,7 @@ def draw_order(filter_order_df):
     return fig
 
 
-def create_analytic_tab():
+def create_analytic_tab(run_date_str):
     interactive = st.container()
     with interactive:
         # 1. Load data
@@ -271,7 +271,7 @@ def create_analytic_tab():
             """
         )
 
-        ton_dong_df = st_get_don_ton_dong()
+        ton_dong_df = st_get_don_ton_dong(run_date_str)
         opt_stuck_receiver_province, opt_stuck_receiver_district = chart_stuck.columns(2)
 
         opt_stuck_receiver_province.selectbox(

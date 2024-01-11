@@ -1,3 +1,4 @@
+import optparse
 import sys
 from pathlib import Path
 
@@ -57,7 +58,6 @@ def approx(x):
         return x
     else:
         return 500 * (x // 500 + 1)
-
 
 
 def generate_sample_input(n_rows=1000):
@@ -149,8 +149,8 @@ def generate_order_type(input_df, carriers=ACTIVE_CARRIER):
     ], axis=1)
 
 
-def combine_info_from_api(input_df, show_logs=False):
-    api_data_final = out_data_api(return_full_cols_df=True, show_logs=show_logs)
+def combine_info_from_api(input_df, run_date_str, show_logs=False):
+    api_data_final = out_data_api(run_date_str, return_full_cols_df=True, show_logs=show_logs)
     api_data_final = api_data_final[[
         'receiver_province_code', 'receiver_district_code', 'carrier_id', 'new_type',
         'status', 'description',
@@ -349,7 +349,7 @@ def partner_best_carrier(data_api_df):
     return data_api_df.drop(['wscore'], axis=1)
 
 
-def out_data_final(input_df=None, carriers=ACTIVE_CARRIER, show_logs=False):
+def out_data_final(run_date_str, input_df=None, carriers=ACTIVE_CARRIER, show_logs=False):
     if input_df is None:
         giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
         giao_dich_valid = giao_dich_valid[[
@@ -389,7 +389,7 @@ def out_data_final(input_df=None, carriers=ACTIVE_CARRIER, show_logs=False):
     assert len(tmp_df1) == len(focus_df) * len(carriers), 'Transform data sai'
 
     print('ii. Gắn thông tin tính toán từ API')
-    tmp_df2 = combine_info_from_api(tmp_df1, show_logs=show_logs)
+    tmp_df2 = combine_info_from_api(run_date_str, tmp_df1, show_logs=show_logs)
     assert len(tmp_df2) == len(tmp_df1), 'Transform data sai'
 
     print('iii. Tính phí dịch vụ')
@@ -487,6 +487,14 @@ def get_data_viz(target_df):
 
 
 if __name__ == '__main__':
+
+    parser = optparse.OptionParser(description="Running mode")
+    parser.add_option(
+        '-r', '--run_date',
+        action="store", dest="run_date",
+        help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
+    )
+    options, args = parser.parse_args()
     # target_df = out_data_final(carriers=ACTIVE_CARRIER + ['SuperShip'])  # Assign phan_vung_nha_van_chuyen + cuoc_phi
-    target_df = out_data_final()
+    target_df = out_data_final(options.run_date)
     get_data_viz(target_df)
