@@ -59,11 +59,7 @@ def out_data_order_type(show_logs=True):
         (((input_df['sender_province_code'] == '79') & (
             input_df['receiver_outer_region_id'].isin([0, 1])))
          | (
-                 (input_df['sender_province_code'] == '01') & (input_df['receiver_outer_region_id'].isin([1, 2])))
-         | ((input_df['receiver_province_code'] == '79') & (
-                    input_df['sender_outer_region_id'].isin([0, 1])))
-         | (
-                 (input_df['receiver_province_code'] == '01') & (input_df['sender_outer_region_id'].isin([1, 2]))))
+                 (input_df['sender_province_code'] == '01') & (input_df['receiver_outer_region_id'].isin([1, 2]))))
         & (input_df['order_type_id'] == -1),
         'order_type_id'
     ] = 9
@@ -86,8 +82,7 @@ def out_data_order_type(show_logs=True):
 
     input_df.loc[
         (input_df['sender_province_code'] != input_df['receiver_province_code'])
-        & (input_df['sender_province_code'].isin(['01', '79'])
-           | input_df['receiver_province_code'].isin(['01', '79']))
+        & input_df['sender_province_code'].isin(['01', '79'])
         & (input_df['order_type_id'] == -1),
         'order_type_id'
     ] = 8
