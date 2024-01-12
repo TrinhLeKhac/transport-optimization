@@ -301,6 +301,7 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
             (run_date - timedelta(days=n_days_back))
         ]
         valid_order_df = valid_order_df.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
+        print('Shape: ', len(valid_order_df))
 
         # 4. Lưu thông tin
         valid_order_df.to_parquet(ROOT_PATH + '/processed_data/order.parquet', index=False)

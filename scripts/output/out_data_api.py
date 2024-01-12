@@ -402,5 +402,7 @@ if __name__ == '__main__':
         help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
     )
     options, args = parser.parse_args()
-    df_api = out_data_api(options.run_date)
-    assign_supership_carrier(df_api)
+    print(options.run_date)
+    print(type(options.run_date))
+    # df_api = out_data_api(options.run_date)
+    # assign_supership_carrier(df_api)
