@@ -153,15 +153,15 @@ if __name__ == '__main__':
         help="mode string", default=True
     )
     parser.add_option(
-        '-d', '--date',
-        action="store", dest="date",
-        help="date_str", default=datetime.now().strftime('%F')
+        '-d', '--run_date',
+        action="store", dest="run_date",
+        help="run_date string", default=datetime.strptime(datetime.now().strftime('%F'), '%Y-%m-%d')
     )
     options, args = parser.parse_args()
     # print(options.mode)
-    # print(options.date)
+    # print(options.run_date)
 
     if options.mode == 'init':
-        ingest_data_to_db(options.date, schema_name="db_schema", init=True)
+        ingest_data_to_db(options.run_date, schema_name="db_schema", init=True)
     elif options.mode == 'daily':
-        ingest_data_to_db(options.date, schema_name="db_schema", init=False)
+        ingest_data_to_db(options.run_date, schema_name="db_schema", init=False)
