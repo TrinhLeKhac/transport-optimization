@@ -29,8 +29,8 @@ def _get_delivery_success_rate(df_order):
     return ti_le_giao_hang[['receiver_province', 'receiver_district', 'carrier', 'delivery_success_rate']]
 
 
-def get_delivery_success_rate(df_order, run_date_str, n_days_back=30):
-    run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
+def get_delivery_success_rate(df_order, run_date, n_days_back=30):
+
     nstep = n_days_back // 3
 
     df_order1 = df_order.loc[df_order['created_at'] >= (run_date - timedelta(days=nstep))]
@@ -115,7 +115,7 @@ def score_ti_le_giao_hang(tong_don, ti_le_thanh_cong):
 
 def transform_data_ti_le_giao_hang(run_date_str, n_days_back=30):
     run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
-
+    print(run_date)
     # 1. Đọc thông tin giao dịch valid
     df_order = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
     df_order = df_order.loc[df_order['created_at'] >= (run_date - timedelta(days=n_days_back))]

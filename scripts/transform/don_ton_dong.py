@@ -13,7 +13,6 @@ def score_ton_dong(n_order_type, threshold=10):
 
 def get_don_ton_dong(run_date_str, n_days_back=30):
     run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
-
     loai_van_chuyen_df = pd.DataFrame(THOI_GIAN_GIAO_HANG_DEFAULT.items(),
                                       columns=['order_type', 'default_delivery_time'])
     loai_van_chuyen_df['default_delivery_time_details'] = [48 + 12, 48 + 12, 48 + 12, 48 + 12, 24 + 12, 48 + 12, 72 + 12, 72 + 12, 72 + 12, 108 + 12]
