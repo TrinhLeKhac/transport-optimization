@@ -349,7 +349,7 @@ def partner_best_carrier(data_api_df):
     return data_api_df.drop(['wscore'], axis=1)
 
 
-def out_data_final(run_date_str, input_df=None, carriers=ACTIVE_CARRIER, show_logs=False):
+def out_data_final(input_df, run_date_str, carriers=ACTIVE_CARRIER, show_logs=False):
     if input_df is None:
         giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
         giao_dich_valid = giao_dich_valid[[
@@ -389,7 +389,7 @@ def out_data_final(run_date_str, input_df=None, carriers=ACTIVE_CARRIER, show_lo
     assert len(tmp_df1) == len(focus_df) * len(carriers), 'Transform data sai'
 
     print('ii. Gắn thông tin tính toán từ API')
-    tmp_df2 = combine_info_from_api(run_date_str, tmp_df1, show_logs=show_logs)
+    tmp_df2 = combine_info_from_api(tmp_df1, run_date_str, show_logs=show_logs)
     assert len(tmp_df2) == len(tmp_df1), 'Transform data sai'
 
     print('iii. Tính phí dịch vụ')
@@ -495,6 +495,6 @@ if __name__ == '__main__':
         help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
     )
     options, args = parser.parse_args()
-    # target_df = out_data_final(run_date_str=options.run_date, carriers=ACTIVE_CARRIER + ['SuperShip'])  # Assign phan_vung_nha_van_chuyen + cuoc_phi
-    target_df = out_data_final(run_date_str=options.run_date)
+    target_df = out_data_final(input_df=None, run_date_str=options.run_date, carriers=ACTIVE_CARRIER + ['SuperShip'])
+    # target_df = out_data_final(input_df=None, run_date_str=options.run_date, carriers=ACTIVE_CARRIER)
     get_data_viz(target_df)
