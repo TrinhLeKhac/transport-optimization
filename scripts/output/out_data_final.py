@@ -495,6 +495,6 @@ if __name__ == '__main__':
         help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
     )
     options, args = parser.parse_args()
-    # target_df = out_data_final(carriers=ACTIVE_CARRIER + ['SuperShip'])  # Assign phan_vung_nha_van_chuyen + cuoc_phi
-    target_df = out_data_final(options.run_date)
+    # target_df = out_data_final(run_date_str=options.run_date, carriers=ACTIVE_CARRIER + ['SuperShip'])  # Assign phan_vung_nha_van_chuyen + cuoc_phi
+    target_df = out_data_final(run_date_str=options.run_date)
     get_data_viz(target_df)
