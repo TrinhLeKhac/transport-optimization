@@ -9,16 +9,13 @@ from scripts.utilities.helper import *
 from scripts.utilities.config import *
 
 
-def out_data_order_type(show_logs=True):
-    if show_logs:
-        print('1. Xử lý data phân vùng nhà vận chuyển...')
-    phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
-    phan_vung_nvc = phan_vung_nvc[
-        ['carrier_id', 'receiver_province_code', 'receiver_district_code', 'outer_region_id', 'inner_region_id']]
+def out_data_order_type(carriers=ACTIVE_CARRIER, include_supership=True, show_logs=True):
 
     if show_logs:
-        print('2. Mapping 713 * 713 tỉnh thành, quận huyện gửi/nhận...')
-    carrier_id_df = pd.DataFrame(data={'carrier_id': [MAPPING_CARRIER_ID[v] for v in ACTIVE_CARRIER]})
+        print('1. Mapping 713 * 713 tỉnh thành, quận huyện gửi/nhận...')
+    if include_supership:
+        carriers = carriers + ['SuperShip']
+    carrier_id_df = pd.DataFrame(data={'carrier_id': [MAPPING_CARRIER_ID[v] for v in carriers]})
 
     sender_df = PROVINCE_MAPPING_DISTRICT_DF[['province_code', 'district_code']]
     sender_df.columns = ['sender_province_code', 'sender_district_code']
@@ -27,177 +24,29 @@ def out_data_order_type(show_logs=True):
     receiver_df.columns = ['receiver_province_code', 'receiver_district_code']
 
     input_df = carrier_id_df.merge(sender_df, how='cross').merge(receiver_df, how='cross')
-    input_df = (
-        input_df.merge(
-            phan_vung_nvc.rename(columns={
-                'receiver_province_code': 'sender_province_code',
-                'receiver_district_code': 'sender_district_code',
-                'outer_region_id': 'sender_outer_region_id',
-                'inner_region_id': 'sender_inner_region_id',
-            }), on=['carrier_id', 'sender_province_code', 'sender_district_code'], how='left')
-            .merge(
-            phan_vung_nvc.rename(columns={
-                'outer_region_id': 'receiver_outer_region_id',
-                'inner_region_id': 'receiver_inner_region_id',
-            }), on=['carrier_id', 'receiver_province_code', 'receiver_district_code'], how='left')
-    )
-    if show_logs:
-        print('3. Mapping order_type...')
-
-    input_df['order_type_id'] = -1
-    input_df.loc[
-        (((input_df['sender_province_code'] == '79') & (
-            input_df['receiver_province_code'].isin(['01', '48']))) | ((input_df['sender_province_code'] == '01') & (
-            input_df['receiver_province_code'].isin(['79', '48']))) | ((input_df['receiver_province_code'] == '79') & (
-            input_df['sender_province_code'].isin(['01', '48']))) | ((input_df['receiver_province_code'] == '01') & (
-            input_df['sender_province_code'].isin(['79', '48']))))
-        & (input_df['order_type_id'] == -1),
-        'order_type_id'
-    ] = 10
-
-    input_df.loc[
-        (((input_df['sender_province_code'] == '79') & (
-            input_df['receiver_outer_region_id'].isin([0, 1])))
-         | (
-                 (input_df['sender_province_code'] == '01') & (input_df['receiver_outer_region_id'].isin([1, 2]))))
-        & (input_df['order_type_id'] == -1),
-        'order_type_id'
-    ] = 9
-
-    input_df.loc[
-        (((input_df['sender_outer_region_id'] == 0) & (input_df['receiver_outer_region_id'] == 2))
-         | ((input_df['sender_outer_region_id'] == 2) & (input_df['receiver_outer_region_id'] == 0)))
-        & (input_df['order_type_id'] == -1),
-        'order_type_id'
-    ] = 7
-
-    input_df.loc[
-        (((input_df['sender_outer_region_id'] == 0) & (input_df['receiver_outer_region_id'] == 1))
-         | ((input_df['sender_outer_region_id'] == 1) & (input_df['receiver_outer_region_id'] == 2))
-         | ((input_df['sender_outer_region_id'] == 1) & (input_df['receiver_outer_region_id'] == 0))
-         | ((input_df['sender_outer_region_id'] == 2) & (input_df['receiver_outer_region_id'] == 1)))
-        & (input_df['order_type_id'] == -1),
-        'order_type_id'
-    ] = 6
-
-    input_df.loc[
-        (input_df['sender_province_code'] != input_df['receiver_province_code'])
-        & input_df['sender_province_code'].isin(['01', '79'])
-        & (input_df['order_type_id'] == -1),
-        'order_type_id'
-    ] = 8
-
-    input_df.loc[
-        (input_df['sender_province_code'] != input_df['receiver_province_code'])
-        & (input_df['order_type_id'] == -1),
-        'order_type_id'
-    ] = 5
-
-    input_df.loc[
-        (input_df['receiver_inner_region_id'] == 0)
-        & (input_df['receiver_province_code'].isin(['79', '01']))
-        & (input_df['order_type_id'] == -1),
-        'order_type_id'
-    ] = 3
-
-    input_df.loc[
-        (input_df['receiver_inner_region_id'] == 0)
-        & (~input_df['receiver_province_code'].isin(['79', '01']))
-        & (input_df['order_type_id'] == -1),
-        'order_type_id'
-    ] = 1
-
-    input_df.loc[
-        (input_df['receiver_inner_region_id'] == 1)
-        & (input_df['receiver_province_code'].isin(['79', '01']))
-        & (input_df['order_type_id'] == -1),
-        'order_type_id'
-    ] = 4
-
-    input_df.loc[
-        (input_df['receiver_inner_region_id'] == 1)
-        & (~input_df['receiver_province_code'].isin(['79', '01']))
-        & (input_df['order_type_id'] == -1),
-        'order_type_id'
-    ] = 2
 
     if show_logs:
-        print('4. Mapping system_order_type...')
-    # input_df['sys_order_type_id'] = -1
-    # input_df.loc[
-    #     (input_df['sender_province_code'].isin(['79', '01'])) \
-    #     & (input_df['sender_province_code'] == input_df['receiver_province_code'])
-    #     & (input_df['sys_order_type_id'] == -1),
-    #     'sys_order_type_id'
-    # ] = 1
-    # input_df.loc[
-    #     (((input_df['sender_province_code'] == '79') & (
-    #         input_df['receiver_province_code'].isin(['01', '48'])))
-    #      | ((input_df['sender_province_code'] == '01') & (
-    #                 input_df['receiver_province_code'].isin(['79', '48'])))
-    #      | ((input_df['receiver_province_code'] == '79') & (
-    #                 input_df['sender_province_code'].isin(['01', '48'])))
-    #      | ((input_df['receiver_province_code'] == '01') & (
-    #                 input_df['sender_province_code'].isin(['79', '48']))))
-    #     & (input_df['sys_order_type_id'] == -1),
-    #     'sys_order_type_id'
-    # ] = 2
-    # input_df.loc[
-    #     (((input_df['sender_province_code'] == '79') & (input_df['receiver_outer_region_id'] == 2)) | ((input_df['sender_province_code'] == '01') & (input_df['receiver_outer_region_id'] == 0)) | ((input_df['receiver_province_code'] == '79') & (input_df['sender_outer_region_id'] == 2)) | ((input_df['receiver_province_code'] == '01') & (input_df['sender_outer_region_id'] == 0)))
-    #     & (input_df['sys_order_type_id'] == -1),
-    #     'sys_order_type_id'
-    # ] = 3
-    # input_df.loc[
-    #     (((input_df['sender_province_code'] == '79') & (
-    #         input_df['receiver_outer_region_id'].isin([0, 1])))
-    #      | (
-    #              (input_df['sender_province_code'] == '01') & (input_df['receiver_outer_region_id'].isin([1, 2])))
-    #      | ((input_df['receiver_province_code'] == '79') & (
-    #                 input_df['sender_outer_region_id'].isin([0, 1])))
-    #      | (
-    #              (input_df['receiver_province_code'] == '01') & (input_df['sender_outer_region_id'].isin([1, 2]))))
-    #     & (input_df['sys_order_type_id'] == -1),
-    #     'sys_order_type_id'
-    # ] = 4
-    # input_df.loc[
-    #     (input_df['sender_province_code'] == input_df['receiver_province_code'])
-    #     & (input_df['sys_order_type_id'] == -1),
-    #     'sys_order_type_id'
-    # ] = 5
-    # input_df.loc[
-    #     (input_df['sender_outer_region_id'] == input_df['receiver_outer_region_id'])
-    #     & (input_df['sys_order_type_id'] == -1),
-    #     'sys_order_type_id'
-    # ] = 6
-    # input_df.loc[
-    #     (((input_df['sender_outer_region_id'] == 0) & (input_df['receiver_outer_region_id'].isin([1, 2])))
-    #      | ((input_df['sender_outer_region_id'] == 1) & (input_df['receiver_outer_region_id'].isin([0, 2])))
-    #      | ((input_df['sender_outer_region_id'] == 2) & (input_df['receiver_outer_region_id'].isin([0, 1])))
-    #      | ((input_df['receiver_outer_region_id'] == 0) & (input_df['sender_outer_region_id'].isin([1, 2])))
-    #      | ((input_df['receiver_outer_region_id'] == 1) & (input_df['sender_outer_region_id'].isin([0, 2])))
-    #      | ((input_df['receiver_outer_region_id'] == 2) & (input_df['sender_outer_region_id'].isin([0, 1]))))
-    #     & (input_df['sys_order_type_id'] == -1),
-    #     'sys_order_type_id'
-    # ] = 7
-    input_df['sys_order_type_id'] = input_df['order_type_id'].map(MAPPING_ORDER_TYPE_ID_ROUTE_TYPE)
+        print('2. Mapping data...')
+    order_type_df = create_type_of_delivery(input_df)
+
     if show_logs:
-        print('5. Transform data final...')
-    input_df = input_df.rename(columns={'order_type_id': 'new_type', 'sys_order_type_id': 'route_type'})
-    input_df = input_df.reset_index().rename(columns={"index": "id"})
-    input_df['new_type'] = input_df['new_type'].astype(str)
-    input_df['route_type'] = input_df['route_type'].astype(str)
-    order_type_df = input_df[[
+        print('3. Transform data...')
+    order_type_df = order_type_df.rename(columns={'order_type_id': 'new_type', 'sys_order_type_id': 'route_type'})
+    order_type_df = order_type_df.reset_index().rename(columns={"index": "id"})
+    order_type_df['new_type'] = order_type_df['new_type'].astype(str)
+    order_type_df['route_type'] = order_type_df['route_type'].astype(str)
+    order_type_df = order_type_df[[
         'id', 'carrier_id', 'sender_province_code', 'sender_district_code',
         'receiver_province_code', 'receiver_district_code',
-        'new_type', 'route_type']]
-    order_type_df.columns = ['id', 'carrier_id', 'sender_province_code', 'sender_district_code',
-                             'receiver_province_code', 'receiver_district_code', 'new_type', 'route_type']
+        'new_type', 'route_type'
+    ]]
+
     if show_logs:
-        print('6. Saving data...')
+        print('4. Saving data...')
     order_type_df.to_parquet(ROOT_PATH + "/output/data_order_type.parquet", index=False)
 
 
-def out_data_service_fee(show_logs=True):
+def out_data_service_fee():
     print('Xử lý data service_fee...')
     cuoc_phi_df = pd.read_parquet(ROOT_PATH + '/processed_data/cuoc_phi.parquet')
     cuoc_phi_df['order_type_id'] = cuoc_phi_df['order_type'].map(MAPPING_ORDER_TYPE_ID)

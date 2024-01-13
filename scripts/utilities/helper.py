@@ -187,6 +187,168 @@ def generate_sample_input(n_rows=1000):
     ]]
 
 
+def create_type_of_delivery(input_df):
+
+    target_df = input_df.copy()
+
+    phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
+    phan_vung_nvc = phan_vung_nvc[[
+        'carrier_id', 'receiver_province_code', 'receiver_district_code',
+        'outer_region_id', 'inner_region_id'
+    ]]
+    target_df = (
+        target_df.merge(
+            phan_vung_nvc.rename(columns={
+                'receiver_province_code': 'sender_province_code',
+                'receiver_district_code': 'sender_district_code',
+                'outer_region_id': 'sender_outer_region_id',
+                'inner_region_id': 'sender_inner_region_id',
+            }), on=['carrier_id', 'sender_province_code', 'sender_district_code'], how='left')
+            .merge(
+            phan_vung_nvc.rename(columns={
+                'outer_region_id': 'receiver_outer_region_id',
+                'inner_region_id': 'receiver_inner_region_id',
+            }), on=['carrier_id', 'receiver_province_code', 'receiver_district_code'], how='left')
+    )
+
+    target_df['order_type_id'] = -1
+    target_df.loc[
+        (((target_df['sender_province_code'] == '79') & (
+            target_df['receiver_province_code'].isin(['01', '48']))) | ((target_df['sender_province_code'] == '01') & (
+            target_df['receiver_province_code'].isin(['79', '48']))) | ((target_df['receiver_province_code'] == '79') & (
+            target_df['sender_province_code'].isin(['01', '48']))) | ((target_df['receiver_province_code'] == '01') & (
+            target_df['sender_province_code'].isin(['79', '48']))))
+        & (target_df['order_type_id'] == -1),
+        'order_type_id'
+    ] = 10
+
+    target_df.loc[
+        (((target_df['sender_province_code'] == '79') & (
+            target_df['receiver_outer_region_id'].isin([0, 1])))
+         | (
+                 (target_df['sender_province_code'] == '01') & (target_df['receiver_outer_region_id'].isin([1, 2]))))
+        & (target_df['order_type_id'] == -1),
+        'order_type_id'
+    ] = 9
+
+    target_df.loc[
+        (((target_df['sender_outer_region_id'] == 0) & (target_df['receiver_outer_region_id'] == 2))
+         | ((target_df['sender_outer_region_id'] == 2) & (target_df['receiver_outer_region_id'] == 0)))
+        & (target_df['order_type_id'] == -1),
+        'order_type_id'
+    ] = 7
+
+    target_df.loc[
+        (((target_df['sender_outer_region_id'] == 0) & (target_df['receiver_outer_region_id'] == 1))
+         | ((target_df['sender_outer_region_id'] == 1) & (target_df['receiver_outer_region_id'] == 2))
+         | ((target_df['sender_outer_region_id'] == 1) & (target_df['receiver_outer_region_id'] == 0))
+         | ((target_df['sender_outer_region_id'] == 2) & (target_df['receiver_outer_region_id'] == 1)))
+        & (target_df['order_type_id'] == -1),
+        'order_type_id'
+    ] = 6
+
+    target_df.loc[
+        (target_df['sender_province_code'] != target_df['receiver_province_code'])
+        & target_df['sender_province_code'].isin(['01', '79'])
+        & (target_df['order_type_id'] == -1),
+        'order_type_id'
+    ] = 8
+
+    target_df.loc[
+        (target_df['sender_province_code'] != target_df['receiver_province_code'])
+        & (target_df['order_type_id'] == -1),
+        'order_type_id'
+    ] = 5
+
+    target_df.loc[
+        (target_df['receiver_inner_region_id'] == 0)
+        & (target_df['receiver_province_code'].isin(['79', '01']))
+        & (target_df['order_type_id'] == -1),
+        'order_type_id'
+    ] = 3
+
+    target_df.loc[
+        (target_df['receiver_inner_region_id'] == 0)
+        & (~target_df['receiver_province_code'].isin(['79', '01']))
+        & (target_df['order_type_id'] == -1),
+        'order_type_id'
+    ] = 1
+
+    target_df.loc[
+        (target_df['receiver_inner_region_id'] == 1)
+        & (target_df['receiver_province_code'].isin(['79', '01']))
+        & (target_df['order_type_id'] == -1),
+        'order_type_id'
+    ] = 4
+
+    target_df.loc[
+        (target_df['receiver_inner_region_id'] == 1)
+        & (~target_df['receiver_province_code'].isin(['79', '01']))
+        & (target_df['order_type_id'] == -1),
+        'order_type_id'
+    ] = 2
+
+    # target_df['sys_order_type_id'] = -1
+    # target_df.loc[
+    #     (target_df['sender_province_code'].isin(['79', '01'])) \
+    #     & (target_df['sender_province_code'] == target_df['receiver_province_code'])
+    #     & (target_df['sys_order_type_id'] == -1),
+    #     'sys_order_type_id'
+    # ] = 1
+    # target_df.loc[
+    #     (((target_df['sender_province_code'] == '79') & (
+    #         target_df['receiver_province_code'].isin(['01', '48'])))
+    #      | ((target_df['sender_province_code'] == '01') & (
+    #                 target_df['receiver_province_code'].isin(['79', '48'])))
+    #      | ((target_df['receiver_province_code'] == '79') & (
+    #                 target_df['sender_province_code'].isin(['01', '48'])))
+    #      | ((target_df['receiver_province_code'] == '01') & (
+    #                 target_df['sender_province_code'].isin(['79', '48']))))
+    #     & (target_df['sys_order_type_id'] == -1),
+    #     'sys_order_type_id'
+    # ] = 2
+    # target_df.loc[
+    #     (((target_df['sender_province_code'] == '79') & (target_df['receiver_outer_region_id'] == 2)) | ((target_df['sender_province_code'] == '01') & (input_df['receiver_outer_region_id'] == 0)) | ((input_df['receiver_province_code'] == '79') & (input_df['sender_outer_region_id'] == 2)) | ((input_df['receiver_province_code'] == '01') & (input_df['sender_outer_region_id'] == 0)))
+    #     & (target_df['sys_order_type_id'] == -1),
+    #     'sys_order_type_id'
+    # ] = 3
+    # target_df.loc[
+    #     (((target_df['sender_province_code'] == '79') & (
+    #         target_df['receiver_outer_region_id'].isin([0, 1])))
+    #      | (
+    #              (target_df['sender_province_code'] == '01') & (target_df['receiver_outer_region_id'].isin([1, 2])))
+    #      | ((target_df['receiver_province_code'] == '79') & (
+    #                 target_df['sender_outer_region_id'].isin([0, 1])))
+    #      | (
+    #              (target_df['receiver_province_code'] == '01') & (target_df['sender_outer_region_id'].isin([1, 2]))))
+    #     & (target_df['sys_order_type_id'] == -1),
+    #     'sys_order_type_id'
+    # ] = 4
+    # target_df.loc[
+    #     (target_df['sender_province_code'] == target_df['receiver_province_code'])
+    #     & (target_df['sys_order_type_id'] == -1),
+    #     'sys_order_type_id'
+    # ] = 5
+    # target_df.loc[
+    #     (target_df['sender_outer_region_id'] == target_df['receiver_outer_region_id'])
+    #     & (target_df['sys_order_type_id'] == -1),
+    #     'sys_order_type_id'
+    # ] = 6
+    # target_df.loc[
+    #     (((target_df['sender_outer_region_id'] == 0) & (target_df['receiver_outer_region_id'].isin([1, 2])))
+    #      | ((target_df['sender_outer_region_id'] == 1) & (target_df['receiver_outer_region_id'].isin([0, 2])))
+    #      | ((target_df['sender_outer_region_id'] == 2) & (target_df['receiver_outer_region_id'].isin([0, 1])))
+    #      | ((target_df['receiver_outer_region_id'] == 0) & (target_df['sender_outer_region_id'].isin([1, 2])))
+    #      | ((target_df['receiver_outer_region_id'] == 1) & (target_df['sender_outer_region_id'].isin([0, 2])))
+    #      | ((target_df['receiver_outer_region_id'] == 2) & (target_df['sender_outer_region_id'].isin([0, 1]))))
+    #     & (target_df['sys_order_type_id'] == -1),
+    #     'sys_order_type_id'
+    # ] = 7
+    target_df['sys_order_type_id'] = target_df['order_type_id'].map(MAPPING_ORDER_TYPE_ID_ROUTE_TYPE)
+
+    return target_df
+
+
 def type_of_delivery(s):
 
     if ((s['sender_province'] == 'Thành phố Hồ Chí Minh') & (
