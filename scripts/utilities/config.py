@@ -278,7 +278,7 @@ TRONG_SO = {
         }
     },
     'Đơn tồn đọng': {
-        'Tiêu chí': 10,
+        'Tiêu chí': 8,
         'Phân loại': {
             'Tồn đọng trên 10 đơn đối với 1 loại hình vận chuyển': -2,
             'Tồn đọng trên 10 đơn đối với 2 loại hình vận chuyển': -5,
@@ -311,6 +311,10 @@ MAPPING_ORDER_TYPE_ID = {
     'Liên Miền Đặc Biệt': 10,
 }
 
+MAPPING_ID_ORDER_TYPE = {}
+for order_type, id in MAPPING_ORDER_TYPE_ID.items():
+    MAPPING_ID_ORDER_TYPE[id] = order_type
+
 MAPPING_ORDER_TYPE_ID_ROUTE_TYPE = {
     1: 5,
     2: 5,
@@ -342,6 +346,7 @@ ACTIVE_CARRIER = [
     'Ninja Van',
     'SPX Express'
 ]
+
 MAPPING_CARRIER_ID = {
     'GHTK': 1,
     'GHN': 2,
@@ -358,6 +363,10 @@ MAPPING_CARRIER_ID = {
     'SuperShip': 13,
 }
 
+MAPPING_ID_CARRIER = {}
+for carrier, id in MAPPING_CARRIER_ID.items():
+    MAPPING_ID_CARRIER[id] = carrier
+
 THOI_GIAN_GIAO_HANG_DEFAULT = {
     'Nội Thành Tỉnh': '1.75 - 2.25 ngày',
     'Ngoại Thành Tỉnh': '1.75 - 2.25 ngày',
@@ -370,14 +379,6 @@ THOI_GIAN_GIAO_HANG_DEFAULT = {
     'Liên Miền Đặc Biệt': '2.75 - 3.25 ngày',
     'Cách Miền': '3.75 - 4.25 ngày',
 }
-
-MAPPING_ID_CARRIER = {}
-for carrier, id in MAPPING_CARRIER_ID.items():
-    MAPPING_ID_CARRIER[id] = carrier
-
-MAPPING_ID_ORDER_TYPE = {}
-for order_type, id in MAPPING_ORDER_TYPE_ID.items():
-    MAPPING_ID_ORDER_TYPE[id] = order_type
 
 CUSTOMER_BEST_CARRIER_DEFAULT = 'BEST Express'
 PARTNER_BEST_CARRIER_DEFAULT = 'BEST Express'

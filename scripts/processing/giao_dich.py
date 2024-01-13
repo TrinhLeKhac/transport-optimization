@@ -158,56 +158,18 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
         order_df['sender_district'] = order_df['storage_address'].str.split(', ').str[-2]
 
         print('Chuẩn hóa thông tin tỉnh/thành, quận/huyện lấy hàng...')
-        order_df = normalize_province_district(order_df, tinh_thanh='sender_province',
-                                                      quan_huyen='sender_district')
+        order_df = normalize_province_district(order_df, tinh_thanh='sender_province', quan_huyen='sender_district')
 
         print('Chuẩn hóa thông tin tỉnh/thành, quận/huyện giao hàng...')
-        order_df = normalize_province_district(order_df, tinh_thanh='receiver_province',
-                                                      quan_huyen='receiver_district')
+        order_df = normalize_province_district(order_df, tinh_thanh='receiver_province', quan_huyen='receiver_district')
 
         valid_order_df = order_df[
             order_df['sender_province'].notna()
             & order_df['sender_district'].notna()
             & order_df['receiver_province'].notna()
             & order_df['receiver_district'].notna()
-            ]
+        ]
         print('Số giao dịch sau khi chuẩn hóa tỉnh/thành, quận/huyện: ', len(valid_order_df))
-
-        print('Tính toán loại vận chuyển từ địa chỉ giao và nhận...')
-        phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
-        phan_vung_nvc = phan_vung_nvc[['carrier', 'receiver_province', 'receiver_district', 'outer_region', 'inner_region']]
-        valid_order_df = (
-            valid_order_df.merge(
-                phan_vung_nvc.rename(columns={
-                    'receiver_province': 'sender_province',
-                    'receiver_district': 'sender_district',
-                    'outer_region': 'sender_outer_region',
-                    'inner_region': 'sender_inner_region',
-                }), on=['carrier', 'sender_province', 'sender_district'], how='left').merge(
-                phan_vung_nvc.rename(columns={
-                    'outer_region': 'receiver_outer_region',
-                    'inner_region': 'receiver_inner_region',
-                }), on=['carrier', 'receiver_province', 'receiver_district'], how='left')
-        )
-        valid_order_df['order_type'] = valid_order_df.apply(type_of_delivery, axis=1)
-        valid_order_df['order_type_id'] = valid_order_df['order_type'].map(MAPPING_ORDER_TYPE_ID)
-        valid_order_df['sys_order_type_id'] = valid_order_df['order_type_id'].map(MAPPING_ORDER_TYPE_ID_ROUTE_TYPE)
-
-        valid_order_df['sent_at'] = None
-        valid_order_df['order_status'] = None
-        valid_order_df['picked_at'] = None
-        valid_order_df['carrier_updated_at'] = None
-        valid_order_df['last_delivering_at'] = None
-        valid_order_df['date'] = None
-
-        valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
-        valid_order_df['sent_at'] = pd.to_datetime(valid_order_df['sent_at'], errors='coerce')
-        valid_order_df['picked_at'] = pd.to_datetime(valid_order_df['picked_at'], errors='coerce')
-        valid_order_df['carrier_updated_at'] = pd.to_datetime(valid_order_df['carrier_updated_at'], errors='coerce')
-        valid_order_df['last_delivering_at'] = pd.to_datetime(valid_order_df['last_delivering_at'], errors='coerce')
-        valid_order_df['carrier_delivered_at'] = pd.to_datetime(valid_order_df['carrier_delivered_at'],
-                                                                 errors='coerce')
-        valid_order_df['date'] = pd.to_datetime(valid_order_df['date'], errors='coerce')
 
         valid_order_df = (
             valid_order_df.merge(
@@ -225,6 +187,24 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
                     'district': 'receiver_district',
                 }), on=['receiver_province', 'receiver_district'], how='left')
         )
+        valid_order_df['carrier_id'] = valid_order_df['carrier'].map(MAPPING_CARRIER_ID)
+        valid_order_df = create_type_of_delivery(valid_order_df)
+        valid_order_df['order_type'] = valid_order_df['order_type_id'].map(MAPPING_ID_ORDER_TYPE)
+
+        valid_order_df['sent_at'] = None
+        valid_order_df['order_status'] = None
+        valid_order_df['picked_at'] = None
+        valid_order_df['carrier_updated_at'] = None
+        valid_order_df['last_delivering_at'] = None
+        valid_order_df['date'] = None
+
+        valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
+        valid_order_df['sent_at'] = pd.to_datetime(valid_order_df['sent_at'], errors='coerce')
+        valid_order_df['picked_at'] = pd.to_datetime(valid_order_df['picked_at'], errors='coerce')
+        valid_order_df['carrier_updated_at'] = pd.to_datetime(valid_order_df['carrier_updated_at'], errors='coerce')
+        valid_order_df['last_delivering_at'] = pd.to_datetime(valid_order_df['last_delivering_at'], errors='coerce')
+        valid_order_df['carrier_delivered_at'] = pd.to_datetime(valid_order_df['carrier_delivered_at'], errors='coerce')
+        valid_order_df['date'] = pd.to_datetime(valid_order_df['date'], errors='coerce')
 
         valid_order_df = valid_order_df[[
             'created_at', 'order_code', 'carrier', 'weight',
@@ -275,27 +255,8 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
             )
         )
 
-        phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
-        phan_vung_nvc = phan_vung_nvc[
-            ['carrier', 'receiver_province', 'receiver_district', 'outer_region', 'inner_region']]
-
-        valid_order_df = (
-            valid_order_df.merge(
-                phan_vung_nvc.rename(columns={
-                    'receiver_province': 'sender_province',
-                    'receiver_district': 'sender_district',
-                    'outer_region': 'sender_outer_region',
-                    'inner_region': 'sender_inner_region',
-                }), on=['carrier', 'sender_province', 'sender_district'], how='left').merge(
-                phan_vung_nvc.rename(columns={
-                    'outer_region': 'receiver_outer_region',
-                    'inner_region': 'receiver_inner_region',
-                }), on=['carrier', 'receiver_province', 'receiver_district'], how='left')
-        )
-
-        valid_order_df['order_type'] = valid_order_df.apply(type_of_delivery, axis=1)
-        valid_order_df['order_type_id'] = valid_order_df['order_type'].map(MAPPING_ORDER_TYPE_ID)
-        valid_order_df['sys_order_type_id'] = valid_order_df['order_type_id'].map(MAPPING_ORDER_TYPE_ID_ROUTE_TYPE)
+        valid_order_df = create_type_of_delivery(valid_order_df)
+        valid_order_df['order_type'] = valid_order_df['order_type_id'].map(MAPPING_ID_ORDER_TYPE)
 
         valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
         valid_order_df['sent_at'] = pd.to_datetime(valid_order_df['sent_at'], errors='coerce')
@@ -304,23 +265,6 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
         valid_order_df['last_delivering_at'] = pd.to_datetime(valid_order_df['last_delivering_at'], errors='coerce')
         valid_order_df['carrier_delivered_at'] = pd.to_datetime(valid_order_df['carrier_delivered_at'], errors='coerce')
         valid_order_df['date'] = pd.to_datetime(valid_order_df['date'], errors='coerce')
-
-        valid_order_df = (
-            valid_order_df.merge(
-                PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                    'province_code': 'sender_province_code',
-                    'district_code': 'sender_district_code',
-                    'province': 'sender_province',
-                    'district': 'sender_district'
-                }), on=['sender_province', 'sender_district'], how='left')
-            .merge(
-                PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                    'province_code': 'receiver_province_code',
-                    'district_code': 'receiver_district_code',
-                    'province': 'receiver_province',
-                    'district': 'receiver_district',
-                }), on=['receiver_province', 'receiver_district'], how='left')
-        )
 
         valid_order_df = valid_order_df[[
             'created_at', 'order_code', 'carrier', 'weight',
