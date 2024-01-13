@@ -60,40 +60,6 @@ def approx(x):
         return 500 * (x // 500 + 1)
 
 
-def generate_order_type(input_df, carriers=ACTIVE_CARRIER):
-    result_df = input_df.merge(pd.DataFrame(data={'carrier': carriers}), how='cross')
-    result_df['carrier_id'] = result_df['carrier'].map(MAPPING_CARRIER_ID)
-
-    phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
-    phan_vung_nvc = phan_vung_nvc[[
-        'carrier_id', 'receiver_province_code',
-        'receiver_district_code', 'outer_region', 'inner_region'
-    ]]
-
-    result_df = (
-        result_df.merge(
-            phan_vung_nvc.rename(columns={
-                'receiver_province_code': 'sender_province_code',
-                'receiver_district_code': 'sender_district_code',
-                'outer_region': 'sender_outer_region',
-                'inner_region': 'sender_inner_region',
-            }), on=['carrier_id', 'sender_province_code', 'sender_district_code'], how='left').merge(
-            phan_vung_nvc.rename(columns={
-                'outer_region': 'receiver_outer_region',
-                'inner_region': 'receiver_inner_region',
-            }), on=['carrier_id', 'receiver_province_code', 'receiver_district_code'], how='left')
-    )
-    result_df['order_type'] = result_df.apply(type_of_delivery, axis=1)
-    result_df['order_type_id'] = result_df['order_type'].map(MAPPING_ORDER_TYPE_ID)
-    result_df['order_type_id'] = result_df['order_type_id'].astype(str)
-    result_df['sys_order_type_id'] = result_df.apply(type_of_system_delivery, axis=1)
-
-    return result_df.drop([
-        'sender_outer_region', 'sender_inner_region',
-        'receiver_outer_region', 'receiver_inner_region'
-    ], axis=1)
-
-
 def combine_info_from_api(
     input_df,
     run_date_str,
@@ -186,47 +152,32 @@ def out_data_final(
     include_supership=True
 ):
     order_df = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
-    order_df = order_df[[
-        'order_code', 'weight', 'delivery_type',
-        'sender_province', 'sender_district',
-        'receiver_province', 'receiver_district'
-    ]]
-    focus_df = (
-        order_df.merge(
-            PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                'province_code': 'sender_province_code',
-                'district_code': 'sender_district_code',
-                'province': 'sender_province',
-                'district': 'sender_district'
-            }), on=['sender_province', 'sender_district'], how='left')
-            .merge(
-            PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                'province_code': 'receiver_province_code',
-                'district_code': 'receiver_district_code',
-                'province': 'receiver_province',
-                'district': 'receiver_district',
-            }), on=['receiver_province', 'receiver_district'], how='left')
-    )
-
-    focus_df = focus_df[[
+    focus_df = order_df[[
         'order_code', 'weight', 'delivery_type',
         'sender_province', 'sender_district', 'sender_province_code', 'sender_district_code',
-        'receiver_province', 'receiver_district', 'receiver_province_code', 'receiver_district_code'
+        'receiver_province', 'receiver_district', 'receiver_province_code', 'receiver_district_code',
+        'order_type', 'order_type_id', 'sys_order_type_id'
     ]]
-    focus_df['delivery_type'] = focus_df['delivery_type'].fillna('Gửi Bưu Cục')
-
-    assert len(order_df) == len(focus_df), 'Transform data sai'
     print('Số dòng input dữ liệu: ', len(focus_df))
 
-    print('i. Tính toán order_type')
     if include_supership:
-        tmp_df1 = generate_order_type(focus_df, carriers=carriers + ['SuperShip'])
-        assert len(tmp_df1) == len(focus_df) * len(carriers + ['SuperShip']), 'Transform data sai'
+        tmp_df1 = focus_df.merge(pd.DataFrame(data={'carrier': carriers + ['SuperShip']}), how='cross')
+    else:
+        tmp_df1 = focus_df.merge(pd.DataFrame(data={'carrier': carriers}), how='cross')
 
-    tmp_df1 = generate_order_type(focus_df, carriers=carriers)
-    assert len(tmp_df1) == len(focus_df) * len(carriers), 'Transform data sai'
+    tmp_df1['carrier_id'] = tmp_df1['carrier'].map(MAPPING_CARRIER_ID)
+    assert len(tmp_df1) == len(focus_df) * tmp_df1['carrier'].nunique(), 'Transform data sai'
 
-    print('ii. Gắn thông tin tính toán từ API')
+    tmp_df1 = tmp_df1[[
+        'order_code', 'weight', 'delivery_type',
+        'sender_province', 'sender_district', 'sender_province_code', 'sender_district_code',
+        'receiver_province', 'receiver_district', 'receiver_province_code', 'receiver_district_code',
+        'carrier', 'carrier_id',
+        'order_type', 'order_type_id', 'sys_order_type_id'
+    ]]
+    tmp_df1['delivery_type'] = tmp_df1['delivery_type'].fillna('Gửi Bưu Cục')
+
+    print('i. Gắn thông tin tính toán từ API')
     tmp_df2 = combine_info_from_api(
         tmp_df1,
         run_date_str,
@@ -236,19 +187,19 @@ def out_data_final(
     )
     assert len(tmp_df2) == len(tmp_df1), 'Transform data sai'
 
-    print('iii. Tính phí dịch vụ')
+    print('ii. Tính phí dịch vụ')
     tmp_df3 = calculate_service_fee(tmp_df2)
     assert len(tmp_df3) == len(tmp_df2), 'Transform data sai'
 
-    print('iv. Tính ranking nhà vận chuyển theo tiêu chí rẻ nhất')
+    print('iii. Tính ranking nhà vận chuyển theo tiêu chí rẻ nhất')
     tmp_df4 = calculate_notification(tmp_df3)
     assert len(tmp_df4) == len(tmp_df3), 'Transform data sai'
 
-    print('v. Tính nhà vận chuyển tốt nhất cho đối tác')
+    print('iv. Tính nhà vận chuyển tốt nhất cho đối tác')
     final_df = partner_best_carrier(tmp_df4)
     assert len(final_df) == len(tmp_df4), 'Transform data sai'
 
-    print('vi. Lưu data tính toán...')
+    print('v. Lưu data tính toán...')
     final_df = final_df[FINAL_FULL_COLS]
     final_df.columns = FINAL_FULL_COLS_RENAMED
     print('Shape: ', final_df.shape)
