@@ -23,7 +23,7 @@ python ./scripts/output/out_data_api.py --run_date $3 &&
 python ./scripts/output/out_data_final.py --run_date $3 &&
 
 # Run script out data query database
-python ./scripts/output/out_data_query_db.py --mode $1 --run_date $3 &&
+python ./scripts/output/out_data_query_db.py --mode $1 &&
 
 # Run script ingest data to database
 python ./scripts/database/ingest_data.py --mode $1 --run_date $3 &&
