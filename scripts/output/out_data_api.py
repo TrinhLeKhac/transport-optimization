@@ -76,32 +76,6 @@ def get_agg(
     return result_df
 
 
-def customer_best_carrier_old(data_api_df, threshold=15):
-    df1 = data_api_df.loc[data_api_df['total_order'] > threshold]
-    df2 = data_api_df.loc[(data_api_df['total_order'] >= 1) & (data_api_df['total_order'] <= threshold)]
-    df3 = data_api_df.loc[data_api_df['total_order'] == 0]
-
-    group1 = (
-        df1.sort_values(['delivery_success_rate', 'estimate_delivery_time_details'], ascending=[False, True])
-            .drop_duplicates(['receiver_province', 'receiver_district', 'order_type'], keep='first')
-        [['receiver_province', 'receiver_district', 'order_type', 'carrier']]
-            .rename(columns={'carrier': 'customer_best_carrier'})
-    )
-    group2 = (
-        df2.sort_values(['estimate_delivery_time_details', 'delivery_success_rate'], ascending=[True, False])
-            .drop_duplicates(['receiver_province', 'receiver_district', 'order_type'], keep='first')
-        [['receiver_province', 'receiver_district', 'order_type', 'carrier']]
-            .rename(columns={'carrier': 'customer_best_carrier'})
-    )
-    group3 = df3[['receiver_province', 'receiver_district', 'order_type']].drop_duplicates()
-    group3['customer_best_carrier'] = CUSTOMER_BEST_CARRIER_DEFAULT
-
-    customer_best_carrier_df = pd.concat([group1, group2, group3]).drop_duplicates(
-        ['receiver_province', 'receiver_district', 'order_type'], keep='first')
-
-    return customer_best_carrier_df
-
-
 def customer_best_carrier(data_api_df):
     data_api_df['combine_col'] = data_api_df[["delivery_success_rate", "total_order"]].apply(tuple, axis=1)
 
@@ -346,7 +320,7 @@ def assign_supership_carrier(df_api):
             .merge(total_order, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
     )
 
-    df_supership['carrier_id'] = 13
+    df_supership['carrier_id'] = MAPPING_CARRIER_ID['SuperShip']
     df_supership['route_type'] = df_supership['new_type'].map(
         dict(zip(
             [str(i) for i in MAPPING_ORDER_TYPE_ID_ROUTE_TYPE.keys()],

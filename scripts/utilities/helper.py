@@ -149,6 +149,44 @@ def normalize_province_district(target_df, tinh_thanh='tinh_thanh', quan_huyen='
     return target_df
 
 
+def generate_sample_input(n_rows=1000):
+    result_df = pd.DataFrame()
+    result_df['order_code'] = [
+        ''.join(np.random.choice(list('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 12)) \
+        + ''.join(np.random.choice(list('123456789'), 9))
+        for i in range(n_rows)
+    ]
+    result_df['sender_district_code'] = np.random.choice(PROVINCE_MAPPING_DISTRICT_DF['district_code'].tolist(), n_rows)
+    result_df['receiver_district_code'] = np.random.choice(PROVINCE_MAPPING_DISTRICT_DF['district_code'].tolist(),
+                                                           n_rows)
+    result_df = (
+        result_df.merge(
+            PROVINCE_MAPPING_DISTRICT_DF[['province_code', 'district_code']].rename(columns={
+                'province_code': 'sender_province_code',
+                'district_code': 'sender_district_code'
+            }), on='sender_district_code', how='left')
+            .merge(
+            PROVINCE_MAPPING_DISTRICT_DF[['province_code', 'district_code']].rename(columns={
+                'province_code': 'receiver_province_code',
+                'district_code': 'receiver_district_code'
+            }), on='receiver_district_code', how='left')
+    )
+    result_df['weight'] = [
+        np.random.choice(list(range(100, 50000, 100)))
+        for i in range(n_rows)
+    ]
+
+    result_df['delivery_type'] = [
+        np.random.choice(['Lấy Tận Nơi', 'Gửi Bưu Cục'])
+        for i in range(n_rows)
+    ]
+
+    return result_df[[
+        'order_code', 'weight', 'delivery_type',
+        'sender_province_code', 'sender_district_code', 'receiver_province_code', 'receiver_district_code',
+    ]]
+
+
 def type_of_delivery(s):
 
     if ((s['sender_province'] == 'Thành phố Hồ Chí Minh') & (
