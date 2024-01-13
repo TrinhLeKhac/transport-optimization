@@ -7,7 +7,7 @@ sys.path.append(ROOT_PATH)
 
 from scripts.utilities.helper import *
 from scripts.utilities.config import *
-from scripts.output.out_data_api import out_data_api
+from scripts.output.out_data_api import out_data_api, assign_supership_carrier
 
 FINAL_FULL_COLS = [
     'order_code',
@@ -63,23 +63,6 @@ def approx(x):
 def generate_order_type(input_df, carriers=ACTIVE_CARRIER):
     result_df = input_df.merge(pd.DataFrame(data={'carrier': carriers}), how='cross')
     result_df['carrier_id'] = result_df['carrier'].map(MAPPING_CARRIER_ID)
-    result_df = (
-        result_df
-            .merge(
-            PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                'province_code': 'sender_province_code',
-                'district_code': 'sender_district_code',
-                'province': 'sender_province',
-                'district': 'sender_district'
-            }), on=['sender_province_code', 'sender_district_code'], how='left')
-            .merge(
-            PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                'province_code': 'receiver_province_code',
-                'district_code': 'receiver_district_code',
-                'province': 'receiver_province',
-                'district': 'receiver_district'
-            }), on=['receiver_province_code', 'receiver_district_code'], how='left')
-    )
 
     phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
     phan_vung_nvc = phan_vung_nvc[[
@@ -111,9 +94,18 @@ def generate_order_type(input_df, carriers=ACTIVE_CARRIER):
     ], axis=1)
 
 
-def combine_info_from_api(input_df, run_date_str, show_logs=False):
-    api_data_final = out_data_api(run_date_str, return_full_cols_df=True, show_logs=show_logs)
-    api_data_final = api_data_final[[
+def combine_info_from_api(
+    input_df,
+    run_date_str,
+    carriers=ACTIVE_CARRIER,
+    show_logs=False,
+    include_supership=True
+):
+
+    api_data_api = out_data_api(run_date_str, carriers=carriers, save_output=False, show_logs=show_logs)
+    if include_supership:
+        api_data_api = assign_supership_carrier(api_data_api, save_output=False)
+    api_data_api = api_data_api[[
         'receiver_province_code', 'receiver_district_code', 'carrier_id', 'new_type',
         'status', 'description',
         'time_data', 'time_display',
@@ -122,7 +114,7 @@ def combine_info_from_api(input_df, run_date_str, show_logs=False):
         'rate_ranking', 'rate',
         'score', 'star', 'total_order'
     ]]
-    api_data_final.columns = [
+    api_data_api.columns = [
         'receiver_province_code', 'receiver_district_code', 'carrier_id', 'order_type_id',
         'carrier_status', 'carrier_status_comment',
         'estimate_delivery_time_details', 'estimate_delivery_time',
@@ -133,7 +125,7 @@ def combine_info_from_api(input_df, run_date_str, show_logs=False):
     ]
     result_df = (
         input_df.merge(
-            api_data_final,
+            api_data_api,
             on=['receiver_province_code', 'receiver_district_code', 'carrier_id', 'order_type_id'], how='left'
         )
     )
@@ -187,47 +179,61 @@ def partner_best_carrier(data_api_df):
     return data_api_df.drop(['wscore'], axis=1)
 
 
-def out_data_final(input_df, run_date_str, carriers=ACTIVE_CARRIER, show_logs=False):
-    if input_df is None:
-        giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
-        giao_dich_valid = giao_dich_valid[[
-            'order_code', 'weight', 'delivery_type', 'sender_province', 'sender_district',
-            'receiver_province', 'receiver_district'
-        ]]
-        focus_df = (
-            giao_dich_valid.merge(
-                PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                    'province_code': 'sender_province_code',
-                    'district_code': 'sender_district_code',
-                    'province': 'sender_province',
-                    'district': 'sender_district'
-                }), on=['sender_province', 'sender_district'], how='left')
-                .merge(
-                PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
-                    'province_code': 'receiver_province_code',
-                    'district_code': 'receiver_district_code',
-                    'province': 'receiver_province',
-                    'district': 'receiver_district',
-                }), on=['receiver_province', 'receiver_district'], how='left')
-        )
+def out_data_final(
+    run_date_str,
+    carriers=ACTIVE_CARRIER,
+    show_logs=False,
+    include_supership=True
+):
+    order_df = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
+    order_df = order_df[[
+        'order_code', 'weight', 'delivery_type',
+        'sender_province', 'sender_district',
+        'receiver_province', 'receiver_district'
+    ]]
+    focus_df = (
+        order_df.merge(
+            PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
+                'province_code': 'sender_province_code',
+                'district_code': 'sender_district_code',
+                'province': 'sender_province',
+                'district': 'sender_district'
+            }), on=['sender_province', 'sender_district'], how='left')
+            .merge(
+            PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
+                'province_code': 'receiver_province_code',
+                'district_code': 'receiver_district_code',
+                'province': 'receiver_province',
+                'district': 'receiver_district',
+            }), on=['receiver_province', 'receiver_district'], how='left')
+    )
 
-        focus_df = focus_df[[
-            'order_code', 'weight', 'delivery_type', 'sender_province_code', 'sender_district_code',
-            'receiver_province_code', 'receiver_district_code'
-        ]]
-        focus_df['delivery_type'] = focus_df['delivery_type'].fillna('Gửi Bưu Cục')
+    focus_df = focus_df[[
+        'order_code', 'weight', 'delivery_type',
+        'sender_province', 'sender_district', 'sender_province_code', 'sender_district_code',
+        'receiver_province', 'receiver_district', 'receiver_province_code', 'receiver_district_code'
+    ]]
+    focus_df['delivery_type'] = focus_df['delivery_type'].fillna('Gửi Bưu Cục')
 
-        assert len(giao_dich_valid) == len(focus_df), 'Transform data sai'
-    else:
-        focus_df = input_df.copy()
+    assert len(order_df) == len(focus_df), 'Transform data sai'
     print('Số dòng input dữ liệu: ', len(focus_df))
 
     print('i. Tính toán order_type')
+    if include_supership:
+        tmp_df1 = generate_order_type(focus_df, carriers=carriers + ['SuperShip'])
+        assert len(tmp_df1) == len(focus_df) * len(carriers + ['SuperShip']), 'Transform data sai'
+
     tmp_df1 = generate_order_type(focus_df, carriers=carriers)
     assert len(tmp_df1) == len(focus_df) * len(carriers), 'Transform data sai'
 
     print('ii. Gắn thông tin tính toán từ API')
-    tmp_df2 = combine_info_from_api(tmp_df1, run_date_str, show_logs=show_logs)
+    tmp_df2 = combine_info_from_api(
+        tmp_df1,
+        run_date_str,
+        carriers=carriers,
+        show_logs=show_logs,
+        include_supership=include_supership
+    )
     assert len(tmp_df2) == len(tmp_df1), 'Transform data sai'
 
     print('iii. Tính phí dịch vụ')
@@ -242,18 +248,16 @@ def out_data_final(input_df, run_date_str, carriers=ACTIVE_CARRIER, show_logs=Fa
     final_df = partner_best_carrier(tmp_df4)
     assert len(final_df) == len(tmp_df4), 'Transform data sai'
 
-    if input_df is None:
-        print('vi. Lưu data tính toán...')
-        final_df = final_df[FINAL_FULL_COLS]
-        final_df.columns = FINAL_FULL_COLS_RENAMED
-        print('Shape: ', final_df.shape)
-        if not os.path.exists(ROOT_PATH + '/output'):
-            os.makedirs(ROOT_PATH + '/output')
-        final_df.to_parquet(ROOT_PATH + '/output/data_visualization.parquet')
-    else:
-        final_df = final_df[FINAL_COLS]
-        final_df.columns = FINAL_COLS_RENAMED
+    print('vi. Lưu data tính toán...')
+    final_df = final_df[FINAL_FULL_COLS]
+    final_df.columns = FINAL_FULL_COLS_RENAMED
+    print('Shape: ', final_df.shape)
+
+    if not os.path.exists(ROOT_PATH + '/output'):
+        os.makedirs(ROOT_PATH + '/output')
+    final_df.to_parquet(ROOT_PATH + '/output/data_visualization.parquet')
     print('-' * 100)
+
     return final_df
 
 
@@ -307,7 +311,8 @@ def _get_data_viz(target_df, threshold=0.6):
 
 
 def get_data_viz(target_df):
-    thresholds = np.linspace(2.5, 5, 101)  # Thay đổi lại khi range score change từ [0-1] -> [0-5]
+    # Thay đổi lại khi range score change từ [0-1] -> [0-5]
+    thresholds = np.linspace(2.5, 5, 101)
     analyze_df1_list = []
     analyze_df2_list = []
 
@@ -333,6 +338,5 @@ if __name__ == '__main__':
         help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
     )
     options, args = parser.parse_args()
-    target_df = out_data_final(input_df=None, run_date_str=options.run_date, carriers=ACTIVE_CARRIER + ['SuperShip'])
-    # target_df = out_data_final(input_df=None, run_date_str=options.run_date, carriers=ACTIVE_CARRIER)
+    target_df = out_data_final(run_date_str=options.run_date, include_supership=True)
     get_data_viz(target_df)

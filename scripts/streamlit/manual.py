@@ -83,7 +83,7 @@ def create_manual_tab():
             with st.spinner('Đang xử lý...'):
                 with rd.stdout(format='code'):
                     df_api = out_data_api()
-                    assign_supership_carrier(df_api)
+                    _ = assign_supership_carrier(df_api)
             stop = time()
             st.session_state['api_state'] = True
             st.info('Thời gian xử lý: ' + convert_time_m_s(stop, start))

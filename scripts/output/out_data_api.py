@@ -93,7 +93,13 @@ def customer_best_carrier(data_api_df):
     return data_api_df.drop(['combine_col', 'wscore'], axis=1)
 
 
-def out_data_api(run_date_str, return_full_cols_df=False, show_logs=True):
+def out_data_api(
+    run_date_str,
+    carriers=ACTIVE_CARRIER,
+    full_cols=False,
+    show_logs=True,
+    save_output=True
+):
     if show_logs:
         print('1. Transform dữ liệu...')
     (
@@ -155,7 +161,7 @@ def out_data_api(run_date_str, return_full_cols_df=False, show_logs=True):
 
     # Thời gian giao hàng default
     active_carrier_df = pd.DataFrame(data={
-        'carrier': ACTIVE_CARRIER,
+        'carrier': carriers,
     })
     loai_van_chuyen_df = pd.DataFrame(THOI_GIAN_GIAO_HANG_DEFAULT.items(),
                                       columns=['order_type', 'default_delivery_time'])
@@ -283,13 +289,14 @@ def out_data_api(run_date_str, return_full_cols_df=False, show_logs=True):
     api_data_final['order_type_id'] = api_data_final['order_type_id'].astype(str)
     api_data_final['sys_order_type_id'] = api_data_final['sys_order_type_id'].astype(str)
 
-    if return_full_cols_df:
+    if full_cols:
         api_data_final = api_data_final[API_FULL_COLS]
         api_data_final.columns = API_FULL_COLS_RENAMED
     else:
         api_data_final = api_data_final[API_COLS]
         api_data_final.columns = API_COLS_RENAMED
-        print('Shape: ', api_data_final.shape)
+    print('Shape: ', api_data_final.shape)
+    if save_output:
         if show_logs:
             print('9. Lưu dữ liệu API')
         if not os.path.exists(ROOT_PATH + '/output'):
@@ -301,7 +308,7 @@ def out_data_api(run_date_str, return_full_cols_df=False, show_logs=True):
     return api_data_final
 
 
-def assign_supership_carrier(df_api):
+def assign_supership_carrier(df_api, save_output=True):
     print('Assigning SuperShip carrier...')
     # 1. Get analytics of top 3 carrier
     time_data = get_agg(df_api, target_col='time_data', n_top=3, asc=True)
@@ -363,9 +370,11 @@ def assign_supership_carrier(df_api):
     df_api_full['star'] = np.round(df_api_full['star'], 1)
     print('Shape after assigning: ', len(df_api_full))
 
-    # 4. Save data
-    df_api_full.to_parquet(ROOT_PATH + '/output/data_api.parquet', index=False)
+    if save_output:
+        df_api_full.to_parquet(ROOT_PATH + '/output/data_api.parquet', index=False)
     print('-' * 100)
+
+    return df_api_full
 
 
 if __name__ == '__main__':
@@ -379,4 +388,4 @@ if __name__ == '__main__':
     # print(options.run_date)
     # print(type(options.run_date))
     df_api = out_data_api(options.run_date)
-    assign_supership_carrier(df_api)
+    _ = assign_supership_carrier(df_api)
