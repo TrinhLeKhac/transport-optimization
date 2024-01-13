@@ -172,7 +172,7 @@ def out_data_api(
             'province': 'receiver_province',
             'district': 'receiver_district',
         })
-            .merge(
+        .merge(
             active_carrier_df.merge(loai_van_chuyen_df, how='cross'),
             how='cross'
         )
@@ -309,7 +309,7 @@ def out_data_api(
 
 
 def assign_supership_carrier(df_api, save_output=True):
-    print('Assigning SuperShip carrier...')
+
     # 1. Get analytics of top 3 carrier
     time_data = get_agg(df_api, target_col='time_data', n_top=3, asc=True)
     rate = get_agg(df_api, target_col='rate', n_top=3, asc=False)
@@ -322,9 +322,9 @@ def assign_supership_carrier(df_api, save_output=True):
     # 2. Assign infor to SuperShip
     df_supership = (
         time_data.merge(rate, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
-            .merge(score, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
-            .merge(star, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
-            .merge(total_order, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
+        .merge(score, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
+        .merge(star, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
+        .merge(total_order, on=['receiver_province_code', 'receiver_district_code', 'new_type'], how='inner')
     )
 
     df_supership['carrier_id'] = MAPPING_CARRIER_ID['SuperShip']

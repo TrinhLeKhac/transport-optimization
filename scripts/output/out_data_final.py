@@ -176,6 +176,8 @@ def out_data_final(
         'order_type', 'order_type_id', 'sys_order_type_id'
     ]]
     tmp_df1['delivery_type'] = tmp_df1['delivery_type'].fillna('Gửi Bưu Cục')
+    tmp_df1['order_type_id'] = tmp_df1['order_type_id'].astype(str)
+    tmp_df1['sys_order_type_id'] = tmp_df1['sys_order_type_id'].astype(str)
 
     print('i. Gắn thông tin tính toán từ API')
     tmp_df2 = combine_info_from_api(
