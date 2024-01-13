@@ -16,7 +16,7 @@ from scripts.processing.phan_vung_nha_van_chuyen import xu_ly_phan_vung_nha_van_
 from scripts.processing.giao_dich import xu_ly_giao_dich, xu_ly_giao_dich_co_khoi_luong, tong_hop_thong_tin_giao_dich
 
 
-def total_processing(run_date_str, from_api=True):
+def total_processing(run_date_str, from_api=True, n_days_back=30):
 
     if not os.path.exists(ROOT_PATH + '/processed_data'):
         os.makedirs(ROOT_PATH + '/processed_data')
@@ -34,7 +34,7 @@ def total_processing(run_date_str, from_api=True):
     print('>>> Done\n')
 
     print('4. Xử lý data đánh giá ZNS...')
-    xu_ly_danh_gia_zns(run_date_str, from_api=from_api)
+    xu_ly_danh_gia_zns(run_date_str, from_api=from_api, n_days_back=n_days_back)
     print('>>> Done\n')
 
     print('5. Xử lý data ngưng giao nhận...')
@@ -47,7 +47,7 @@ def total_processing(run_date_str, from_api=True):
 
     if from_api:
         print('7. Tổng hợp thông tin giao dịch...')
-        tong_hop_thong_tin_giao_dich(run_date_str, from_api=from_api)
+        tong_hop_thong_tin_giao_dich(run_date_str, from_api=from_api, n_days_back=n_days_back)
         print('>>> Done\n')
     else:
         print('7. Xử lý data giao dịch...')
@@ -79,7 +79,12 @@ if __name__ == '__main__':
     options, args = parser.parse_args()
     # print(options.mode)
     # print(options.run_date)
+
+    n_days_back = 30
+
     if options.mode == 'api':
-        total_processing(options.run_date, from_api=True)
+        print(f'Processing data on date = {options.run_date} with interval = {n_days_back} from API get data order, zns...')
+        total_processing(options.run_date, from_api=True, n_days_back=n_days_back)
     elif options.mode == 'excel':
+        print('Processing data from Excel File...')
         total_processing(options.run_date, from_api=False)

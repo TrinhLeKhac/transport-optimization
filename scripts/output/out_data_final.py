@@ -289,5 +289,11 @@ if __name__ == '__main__':
         help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
     )
     options, args = parser.parse_args()
-    target_df = out_data_final(run_date_str=options.run_date, include_supership=True)
+
+    include_supership = True
+    if include_supership:
+        print('Out data visualization and assigning SuperShip carrier...')
+    else:
+        print('Out data visualization...')
+    target_df = out_data_final(run_date_str=options.run_date, include_supership=include_supership)
     get_data_viz(target_df)

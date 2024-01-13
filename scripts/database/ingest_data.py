@@ -161,6 +161,7 @@ if __name__ == '__main__':
     # print(options.mode)
     # print(options.run_date)
 
+    print(f'Ingesting data on date = {options.run_date}...')
     if options.mode == 'init':
         ingest_data_to_db(options.run_date, schema_name="db_schema", init=True)
     elif options.mode == 'daily':

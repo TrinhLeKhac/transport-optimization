@@ -83,8 +83,14 @@ if __name__ == '__main__':
     options, args = parser.parse_args()
     # print(options.mode)
 
+    include_supership = True
+
     if options.mode == 'init':
-        out_data_order_type()
+        if include_supership:
+            print('Out data query_db and assigning SuperShip carrier...')
+        else:
+            print('Out data query_db...')
+        out_data_order_type(include_supership=include_supership)
         out_data_service_fee()
     elif options.mode == 'daily':
         pass

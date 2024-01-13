@@ -387,5 +387,11 @@ if __name__ == '__main__':
     options, args = parser.parse_args()
     # print(options.run_date)
     # print(type(options.run_date))
+
+    print('Transforming output API from processed_data...')
     df_api = out_data_api(options.run_date)
-    _ = assign_supership_carrier(df_api)
+
+    include_supership = True
+    if include_supership:
+        print('Assigning SuperShip carrier...')
+        _ = assign_supership_carrier(df_api)
