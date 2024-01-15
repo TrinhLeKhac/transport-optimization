@@ -262,10 +262,10 @@ def create_analytic_tab(run_date_str):
         chart_stuck.info(
             f"""
                 **Nguyên tắc tính :red[đơn tồn đọng]**     
-                👉 Nội/Ngoại Thành Tỉnh, Nội/Ngoại Thành Tp.HCM - HN, Nội Miền: 60h    
-                👉 Nội Miền Tp.HCM - HN: 36h  
-                👉 Cận Miền, Liên Miền Tp.HCM - HN, Liên Miền Đặc Biệt: 84h  
-                👉 Cách Miền: 120h  
+                👉 Nội/Ngoại Thành Tỉnh, Nội/Ngoại Thành Tp.HCM - HN, Nội Miền: :red[**60h**]  
+                👉 Nội Miền Tp.HCM - HN: :red[**36h**]  
+                👉 Cận Miền, Liên Miền Tp.HCM - HN, Liên Miền Đặc Biệt: :red[**84h**]  
+                👉 Cách Miền: :red[**120h**]    
                 👉 Fill :red[**last_delivering_at**] bằng giá trị :red[**lớn nhất**] trong tập dữ liệu  
                 👉 **:red[Thời gian tồn đọng] = :red[last_delivering_at] - :red[picked_at]**
             """
@@ -376,7 +376,7 @@ def create_analytic_tab(run_date_str):
 
         # ----------------------------------------------------------------------------------------------
         div_3, _, _ = st.columns(3)
-        div_3.info(f"👉 Số đơn :red[**hoàn hàng**]: :red[**{len(success_df)}**]")
+        div_3.info(f"👉 Số đơn :red[**thành công**]: :red[**{len(success_df)}**]")
         div_5_6, div_1_6 = st.columns([5, 1])
         with div_5_6.expander(":blue[**Show chi tiết đơn hàng**] :red[**giao thành công**] :blue[**theo điều kiện lọc**]"):
             st.dataframe(

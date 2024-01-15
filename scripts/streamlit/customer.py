@@ -147,7 +147,7 @@ def create_customer_tab():
     if st.session_state['is_submitted_at_least_one_time']:
         result_df = st.session_state['submit_result']
         result_df['carrier'] = result_df['carrier_id'].map(MAPPING_ID_CARRIER)
-        # print(result_df)
+        print(result_df)
         # new_type = MAPPING_ID_ORDER_TYPE[int(result_df['new_type'].values[0])]
 
         # Table 1
