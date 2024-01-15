@@ -147,7 +147,7 @@ def create_customer_tab():
     if st.session_state['is_submitted_at_least_one_time']:
         result_df = st.session_state['submit_result']
         result_df['carrier'] = result_df['carrier_id'].map(MAPPING_ID_CARRIER)
-        print(result_df)
+        # print(result_df)
         # new_type = MAPPING_ID_ORDER_TYPE[int(result_df['new_type'].values[0])]
 
         # Table 1
@@ -206,7 +206,7 @@ def create_customer_tab():
                 :three: :blue[**{', '.join(result_df[result_df['for_partner'] == 3]['carrier'].tolist())}**]  
                 :four: :blue[**{', '.join(result_df[result_df['for_partner'] == 4]['carrier'].tolist())}**]  
                 :five: :blue[**{', '.join(result_df[result_df['for_partner'] == 5]['carrier'].tolist())}**]  
-                :six: :blue[**{', '.join(result_df[result_df['for_shop'] == 6]['carrier'].tolist())}**]  
+                :six: :blue[**{', '.join(result_df[result_df['for_partner'] == 6]['carrier'].tolist())}**]  
                 """
             )
 
