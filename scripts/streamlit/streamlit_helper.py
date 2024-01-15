@@ -117,7 +117,7 @@ def get_st_dataframe_from_db(
     table_query = """
         WITH carrier_information AS (
             SELECT 
-            tbl_ord.carrier_id, tbl_ord.route_type, 
+            tbl_ord.carrier_id, tbl_ord.new_type, 
             tbl_fee.price, 
             tbl_api.status, tbl_api.description, tbl_api.time_data,
             tbl_api.time_display, tbl_api.rate, tbl_api.score, tbl_api.star, 
@@ -141,7 +141,7 @@ def get_st_dataframe_from_db(
             AND tbl_fee.weight = CEIL({}/500.0)*500 
             AND tbl_fee.pickup = '{}'
         )
-        select carrier_id, route_type, price, status::varchar(1) AS status, description, time_data, time_display,
+        select carrier_id, new_type, price, status::varchar(1) AS status, description, time_data, time_display,
         rate, score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
             ORDER BY

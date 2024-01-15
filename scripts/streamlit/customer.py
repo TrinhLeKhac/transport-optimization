@@ -1,6 +1,20 @@
 from scripts.streamlit.streamlit_helper import *
 
 
+def get_order_type_str(target_df, order_type_col='new_type'):
+    final_str = 'Phân loại tuyến  '
+
+    if target_df[order_type_col].nunique() == 1:
+        new_type = MAPPING_ID_ORDER_TYPE[int(target_df[order_type_col].values[0])]
+        final_str = final_str + f"""\n✅:red[**{new_type}**]"""
+    else:
+        for odt_id in target_df[order_type_col].unique():
+            tmp_new_type = MAPPING_ID_ORDER_TYPE[int(odt_id)]
+            tmp_carrier = ', '.join(target_df.loc[target_df[order_type_col] == odt_id]['carrier'].tolist())
+            final_str = final_str + f"""\n✅:red[**{tmp_new_type}:**] :blue[**{tmp_carrier}**]  """
+    return final_str
+
+
 def handle_submit_form():
     print('Weight inside callback function:', st.session_state['weight'])
     sender_province_code = (
@@ -10,7 +24,8 @@ def handle_submit_form():
     )
     sender_district_code = (
         PROVINCE_MAPPING_DISTRICT_DF.loc[
-            PROVINCE_MAPPING_DISTRICT_DF['district'] == st.session_state['sender_district']
+            (PROVINCE_MAPPING_DISTRICT_DF['province'] == st.session_state['sender_province'])
+            & (PROVINCE_MAPPING_DISTRICT_DF['district'] == st.session_state['sender_district'])
             ]['district_code'].values[0]
     )
     receiver_province_code = (
@@ -20,7 +35,8 @@ def handle_submit_form():
     )
     receiver_district_code = (
         PROVINCE_MAPPING_DISTRICT_DF.loc[
-            PROVINCE_MAPPING_DISTRICT_DF['district'] == st.session_state['receiver_district']
+            (PROVINCE_MAPPING_DISTRICT_DF['province'] == st.session_state['receiver_province'])
+            & (PROVINCE_MAPPING_DISTRICT_DF['district'] == st.session_state['receiver_district'])
             ]['district_code'].values[0]
     )
     if st.session_state['pickup'] == 'Lấy Tận Nơi':
@@ -29,11 +45,14 @@ def handle_submit_form():
         pickup = '1'
     weight = st.session_state['weight']
 
+    # print(sender_province_code, sender_district_code, receiver_province_code, receiver_district_code)
+
     result_df = get_st_dataframe_from_db(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
         weight, pickup
     )
+    # print(result_df.columns)
     st.session_state['submit_result'] = result_df
     st.session_state['is_submitted_at_least_one_time'] = True
 
@@ -128,7 +147,8 @@ def create_customer_tab():
     if st.session_state['is_submitted_at_least_one_time']:
         result_df = st.session_state['submit_result']
         result_df['carrier'] = result_df['carrier_id'].map(MAPPING_ID_CARRIER)
-        route_type = MAPPING_ID_ORDER_TYPE[int(result_df['route_type'].values[0])]
+        # print(result_df)
+        # new_type = MAPPING_ID_ORDER_TYPE[int(result_df['new_type'].values[0])]
 
         # Table 1
         result_df1 = result_df[[
@@ -145,7 +165,7 @@ def create_customer_tab():
 
         # Show dataframe of information
         if len(result_df) > 0:
-            st.info(f'Phân loại tuyến: :red[**{route_type}**]')
+            st.info(f"""{get_order_type_str(result_df)}""")
             st.dataframe(
                 result_df1,
                 column_config={
