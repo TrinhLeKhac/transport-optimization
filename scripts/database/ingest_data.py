@@ -155,7 +155,7 @@ if __name__ == '__main__':
     parser.add_option(
         '-d', '--run_date',
         action="store", dest="run_date",
-        help="run_date string", default=datetime.strptime(datetime.now().strftime('%F'), '%Y-%m-%d')
+        help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
     )
     options, args = parser.parse_args()
     # print(options.mode)
