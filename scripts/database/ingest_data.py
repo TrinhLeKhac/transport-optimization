@@ -35,7 +35,7 @@ config_daily = [
     (ROOT_PATH + '/processed_data/chat_luong_noi_bo_njv.parquet', 'tbl_clnb_ninja_van', False, False),
     (ROOT_PATH + '/processed_data/ngung_giao_nhan.parquet', 'tbl_ngung_giao_nhan', False, False),
     (ROOT_PATH + '/output/data_api.parquet', 'tbl_data_api', True, False),
-    (ROOT_PATH + '/output/data_visualization.parquet', 'tbl_data_visualization', True, True),
+    # (ROOT_PATH + '/output/data_visualization.parquet', 'tbl_data_visualization', True, True),
 ]
 
 
