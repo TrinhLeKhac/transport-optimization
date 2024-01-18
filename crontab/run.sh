@@ -1,8 +1,27 @@
 #!/bin/bash
 # This scripts is used to run multiple python script to preprocessing, transform and ingest all data to database, that servers for SuperAI project
-# There are 2 arguments
-# $1 mode get data (init | daily)
-# $2 mode run (excel | api)
+# There are 3 arguments
+# $1 run mode (init | daily) --mode|-m
+# $2 type of get data (excel | api) --get-data|-g
+# $3 run date (2024-01-15 | None) --run-date|-r
+
+for argument in "$@"
+do
+  key=$(echo $argument | cut --fields 1 --delimiter='=')
+  value=$(echo $argument | cut --fields 2 --delimiter='=')
+
+  case "$key" in
+    --mode|-m)        mode="$value" ;;
+    --get-data|-g)    get_data="$value" ;;
+    --run-date|-r)    run_date="$value" ;;
+    *)
+  esac
+done
+
+if [ -z "$3" ]
+  then
+    run_date=$(date +%F)
+fi
 
 # Change cwd to the project's directory
 cd ~/superai
@@ -14,19 +33,19 @@ source ./venv/bin/activate &&
 sudo systemctl stop supervisord &&
 
 # Run script processing data
-python ./scripts/processing/total_processing.py --mode $2 --run_date $3 &&
+python ./scripts/processing/total_processing.py --mode $get_data --run_date $run_date &&
 
 # Run script out data for API
-python ./scripts/output/out_data_api.py --run_date $3 &&
+python ./scripts/output/out_data_api.py --run_date $run_date &&
 
 # Run script out data for visualization
-python ./scripts/output/out_data_final.py --run_date $3 &&
+python ./scripts/output/out_data_final.py --run_date $run_date &&
 
 # Run script out data query database
-python ./scripts/output/out_data_query_db.py --mode $1 &&
+python ./scripts/output/out_data_query_db.py --mode $mode &&
 
 # Run script ingest data to database
-python ./scripts/database/ingest_data.py --mode $1 --run_date $3 &&
+python ./scripts/database/ingest_data.py --mode $mode --run_date $run_date &&
 
 # Start again module supervisord after updating data
 sudo systemctl start supervisord
