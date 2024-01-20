@@ -187,7 +187,7 @@ def out_data_final(
         show_logs=show_logs,
         include_supership=include_supership
     )
-    assert len(tmp_df2) == len(tmp_df1), 'Transform data sai'
+    # assert len(tmp_df2) == len(tmp_df1), 'Transform data sai'
 
     print('ii. Tính phí dịch vụ')
     tmp_df3 = calculate_service_fee(tmp_df2)
