@@ -90,7 +90,11 @@ if __name__ == '__main__':
             print('Out data query_db and assigning SuperShip carrier...')
         else:
             print('Out data query_db...')
-        out_data_order_type(include_supership=include_supership)
-        out_data_service_fee()
+        try:
+            out_data_order_type(include_supership=include_supership)
+            out_data_service_fee()
+        except Exception as e:
+            error = type(e).__name__ + " – " + str(e)
+            telegram_bot_send_error_message(error)
     elif options.mode == 'daily':
         pass

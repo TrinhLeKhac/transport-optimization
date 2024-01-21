@@ -12,6 +12,34 @@ import re
 import os
 import warnings
 warnings.filterwarnings("ignore")
+import requests
+from config import Settings
+
+
+def telegram_bot_send_message(
+        bot_message,
+        bot_token=Settings.TELEGRAM_BOT_TOKEN,
+        bot_chat_id=Settings.TELEGRAM_CHAT_ID,
+):
+    send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chat_id + '&parse_mode=Markdown&text=' + bot_message
+    res = requests.get(send_text)
+    return res.json()
+
+
+def telegram_bot_send_error_message(message):
+    telegram_bot_send_message(f"""
+        ❌❌❌ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Task run daily *FAILED*!!!  
+    """)
+    telegram_bot_send_message(f"""
+        Details of error:  
+        {message}
+    """)
+
+
+def telegram_bot_send_success_message():
+    telegram_bot_send_message(f"""
+        ✅✅✅ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Task run daily *SUCCESSED*!!!
+    """)
 
 
 def convert_time_m_s(stop, start):

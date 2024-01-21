@@ -297,5 +297,9 @@ if __name__ == '__main__':
         print('Out data visualization and assigning SuperShip carrier...')
     else:
         print('Out data visualization...')
-    target_df = out_data_final(run_date_str=options.run_date, include_supership=include_supership)
-    get_data_viz(target_df)
+    try:
+        target_df = out_data_final(run_date_str=options.run_date, include_supership=include_supership)
+        get_data_viz(target_df)
+    except Exception as e:
+        error = type(e).__name__ + " – " + str(e)
+        telegram_bot_send_error_message(error)

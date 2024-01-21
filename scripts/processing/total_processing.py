@@ -14,6 +14,7 @@ from scripts.processing.danh_gia_zns import xu_ly_danh_gia_zns
 from scripts.processing.ngung_giao_nhan import xu_ly_ngung_giao_nhan
 from scripts.processing.phan_vung_nha_van_chuyen import xu_ly_phan_vung_nha_van_chuyen
 from scripts.processing.giao_dich import xu_ly_giao_dich, xu_ly_giao_dich_co_khoi_luong, tong_hop_thong_tin_giao_dich
+from scripts.utilities.helper import telegram_bot_send_error_message
 
 
 def total_processing(run_date_str, from_api=True, n_days_back=30):
@@ -83,8 +84,16 @@ if __name__ == '__main__':
     n_days_back = 30
 
     if options.mode == 'api':
-        print(f'Processing data on date = {options.run_date} with interval = {n_days_back} from API get data order, zns...')
-        total_processing(options.run_date, from_api=True, n_days_back=n_days_back)
+        try:
+            print(f'Processing data on date = {options.run_date} with interval = {n_days_back} from API get data order, zns...')
+            total_processing(options.run_date, from_api=True, n_days_back=n_days_back)
+        except Exception as e:
+            error = type(e).__name__ + " – " + str(e)
+            telegram_bot_send_error_message(error)
     elif options.mode == 'excel':
-        print('Processing data from Excel File...')
-        total_processing(options.run_date, from_api=False)
+        try:
+            print('Processing data from Excel File...')
+            total_processing(options.run_date, from_api=False)
+        except Exception as e:
+            error = type(e).__name__ + " – " + str(e)
+            telegram_bot_send_error_message(error)

@@ -388,10 +388,18 @@ if __name__ == '__main__':
     # print(options.run_date)
     # print(type(options.run_date))
 
-    print('Transforming output API from processed_data...')
-    df_api = out_data_api(options.run_date)
+    try:
+        print('Transforming output API from processed_data...')
+        df_api = out_data_api(options.run_date)
+    except Exception as e:
+        error = type(e).__name__ + " – " + str(e)
+        telegram_bot_send_error_message(error)
 
     include_supership = True
     if include_supership:
-        print('Assigning SuperShip carrier...')
-        _ = assign_supership_carrier(df_api)
+        try:
+            print('Assigning SuperShip carrier...')
+            _ = assign_supership_carrier(df_api)
+        except Exception as e:
+            error = type(e).__name__ + " – " + str(e)
+            telegram_bot_send_error_message(error)

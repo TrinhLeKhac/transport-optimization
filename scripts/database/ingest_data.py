@@ -163,6 +163,14 @@ if __name__ == '__main__':
 
     print(f'Ingesting data on date = {options.run_date}...')
     if options.mode == 'init':
-        ingest_data_to_db(options.run_date, schema_name="db_schema", init=True)
+        try:
+            ingest_data_to_db(options.run_date, schema_name="db_schema", init=True)
+        except Exception as e:
+            error = type(e).__name__ + " – " + str(e)
+            telegram_bot_send_error_message(error)
     elif options.mode == 'daily':
-        ingest_data_to_db(options.run_date, schema_name="db_schema", init=False)
+        try:
+            ingest_data_to_db(options.run_date, schema_name="db_schema", init=False)
+        except Exception as e:
+            error = type(e).__name__ + " – " + str(e)
+            telegram_bot_send_error_message(error)

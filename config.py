@@ -15,6 +15,8 @@ class Settings:
     USERNAME_AUTH = os.getenv('USERNAME_AUTH', '')
     PASSWORD_AUTH = os.getenv('PASSWORD_AUTH', '')
     LOGGING_CONFIG_FILE = os.path.join(BASE_DIR, 'logging.ini')
+    TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
+    TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID', '')
 
 
 settings = Settings()
