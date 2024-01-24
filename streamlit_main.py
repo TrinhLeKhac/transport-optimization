@@ -88,4 +88,4 @@ if __name__ == '__main__':
         help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
     )
     options, args = parser.parse_args()
-    main(options.run_date, is_auth=True)
+    main(options.run_date, is_auth=False)
