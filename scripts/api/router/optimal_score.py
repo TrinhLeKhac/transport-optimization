@@ -21,6 +21,6 @@ async def get_optimal_score(
     except:
         return {
             "error": True,
-            "message": f"Optimal score for date {date} not found",
+            "message": f"Optimal score not found",
             "data": -1,
         }
