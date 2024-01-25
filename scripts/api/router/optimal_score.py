@@ -12,7 +12,7 @@ async def get_optimal_score(
     optimal_score_df = pd.read_parquet(ROOT_PATH + '/output/total_optimal_score.parquet')
     # score = optimal_score_df.tail(1)['score'].values[0]
     try:
-        score = optimal_score_df.loc[optimal_score_df['date'] == date_str]
+        score = optimal_score_df.loc[optimal_score_df['date'] == date_str]['score'].values[0]
         return {
             "error": False,
             "message": "",
