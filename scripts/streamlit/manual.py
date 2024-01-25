@@ -14,7 +14,7 @@ def create_manual_tab():
         Timeline khuyến nghị:   
         :one: Update data manual (:red[**18h chiều**])  
         :two: Update data API (:red[**24h tối**])  
-        :three: Chạy job định kỳ (:red[**4h sáng**])  
+        :three: Chạy job định kỳ (:red[**4h sáng, 11h trưa, 18h chiều**])  
         Khoảng thời gian :red[**downtime**] service: :red[**4h-4h15p**]
         
         **Import đầy đủ các files sau**  
