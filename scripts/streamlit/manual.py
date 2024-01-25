@@ -12,7 +12,7 @@ def create_manual_tab():
         Page hỗ trợ update :red[**manual**] các files cần thiết cho quá trình tính toán  
         Dữ liệu sử dụng :red[**30 ngày**] gần nhất  
         Timeline khuyến nghị:   
-        :one: Update data manual (:red[**18h chiều**])  
+        :one: Update data manual (:red[**17h30 chiều**])  
         :two: Update data API (:red[**24h tối**])  
         :three: Chạy job định kỳ (:red[**4h sáng, 11h trưa, 18h chiều**])  
         Khoảng thời gian :red[**downtime**] service: :red[**4h-4h15p**]
