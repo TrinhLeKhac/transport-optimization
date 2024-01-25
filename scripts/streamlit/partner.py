@@ -178,6 +178,42 @@ def analyze_by_carrier(total_analyze_df, type_viz='n_orders', threshold=0.75):
     return fig
 
 
+def find_intersection(x1,y1, x2,y2, x3,y3, x4,y4):
+    """
+        the first line is defined by the line between point1(x1, y1) and point2(x2, y2)
+        the first line is defined by the line between point3(x3, y3) and point4(x4, y4)
+    """
+    px= ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4))
+    py= ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4))
+    return px, py
+
+
+def get_optimal_point(input_df, step=2):
+    target_df = input_df[['score', 'monetary', 'total_error']].drop_duplicates().reset_index(drop=True)
+
+    optimal_point = -1
+    error_max = target_df['total_error'].max()
+    monetary_max = target_df['monetary'].max()
+    scale = monetary_max / error_max
+
+    for idx in range(len(target_df) - step):
+        # print(idx)
+        point1 = (target_df.loc[idx, 'score'], target_df.loc[idx, 'monetary'] / scale)
+        point2 = (target_df.loc[idx + step, 'score'], target_df.loc[idx + step, 'monetary'] / scale)
+        point3 = (target_df.loc[idx, 'score'], target_df.loc[idx, 'total_error'])
+        point4 = (target_df.loc[idx + step, 'score'], target_df.loc[idx + step, 'total_error'])
+
+        R = find_intersection(*point1, *point2, *point3, *point4)
+
+        print(point1, point2, point3, point4, idx, R)
+
+        if (R[0] >= target_df.loc[idx, 'score']) and (R[0] <= target_df.loc[idx + step, 'score']):
+            optimal_point = idx + step//2
+            score = target_df.loc[optimal_point, 'score']
+            break
+    return score
+
+
 def create_partner_tab():
     interactive = st.container()
     with interactive:
@@ -200,6 +236,15 @@ def create_partner_tab():
 
         # 2. Tương quan chi phí - lỗi
         draw_fee_error(total_analyze_df1)
+
+        score = get_optimal_point(total_analyze_df1)
+        opt_point_div, _ = st.columns([1, 1])
+        opt_point_div.info(
+            f"""
+            Optimal point: :red[**{score}**]
+            """
+        )
+
         st.divider()
         # ----------------------------------------------------------------------------------------------
 
