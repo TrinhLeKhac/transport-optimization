@@ -10,7 +10,7 @@ from scripts.utilities.helper import *
 def st_get_optimal_score():
     try:
         optimal_score_df = pd.read_parquet(ROOT_PATH + '/output/total_optimal_score.parquet')
-        score = optimal_score_df.tail(1)['score']
+        score = optimal_score_df.tail(1)['score'].values[0]
     except:
         score = 0
     return score

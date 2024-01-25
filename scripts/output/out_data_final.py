@@ -319,12 +319,13 @@ def get_optimal_point(run_date_str, step=2):
 
         R = find_intersection(*point1, *point2, *point3, *point4)
 
-        print(point1, point2, point3, point4, idx, R)
+        # print(point1, point2, point3, point4, idx, R)
 
         if (R[0] >= target_df.loc[idx, 'score']) and (R[0] <= target_df.loc[idx + step, 'score']):
             optimal_point = idx + step//2
             score = target_df.loc[optimal_point, 'score']
             break
+    print('Optimal score: ', score)
     try:
         total_score_df = pd.read_parquet(ROOT_PATH + '/output/total_optimal_score.parquet')
     except:

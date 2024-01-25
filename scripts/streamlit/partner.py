@@ -205,7 +205,7 @@ def create_partner_tab():
         opt_point_div, _ = st.columns([1, 1])
         opt_point_div.info(
             f"""
-            Optimal point: :red[**{score}**]
+            Optimal score: :red[**{score}**]
             """
         )
 
