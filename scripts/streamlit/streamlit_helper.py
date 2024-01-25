@@ -7,6 +7,16 @@ from scripts.utilities.helper import *
 
 
 @st.cache_data
+def st_get_optimal_score():
+    try:
+        optimal_score_df = pd.read_parquet(ROOT_PATH + '/output/total_optimal_score.parquet')
+        score = optimal_score_df.tail(1)['score']
+    except:
+        score = 0
+    return score
+
+
+@st.cache_data
 def st_get_province_mapping_district():
     return pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
 

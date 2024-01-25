@@ -282,6 +282,58 @@ def get_data_viz(target_df):
     total_analyze_df2.to_parquet(ROOT_PATH + '/output/st_data_visualization_p2.parquet', index=False)
 
 
+def find_intersection(x1,y1, x2,y2, x3,y3, x4,y4):
+    """
+        the first line is defined by the line between point1(x1, y1) and point2(x2, y2)
+        the first line is defined by the line between point3(x3, y3) and point4(x4, y4)
+    """
+    px=((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4))
+    py=((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4))
+    return px, py
+
+
+def get_optimal_point(run_date_str, step=2):
+    input_df = pd.read_parquet(ROOT_PATH + '/output/st_data_visualization_p1.parquet', columns=['score', 'monetary', 'total_error'])
+    target_df = input_df.drop_duplicates().reset_index(drop=True)
+
+    optimal_point = -1
+    error_max = target_df['total_error'].max()
+    error_min = target_df['total_error'].min()
+
+    monetary_max = target_df['monetary'].max()
+    monetary_min = target_df['monetary'].min()
+
+    monetary_range = monetary_max - monetary_min
+    error_range = error_max - error_min
+    scale = monetary_range / error_range
+
+    for idx in range(len(target_df) - step):
+        # print(idx)
+        # (x - amin)/(amax - amin) = (y - bmin)/(bmax - bmin)
+        # x - amin = (y - bmin)/scale
+        # x = (y - bmin)/scale + amin
+        point1 = (target_df.loc[idx, 'score'], (target_df.loc[idx, 'monetary'] - monetary_min) / scale + error_min)
+        point2 = (target_df.loc[idx + step, 'score'], (target_df.loc[idx + step, 'monetary'] - monetary_min) / scale + error_min)
+        point3 = (target_df.loc[idx, 'score'], target_df.loc[idx, 'total_error'])
+        point4 = (target_df.loc[idx + step, 'score'], target_df.loc[idx + step, 'total_error'])
+
+        R = find_intersection(*point1, *point2, *point3, *point4)
+
+        print(point1, point2, point3, point4, idx, R)
+
+        if (R[0] >= target_df.loc[idx, 'score']) and (R[0] <= target_df.loc[idx + step, 'score']):
+            optimal_point = idx + step//2
+            score = target_df.loc[optimal_point, 'score']
+            break
+    try:
+        total_score_df = pd.read_parquet(ROOT_PATH + '/output/total_optimal_score.parquet')
+    except:
+        total_score_df = pd.DataFrame(columns=['score', 'date'])
+    tmp_df = pd.DataFrame(data={'score': [score], 'date': [run_date_str]})
+    total_score_df = pd.concat([total_score_df, tmp_df]).drop_duplicates('date', keep='last')
+    total_score_df.to_parquet(ROOT_PATH + '/output/total_optimal_score.parquet', index=False)
+
+
 if __name__ == '__main__':
 
     parser = optparse.OptionParser(description="Running mode")
@@ -300,6 +352,7 @@ if __name__ == '__main__':
     try:
         target_df = out_data_final(run_date_str=options.run_date, include_supership=include_supership)
         get_data_viz(target_df)
+        get_optimal_point(run_date_str=options.run_date)
     except Exception as e:
         error = type(e).__name__ + " – " + str(e)
         telegram_bot_send_error_message(error)
