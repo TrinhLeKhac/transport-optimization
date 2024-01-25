@@ -5,14 +5,14 @@ from scripts.utilities.helper import *
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 async def get_optimal_score(
-    date_str: str = "2024-01-01",
+    date: str = "2024-01-01",
 ):
     optimal_score_df = pd.read_parquet(ROOT_PATH + '/output/total_optimal_score.parquet')
     # score = optimal_score_df.tail(1)['score'].values[0]
     try:
-        score = optimal_score_df.loc[optimal_score_df['date'] == date_str]['score'].values[0]
+        score = optimal_score_df.loc[optimal_score_df['date'] == date]['score'].values[0]
         return {
             "error": False,
             "message": "",
@@ -21,6 +21,6 @@ async def get_optimal_score(
     except:
         return {
             "error": True,
-            "message": f"Optimal score for date {date_str} not found",
+            "message": f"Optimal score for date {date} not found",
             "data": -1,
         }
