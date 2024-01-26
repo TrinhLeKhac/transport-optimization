@@ -35,6 +35,7 @@ config_daily = [
     (ROOT_PATH + '/processed_data/chat_luong_noi_bo_njv.parquet', 'tbl_clnb_ninja_van', False, False),
     (ROOT_PATH + '/processed_data/ngung_giao_nhan.parquet', 'tbl_ngung_giao_nhan', False, False),
     (ROOT_PATH + '/output/data_api.parquet', 'tbl_data_api', True, False),
+    (ROOT_PATH + '/output/total_optimal_score.parquet', 'tbl_optimal_score', False, False),
     # (ROOT_PATH + '/output/data_visualization.parquet', 'tbl_data_visualization', True, True),
 ]
 
@@ -123,7 +124,7 @@ def ingest_data_to_db(date_str, schema_name="db_schema", init=True):
             )
 
     for path, tbl_name, is_id_col, is_churn_size in config_daily:
-        if tbl_name != 'tbl_data_visualization':
+        if tbl_name not in ['tbl_optimal_score', 'tbl_data_visualization']:
             ingest_tbl_to_db(
                 schema_name,
                 path,

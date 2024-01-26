@@ -84,6 +84,10 @@ TABLE_SCHEMA = {
         "star": NUMERIC(2, 1),
         "import_date": VARCHAR(length=10),
     },
+    'tbl_optimal_score': {
+        'date': VARCHAR(length=10),
+        'score': NUMERIC(4, 3)
+    },
     'tbl_data_visualization': {
         'order_code': VARCHAR(length=30),
         'sender_province_code': VARCHAR(length=2),
