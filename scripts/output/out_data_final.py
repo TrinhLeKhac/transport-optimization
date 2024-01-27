@@ -208,7 +208,7 @@ def out_data_final(
 
     if not os.path.exists(ROOT_PATH + '/output'):
         os.makedirs(ROOT_PATH + '/output')
-    final_df.to_parquet(ROOT_PATH + '/output/data_visualization.parquet')
+    final_df.to_parquet(ROOT_PATH + '/output/data_visualization.parquet', row_group_size=10000, index=False)
     print('-' * 100)
 
     return final_df
