@@ -1,4 +1,4 @@
-from scripts.api.router import result, output, order, zns, optimal_score
+from scripts.api.router import output, order, zns, optimal_score, result
 from scripts.api.auth import authen
 from fastapi.exceptions import RequestValidationError
 from fastapi import FastAPI, Request, status, Depends
