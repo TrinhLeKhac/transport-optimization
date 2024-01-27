@@ -389,115 +389,144 @@ def transform_dict(g):
     })
 
 
-def calculate_monetary(id_nvc, khoi_luong, loai_van_chuyen):
-    cuoc_phi_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/cuoc_phi_nvc.parquet')
-    cuoc_phi_nvc = (
-        pd.melt(
-            cuoc_phi_nvc,
-            id_vars=['nha_van_chuyen', 'gt', 'lt_or_eq'],
-            value_vars=[
-                'noi_thanh_tinh', 'ngoai_thanh_tinh',
-                'noi_thanh_tphcm_hn', 'ngoai_thanh_tphcm_hn',
-                'noi_mien', 'can_mien', 'cach_mien'
-            ],
-            var_name='loai', value_name='cuoc_phi'
-        )
+QUERY_SQL_COMMAND = """
+    -- Create carrier_information CTE
+    -- by JOIN tbl_order_type, tbl_data_api, tbl_service_fee, tbl_optimal_score
+
+    WITH carrier_information AS (
+        SELECT 
+        tbl_ord.carrier_id, tbl_ord.route_type, 
+        tbl_fee.price, 
+        tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data,
+        tbl_api.time_display, tbl_api.rate, tbl_api.score, tbl_api.star, 
+        tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
+        tbl_optimal_score.optimal_score, 
+        CAST (DENSE_RANK() OVER (
+            ORDER BY tbl_fee.price ASC
+        ) AS smallint) AS price_ranking
+        FROM db_schema.tbl_order_type tbl_ord
+        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api
+        ON tbl_ord.carrier_id = tbl_api.carrier_id --6
+        AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code
+        AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code --713
+        AND tbl_ord.new_type = tbl_api.new_type --7
+        INNER JOIN db_schema.tbl_service_fee tbl_fee
+        ON tbl_ord.carrier_id = tbl_fee.carrier_id --6
+        AND tbl_ord.new_type = tbl_fee.new_type  --7
+        CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score
+        WHERE tbl_ord.sender_province_code = '{}' 
+        AND tbl_ord.sender_district_code = '{}'
+        AND tbl_ord.receiver_province_code = '{}' 
+        AND tbl_ord.receiver_district_code = '{}' 
+        AND tbl_fee.weight = CEIL({}/500.0)*500 
+        AND tbl_fee.pickup = '{}'
+    ),
+
+    -- Create carrier_information_above CTE by 
+    -- FILTER carrier_information WHERE score >= optimal_score and
+    -- RANKING for_partner by price ASC
+
+    carrier_information_above AS (
+        SELECT carrier_id, route_type, price, status, description, time_data, 
+        time_display, rate, score, optimal_score, star, for_shop, 
+        CAST (DENSE_RANK() OVER (
+            ORDER BY price ASC
+        ) AS smallint) AS for_partner,
+        price_ranking, speed_ranking, score_ranking
+        FROM carrier_information
+        WHERE score >= optimal_score
+    ), 
+
+    -- Create carrier_information_below_tmp CTE by 
+    -- FILTER carrier_information WHERE score < optimal_score and
+    -- RANKING for_partner by score DESC
+
+    carrier_information_below_tmp1 AS (
+        SELECT carrier_id, route_type, price, status, description, time_data, 
+        time_display, rate, score, optimal_score, star, for_shop, 
+        CAST (DENSE_RANK() OVER (
+            ORDER BY score DESC
+        ) AS smallint) AS for_partner,
+        price_ranking, speed_ranking, score_ranking
+        FROM carrier_information
+        WHERE score < optimal_score
+    ),
+
+    -- Create carrier_information_below CTE by 
+    -- ADD for_partner with max_idx_partner in carrier_information_above CTE
+
+    carrier_information_below_tmp2 AS (
+        SELECT * FROM carrier_information_below_tmp1
+        CROSS JOIN
+        -- using COALESCE in case 
+        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_above) AS tbl_max_idx_partner
+    ),
+
+    carrier_information_below AS (
+        SELECT carrier_id, route_type, price, status, description, time_data, 
+        time_display, rate, score, optimal_score, star, for_shop, 
+        for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner
+        price_ranking, speed_ranking, score_ranking
+        FROM carrier_information_below_tmp2
+    ),
+
+    -- Create carrier_information_final CTE by 
+    -- UNION carrier_information_above and carrier_information_below
+
+    carrier_information_union AS (
+        SELECT * FROM carrier_information_above
+        UNION ALL
+        SELECT * FROM carrier_information_below
+    ),
+
+    -- UPDATE for_fshop EQUAL for_partner
+    carrier_information_final AS (
+        SELECT carrier_id, route_type, price, status, description, time_data, 
+        time_display, rate, score, optimal_score, star, 
+        for_partner AS for_shop, -- UPDATE for_fshop = for_partner
+        for_partner,
+        price_ranking, speed_ranking, score_ranking FROM carrier_information_union
     )
-    cuoc_phi_nvc['id_nvc'] = cuoc_phi_nvc['nha_van_chuyen'].map(MAPPING_ID_NVC)
-    cuoc_phi_nvc = cuoc_phi_nvc.loc[
-        cuoc_phi_nvc['loai'].isin(['noi_thanh_tinh', 'ngoai_thanh_tinh', 'noi_mien', 'can_mien'])]
-    cuoc_phi_nvc['loai'] = cuoc_phi_nvc['loai'].map({
-        'noi_thanh_tinh': 'Nội Thành Tỉnh',
-        'ngoai_thanh_tinh': 'Ngoại Thành Tỉnh',
-        'noi_mien': 'Nội Miền',
-        'can_mien': 'Cận Miền',
-    })
-    cuoc_phi = cuoc_phi_nvc.loc[
-        (cuoc_phi_nvc['id_nvc'] == id_nvc) &
-        (cuoc_phi_nvc['loai'] == loai_van_chuyen) &
-        (cuoc_phi_nvc['lt_or_eq'] >= khoi_luong) &
-        (cuoc_phi_nvc['gt'] < khoi_luong)
-        ]['cuoc_phi'].values[0]
-    return cuoc_phi
 
+    SELECT * FROM carrier_information_final ORDER BY carrier_id;
+"""
 
-def _calculate_output_api(df_api, ma_don_hang, tinh_thanh, quan_huyen, id_nvc, loai_van_chuyen, khoi_luong):
-    result = df_api.loc[
-        (df_api['tinh_thanh'] == tinh_thanh)
-        & (df_api['quan_huyen'] == quan_huyen)
-        & (df_api['id_nvc'] == id_nvc)
-        & (df_api['loai'] == loai_van_chuyen)
-        ]
-    if len(result) > 0:
-        status = result['status'].values[0]  # lấy từ quá khứ
-        estimate_delivery_time = result['estimate_delivery_time'].values[0]  # lấy từ quá khứ
-        score = result['score'].values[0]  # lấy từ quá khứ
-        stars = result['stars'].values[0]  # lấy từ quá khứ
-        monetary = calculate_monetary(id_nvc, khoi_luong, loai_van_chuyen)  # tính tiền từ khối lượng đơn hiện tại
-        # notification = result['notification'].values[0] # tính lại ở khâu sau
-
-        return_df = pd.DataFrame(data={
-            'ma_don_hang': [ma_don_hang],
-            'id_nvc': [id_nvc],
-            'status': [status],
-            'monetary': [monetary],
-            'estimate_delivery_time': [estimate_delivery_time],
-            'score': [score],
-            'stars': [stars],
-            # 'notification': [notification],
-        })
-        return_df['nvc'] = return_df['id_nvc'].map({
-            7: 'Ninja Van',
-            2: 'Giao Hàng Nhanh',
-            6: 'Best',
-            10: 'Shopee Express',
-            1: 'Giao Hàng Tiết Kiệm',
-            4: 'Viettel Post',
-            12: 'Tiki Now',
-        })
-        return_df = return_df[['ma_don_hang', 'id_nvc', 'nvc', 'status', 'monetary',
-                               'estimate_delivery_time', 'score', 'stars']]
-    else:
-        return_df = pd.DataFrame(columns=['ma_don_hang', 'id_nvc', 'nvc', 'status', 'monetary',
-                                          'estimate_delivery_time', 'score', 'stars'])
-    return return_df
-
-
-def calculate_output_api(df_api, ma_don_hang, tinh_thanh, quan_huyen, ids_nvc, loai_van_chuyen, khoi_luong):
-    all_res = []
-    for id_nvc in ids_nvc:
-        tmp_df = _calculate_output_api(df_api, ma_don_hang, tinh_thanh, quan_huyen, id_nvc, loai_van_chuyen, khoi_luong)
-        all_res.append(tmp_df)
-    total_df = pd.concat(all_res, ignore_index=True)
-
-    return total_df
-
-
-def calculate_notification(data_df):
-    data_df['notification'] = ''
-
-    re_nhat_df = data_df.loc[data_df['monetary'] == data_df['monetary'].min()]
-    re_nhat_df['notification'] = 'Rẻ nhất'
-
-    remain_df1 = merge_left_only(data_df, re_nhat_df, keys=['monetary'])
-    if len(remain_df1) == 0:
-        return re_nhat_df
-    else:
-        nhanh_nhat_df = remain_df1.loc[
-            remain_df1['estimate_delivery_time'].str[0].astype(int) ==
-            remain_df1['estimate_delivery_time'].str[0].astype(int).min()
-            ]
-        nhanh_nhat_df['notification'] = 'Nhanh nhất'
-        remain_df2 = merge_left_only(remain_df1, nhanh_nhat_df, keys=['estimate_delivery_time'])
-        if len(remain_df2) == 0:
-            return pd.concat([re_nhat_df, nhanh_nhat_df])
-        else:
-            hieu_qua_nhat_df = remain_df2.loc[
-                remain_df2['score'] == remain_df2['score'].max()]
-            hieu_qua_nhat_df['notification'] = 'Hiệu quả nhất'
-            remain_df3 = merge_left_only(remain_df2, hieu_qua_nhat_df, keys=['score'])
-            if len(remain_df3) == 0:
-                return pd.concat([re_nhat_df, nhanh_nhat_df, hieu_qua_nhat_df])
-            else:
-                remain_df3['notification'] = 'Bình thường'
-                return pd.concat([re_nhat_df, nhanh_nhat_df, hieu_qua_nhat_df, remain_df3])
+QUERY_SQL_COMMAND_OLD = """
+    WITH carrier_information AS (
+        SELECT 
+        tbl_ord.carrier_id, tbl_ord.route_type, 
+        tbl_fee.price, 
+        tbl_api.status, tbl_api.description, tbl_api.time_data,
+        tbl_api.time_display, tbl_api.rate, tbl_api.score, tbl_api.star, 
+        tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
+        CAST (DENSE_RANK() OVER (
+            ORDER BY tbl_fee.price ASC
+        ) AS smallint) AS price_ranking
+        FROM db_schema.tbl_order_type tbl_ord
+        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api
+        ON tbl_ord.carrier_id = tbl_api.carrier_id --6
+        AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code
+        AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code --713
+        AND tbl_ord.new_type = tbl_api.new_type --7
+        INNER JOIN db_schema.tbl_service_fee tbl_fee
+        ON tbl_ord.carrier_id = tbl_fee.carrier_id --6
+        AND tbl_ord.new_type = tbl_fee.new_type  --7
+        WHERE tbl_ord.sender_province_code = '{}' 
+        AND tbl_ord.sender_district_code = '{}'
+        AND tbl_ord.receiver_province_code = '{}' 
+        AND tbl_ord.receiver_district_code = '{}' 
+        AND tbl_fee.weight = CEIL({}/500.0)*500 
+        AND tbl_fee.pickup = '{}'
+    )
+    select carrier_id, route_type, price, status::varchar(1) AS status, description, time_data, time_display,
+    rate, score, star, for_shop, 
+    CAST (DENSE_RANK() OVER (
+        ORDER BY
+            (1.4 * price_ranking + 1.2 * rate_ranking + score_ranking)
+        ASC
+    ) AS smallint) AS for_partner,
+    price_ranking, speed_ranking, score_ranking
+    FROM carrier_information
+    ORDER BY carrier_id;
+"""
