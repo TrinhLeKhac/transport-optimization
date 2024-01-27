@@ -124,7 +124,7 @@ def get_st_dataframe_from_db(
 
     cursor = connection.cursor()
 
-    table_query = QUERY_SQL_COMMAND.format(
+    table_query = QUERY_SQL_COMMAND_STREAMLIT.format(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
         weight, pickup

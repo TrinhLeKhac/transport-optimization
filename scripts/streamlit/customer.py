@@ -159,6 +159,7 @@ def create_customer_tab():
             'rate',
             'star',
             'score',
+            'optimal_score',
             # 'for_shop',
             # 'for_partner',
         ]]
@@ -179,6 +180,7 @@ def create_customer_tab():
                         format="%.1f ⭐",
                     ),
                     "score": "Score chất lượng giao hàng",
+                    "optimal_score": "Điểm chất lượng tối ưu",
                 },
                 hide_index=True,
             )

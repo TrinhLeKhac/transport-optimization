@@ -3,7 +3,7 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 from scripts.api import schemas
 from scripts.api.database import *
-from scripts.utilities.helper import QUERY_SQL_COMMAND
+from scripts.utilities.helper import QUERY_SQL_COMMAND_API
 
 router = APIRouter()
 
@@ -21,7 +21,7 @@ def execute_query(
 
     cursor = connection.cursor()
 
-    table_query = QUERY_SQL_COMMAND.format(
+    table_query = QUERY_SQL_COMMAND_API.format(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
         weight, pickup
