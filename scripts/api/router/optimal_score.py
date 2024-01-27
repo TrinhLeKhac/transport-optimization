@@ -7,37 +7,29 @@ router = APIRouter()
 
 @router.get("")
 async def get_optimal_score(
-        date: str = "2024-01-01",
+        date: str = None,
 ):
-    optimal_score_df = pd.read_parquet(ROOT_PATH + '/output/total_optimal_score.parquet')
+
     try:
-        score = optimal_score_df.loc[optimal_score_df['date'] == date]['score'].values[0]
+        optimal_score_df = pd.read_parquet(ROOT_PATH + '/output/total_optimal_score.parquet')
+        if date is None:
+            score = optimal_score_df.tail(1)['score'].values[0]
+        else:
+            score = optimal_score_df.loc[optimal_score_df['date'] == date]['score'].values[0]
         return {
             "error": False,
             "message": "",
             "data": score,
         }
-    except:
+    except IndexError as e:
         return {
             "error": True,
             "message": f"Optimal score not found",
             "data": -1,
         }
-
-
-@router.get("")
-async def get_optimal_score():
-    optimal_score_df = pd.read_parquet(ROOT_PATH + '/output/total_optimal_score.parquet')
-    try:
-        score = optimal_score_df.tail(1)['score'].values[0]
-        return {
-            "error": False,
-            "message": "",
-            "data": score,
-        }
-    except:
+    except FileNotFoundError as e:
         return {
             "error": True,
-            "message": f"Optimal score not found",
+            "message": f"Data table not found",
             "data": -1,
         }
