@@ -42,4 +42,4 @@ app.include_router(zns.router, tags=[""], prefix="/superai/zns", dependencies=[D
 app.include_router(order.router, tags=[""], prefix="/superai/order", dependencies=[Depends(validate_token)])
 app.include_router(result.router, tags=[""], prefix="/superai/result", dependencies=[Depends(validate_token)])
 app.include_router(output.router, tags=[""], prefix="/superai/output", dependencies=[Depends(validate_token)])
-app.include_router(optimal_score.router, tags=[""], prefix="/superai/optimal_score", dependencies=[Depends(validate_token)])
+app.include_router(optimal_score.router, tags=[""], prefix="/superai/score", dependencies=[Depends(validate_token)])
