@@ -285,8 +285,8 @@ def out_data_api(
     api_data_final = api_data_final.merge(zns_df, on=['receiver_province', 'receiver_district', 'carrier'], how='left')
     api_data_final['star'] = api_data_final['star'].fillna(5.0)
 
-    # Nhu cầu business => lấy star bằng cột score
-    api_data_final['star'] = np.round(api_data_final['score'], 1)
+    # # Nhu cầu business => lấy star bằng cột score
+    # api_data_final['star'] = np.round(api_data_final['score'], 1)
 
     api_data_final['sys_order_type_id'] = api_data_final['order_type_id'].map(MAPPING_ORDER_TYPE_ID_ROUTE_TYPE)
     api_data_final['carrier_status'] = api_data_final['carrier_status'].astype(str)

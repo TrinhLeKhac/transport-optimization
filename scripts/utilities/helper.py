@@ -398,7 +398,8 @@ QUERY_SQL_COMMAND_API = """
         tbl_ord.carrier_id, tbl_ord.route_type, 
         tbl_fee.price, 
         tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data,
-        tbl_api.time_display, tbl_api.rate, tbl_api.score, tbl_api.star, 
+        tbl_api.time_display, tbl_api.rate, tbl_api.score, 
+        ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
         tbl_optimal_score.optimal_score, 
         CAST (DENSE_RANK() OVER (
