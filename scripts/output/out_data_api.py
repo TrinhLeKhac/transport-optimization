@@ -236,6 +236,21 @@ def out_data_api(
     )
     api_data_final['delivery_success_rate'] = np.round(api_data_final['delivery_success_rate'] * 100, 2)
 
+    # Change delivery_success_rate random from 80% - 85% toward region have total_order = 0
+    success_rate_modified = api_data_final.loc[api_data_final['total_order'] == 0][
+        ['receiver_province', 'receiver_district', 'carrier']].drop_duplicates()
+
+    success_rate_modified['delivery_success_rate_modified'] = np.round(np.random.uniform(80, 85, len(success_rate_modified)), 2)
+    api_data_final = api_data_final.merge(success_rate_modified, on=['receiver_province', 'receiver_district', 'carrier'], how='left')
+    api_data_final.loc[api_data_final['total_order'] == 0, 'delivery_success_rate'] = api_data_final['delivery_success_rate_modified']
+    api_data_final.drop('delivery_success_rate_modified', axis=1, inplace=True)
+
+    api_data_final['combine_col'] = api_data_final[["delivery_success_rate", "total_order"]].apply(tuple, axis=1)
+    api_data_final["delivery_success_rate_id"] = \
+        api_data_final.groupby(["receiver_province", "receiver_district", "order_type"])["combine_col"].rank(
+            method="dense", ascending=False).astype(int)
+    api_data_final.drop('combine_col', axis=1, inplace=True)
+
     if show_logs:
         print('6. Gắn thông tin quá tải')
     api_data_final = api_data_final.merge(qua_tai, on=['receiver_province', 'receiver_district', 'carrier'], how='left')
@@ -273,7 +288,11 @@ def out_data_api(
 
     if show_logs:
         print('8. Thông tin customer_best_carrier')
-    api_data_final = customer_best_carrier(api_data_final)
+    # api_data_final = customer_best_carrier(api_data_final)
+
+    # Force customer_best_carrier_id (for_shop) == -1
+    # for_shop, for_partner will be calculated by different rule in SQL_QUERY_COMMAND
+    api_data_final['customer_best_carrier_id'] = -1
 
     if show_logs:
         print('9. Thông tin số sao đánh giá của khách hàng')

@@ -63,7 +63,7 @@ TRONG_SO = {
         }
     },
     'Thời gian giao hàng': {
-        'Tiêu chí': 2,
+        'Tiêu chí': 2,  # total 10 order_type => scale weight 20 -> 20/10=2
         'Phân loại': {
             'Cách Miền': {
                 # 96h
