@@ -328,6 +328,7 @@ def get_optimal_point(run_date_str, step=2):
         if (R[0] >= target_df.loc[idx, 'score']) and (R[0] <= target_df.loc[idx + step, 'score']):
             optimal_point = idx + step // 2
             score = target_df.loc[optimal_point, 'score']
+            score = round(score, 3)
             break
     print('Optimal score: ', score)
     try:
