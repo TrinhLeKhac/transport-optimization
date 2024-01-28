@@ -42,12 +42,12 @@ def get_khu_vuc_ton_dong(run_date_str, threshold=10):
 
     df_order_analytic = df_order.groupby(['receiver_province', 'receiver_district', 'carrier', 'order_type']).agg(
         n_order_late=('is_late', 'sum')).reset_index()
-    don_ton_dong = df_order_analytic.loc[df_order_analytic['n_order_late'] >= threshold]
+    don_ton_dong = df_order_analytic.loc[df_order_analytic['n_order_late'] > threshold]
 
     nghen_don = don_ton_dong.groupby([
         'receiver_province', 'receiver_district', 'carrier'
     ])['order_type'].apply(lambda x: ', '.join(x)).reset_index()
-    nghen_don['carrier_status_comment'] = 'Nghẽn đơn (' + nghen_don['order_type'] + ' )'
+    nghen_don['carrier_status_comment'] = 'Nghẽn đơn (' + nghen_don['order_type'] + ')'
 
     don_ton_dong_final = don_ton_dong.groupby(['receiver_province', 'receiver_district', 'carrier']).agg(
         n_order_type=('order_type', 'nunique')).reset_index()

@@ -284,6 +284,7 @@ TRONG_SO = {
             'Tồn đọng trên 10 đơn đối với 2 loại hình vận chuyển': -5,
             'Tồn đọng trên 10 đơn đối với 3 loại hình vận chuyển': -8,
             'Tồn đọng trên 10 đơn đối với 4 loại hình vận chuyển': -10,
+            'Tồn đọng trên 10 đơn đối với 4++ loại hình vận chuyển': -20,
             'Không có thông tin': 0,
         }
     },
@@ -335,7 +336,7 @@ OVERLOADING_SCORE_DICT = {
     'Chất lượng nội bộ': [-6],
     'Thời gian giao hàng': [-10],
     'Có kho giao nhận': [-50],
-    'Đơn tồn đọng': [-5, -8, -10],
+    'Đơn tồn đọng': [-5, -8, -10, -20],
 }
 
 ACTIVE_CARRIER = [
