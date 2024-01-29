@@ -19,8 +19,8 @@ TRONG_SO = {
             '1 sao & Đánh giá xấu': -10,
             'Nhiều hơn 1 lần đánh giá 1 sao': -8,
             'Đánh giá 1, 2 sao gần đây (<= 5 ngày)': -8,
-            'Đánh giá 5 sao trên 95% đơn': 9,
-            'Không phát sinh đánh giá 1, 2, 3 sao': 8,
+            'Đánh giá 5 sao trên 95% đơn': 8,
+            'Không phát sinh đánh giá 1, 2, 3 sao': 6,
             'Bình thường': 4,
             'Không có thông tin': 0,
         },
@@ -29,13 +29,13 @@ TRONG_SO = {
         'Tiêu chí': 10,
         'Phân loại': {
             'Tổng đơn hàng từ 30 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 10,
-            'Tổng đơn hàng từ 20 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 9,
-            'Tổng đơn hàng từ 10 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 8,
-            'Tổng đơn hàng từ 30 đơn trở lên và có tỷ lệ giao hàng thành công trên 90%': 8,
-            'Tổng đơn hàng từ 20 đơn trở lên và có tỷ lệ giao hàng thành công trên 90%': 7,
-            'Tổng đơn hàng từ 10 đơn trở lên và có tỷ lệ giao hàng thành công trên 90%': 6,
-            'Tổng đơn hàng từ 5 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 5,
-            'Tổng đơn hàng từ 5 đơn trở lên và có tỷ lệ giao hàng thành công trên 90%': 4,
+            'Tổng đơn hàng từ 20 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 8,
+            'Tổng đơn hàng từ 10 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 6,
+            'Tổng đơn hàng từ 30 đơn trở lên và có tỷ lệ giao hàng thành công trên 90%': 6,
+            'Tổng đơn hàng từ 20 đơn trở lên và có tỷ lệ giao hàng thành công trên 90%': 5,
+            'Tổng đơn hàng từ 10 đơn trở lên và có tỷ lệ giao hàng thành công trên 90%': 4,
+            'Tổng đơn hàng từ 5 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 3,
+            'Tổng đơn hàng từ 5 đơn trở lên và có tỷ lệ giao hàng thành công trên 90%': 2,
             'Tổng đơn hàng từ 5 đơn trở lên và có tỷ lệ giao hàng thành công trên 85%': 1,
             'Tổng đơn hàng từ 5 đơn trở lên và có tỷ lệ giao hàng thành công trên 75%': -2,
             'Tổng đơn hàng từ 5 đơn trở lên và có tỷ lệ giao hàng thành công trên 50%': -5,
@@ -264,7 +264,7 @@ TRONG_SO = {
         }
     },
     'Có kho giao nhận': {
-        'Tiêu chí': 4,
+        'Tiêu chí': 3,
         'Phân loại': {
             'Có từ 3 bưu cục cùng cấp quận/huyện trở lên': 10,
             'Có 2 bưu cục cùng cấp quận/huyện trở lên': 9,
@@ -278,7 +278,7 @@ TRONG_SO = {
         }
     },
     'Đơn tồn đọng': {
-        'Tiêu chí': 8,
+        'Tiêu chí': 12,
         'Phân loại': {
             'Tồn đọng trên 10 đơn đối với 1 loại hình vận chuyển': -2,
             'Tồn đọng trên 10 đơn đối với 2 loại hình vận chuyển': -5,
