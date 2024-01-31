@@ -42,14 +42,14 @@ FINAL_COLS = [
     'carrier_status', 'carrier_status_comment',
     'estimate_delivery_time_details', 'estimate_delivery_time', 'total_order', 'delivery_success_rate',
     'customer_best_carrier_id', 'partner_best_carrier_id', 'score', 'star',
-    'cheapest_carrier_id', 'fastest_carrier_id', 'highest_score_carrier_id', 'date'
+    'cheapest_carrier_id', 'fastest_carrier_id', 'highest_score_carrier_id'
 ]
 FINAL_COLS_RENAMED = [
     'order_code', 'carrier_id', 'carrier', 'order_type', 'new_type', 'route_type', 'price',
     'status', 'description',
     'time_data', 'time_display', 'total_order', 'rate',
     'for_shop', 'for_partner', 'score', 'star',
-    'price_ranking', 'speed_ranking', 'score_ranking', 'date'
+    'price_ranking', 'speed_ranking', 'score_ranking'
 ]
 
 
@@ -155,7 +155,7 @@ def out_data_final(
         'order_code', 'weight', 'delivery_type',
         'sender_province', 'sender_district', 'sender_province_code', 'sender_district_code',
         'receiver_province', 'receiver_district', 'receiver_province_code', 'receiver_district_code',
-        'order_type', 'order_type_id', 'sys_order_type_id', 'date'
+        'order_type', 'order_type_id', 'sys_order_type_id'
     ]]
     print('Số dòng input dữ liệu: ', len(focus_df))
 
@@ -172,7 +172,7 @@ def out_data_final(
         'sender_province', 'sender_district', 'sender_province_code', 'sender_district_code',
         'receiver_province', 'receiver_district', 'receiver_province_code', 'receiver_district_code',
         'carrier', 'carrier_id',
-        'order_type', 'order_type_id', 'sys_order_type_id', 'date'
+        'order_type', 'order_type_id', 'sys_order_type_id'
     ]]
     tmp_df1['delivery_type'] = tmp_df1['delivery_type'].fillna('Gửi Bưu Cục')
     tmp_df1['order_type_id'] = tmp_df1['order_type_id'].astype(str)
@@ -205,10 +205,10 @@ def out_data_final(
     final_df.columns = FINAL_COLS_RENAMED  # FINAL_FULL_COLS_RENAMED
     print('Shape: ', final_df.shape)
 
-    if not os.path.exists(ROOT_PATH + '/output'):
-        os.makedirs(ROOT_PATH + '/output')
-    final_df.to_parquet(ROOT_PATH + '/output/data_visualization.parquet', row_group_size=64 * 1024, partition_cols=['date'], index=False)
-    print('-' * 100)
+    # if not os.path.exists(ROOT_PATH + '/output'):
+    #     os.makedirs(ROOT_PATH + '/output')
+    # final_df.to_parquet(ROOT_PATH + '/output/data_visualization.parquet', row_group_size=64 * 1024, index=False)
+    # print('-' * 100)
 
     return final_df
 
