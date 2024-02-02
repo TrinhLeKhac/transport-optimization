@@ -8,6 +8,7 @@ sys.path.append(ROOT_PATH)
 from scripts.utilities.helper import *
 from scripts.utilities.config import *
 from scripts.output.out_data_api import out_data_api, assign_supership_carrier
+import gc
 
 FINAL_FULL_COLS = [
     'order_code',
@@ -167,6 +168,9 @@ def out_data_final(
     tmp_df1['carrier_id'] = tmp_df1['carrier'].map(MAPPING_CARRIER_ID)
     assert len(tmp_df1) == len(focus_df) * tmp_df1['carrier'].nunique(), 'Transform data sai'
 
+    del focus_df
+    gc.collect()
+
     tmp_df1 = tmp_df1[[
         'order_code', 'weight', 'delivery_type',
         'sender_province', 'sender_district', 'sender_province_code', 'sender_district_code',
@@ -188,29 +192,45 @@ def out_data_final(
     )
     # assert len(tmp_df2) == len(tmp_df1), 'Transform data sai'
 
+    del tmp_df1
+    gc.collect()
+
     print('ii. Tính phí dịch vụ')
     tmp_df3 = calculate_service_fee(tmp_df2)
     assert len(tmp_df3) == len(tmp_df2), 'Transform data sai'
+
+    del tmp_df2
+    gc.collect()
 
     print('iii. Tính ranking nhà vận chuyển theo tiêu chí rẻ nhất')
     tmp_df4 = calculate_notification(tmp_df3)
     assert len(tmp_df4) == len(tmp_df3), 'Transform data sai'
 
+    del tmp_df3
+    gc.collect()
+
     print('iv. Tính nhà vận chuyển tốt nhất cho đối tác')
     final_df = partner_best_carrier(tmp_df4)
     assert len(final_df) == len(tmp_df4), 'Transform data sai'
+
+    del tmp_df4
+    gc.collect()
 
     print('v. Lưu data tính toán...')
     final_df = final_df[FINAL_COLS]  # FINAL_FULL_COLS
     final_df.columns = FINAL_COLS_RENAMED  # FINAL_FULL_COLS_RENAMED
     print('Shape: ', final_df.shape)
 
-    # if not os.path.exists(ROOT_PATH + '/output'):
-    #     os.makedirs(ROOT_PATH + '/output')
-    # final_df.to_parquet(ROOT_PATH + '/output/data_visualization.parquet', row_group_size=64 * 1024, index=False)
-    # print('-' * 100)
+    if not os.path.exists(ROOT_PATH + '/output'):
+        os.makedirs(ROOT_PATH + '/output')
+    final_df.to_parquet(ROOT_PATH + '/output/data_visualization.parquet', index=False)
 
-    return final_df
+    del final_df
+    gc.collect()
+
+    print('-' * 100)
+
+    # return final_df
 
 
 def _get_data_viz(target_df, threshold=0.6):
@@ -262,7 +282,10 @@ def _get_data_viz(target_df, threshold=0.6):
     return analyze_df1, analyze_df2
 
 
-def get_data_viz(target_df):
+def get_data_viz():
+
+    target_df = pd.read_parquet(ROOT_PATH + '/output/data_visualization.parquet')
+
     # Thay đổi lại khi range score change từ [0-1] -> [0-5]
     thresholds = np.linspace(2.5, 5, 101)
     analyze_df1_list = []
@@ -356,8 +379,8 @@ if __name__ == '__main__':
     else:
         print('Out data visualization...')
     try:
-        target_df = out_data_final(run_date_str=options.run_date, include_supership=include_supership)
-        get_data_viz(target_df)
+        out_data_final(run_date_str=options.run_date, include_supership=include_supership)
+        get_data_viz()
         get_optimal_point(run_date_str=options.run_date)
     except Exception as e:
         error = type(e).__name__ + " – " + str(e)
