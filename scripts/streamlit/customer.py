@@ -124,7 +124,8 @@ def create_customer_tab():
         weight_field.number_input(
             ':blue[**Khối lượng đơn (gram)**]',
             key='weight',
-            placeholder='Vui lòng nhập khối lượng đơn <= 50,000g và lớn hơn 0g',
+            placeholder='Vui lòng nhập khối lượng đơn <= 50,000g và >= 50g',
+            min_value=50,
             format='%d',
             step=50
         )
@@ -137,8 +138,9 @@ def create_customer_tab():
             ":blue[**Giá trị hàng hóa**]",
             key='item_price',
             placeholder='Vui lòng nhập giá trị đơn hàng của bạn',
+            min_value=1000,
             format='%d',
-            step=1_000
+            step=1000
         )
         is_returned_field.selectbox(
             ":blue[**Hàng đổi trả**]",
@@ -151,8 +153,9 @@ def create_customer_tab():
         money_get_first_field.number_input(
             ":blue[**Tiền thu khách**]",
             key='money_get_first',
+            min_value=1000,
             format='%d',
-            step=1_000,
+            step=1000,
         )
 
         # --------------------------------------------------------------------------------------------
