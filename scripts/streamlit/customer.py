@@ -122,13 +122,38 @@ def create_customer_tab():
             key='pickup'
         )
         weight_field.number_input(
-            ':blue[**Khối lượng đơn (gram)**: ]',
+            ':blue[**Khối lượng đơn (gram)**]',
             key='weight',
             placeholder='Vui lòng nhập khối lượng đơn <= 50,000g và lớn hơn 0g',
             format='%d',
             step=50
         )
         print("Weight after re-run scripts", st.session_state['weight'])
+
+        # --------------------------------------------------------------------------------------------
+
+        item_price_field, is_returned_field = st.columns(2)
+        item_price_field.number_input(
+            ":blue[**Giá trị hàng hóa**]",
+            key='item_price',
+            placeholder='Vui lòng nhập giá trị đơn hàng của bạn',
+            format='%d',
+            step=1_000
+        )
+        is_returned_field.selectbox(
+            ":blue[**Hàng đổi trả**]",
+            options=('Có', 'Không'),
+            key='is_returned',
+        )
+
+        # --------------------------------------------------------------------------------------------
+        money_get_first_field, _ = st.columns(2)
+        money_get_first_field.number_input(
+            ":blue[**Tiền thu khách**]",
+            key='money_get_first',
+            format='%d',
+            step=1_000,
+        )
 
         # --------------------------------------------------------------------------------------------
         st.button(
