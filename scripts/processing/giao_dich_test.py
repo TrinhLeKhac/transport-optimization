@@ -93,7 +93,7 @@ def tong_hop_thong_tin_giao_dich_full(run_date_str, n_days_back=30):
     print('Shape: ', len(valid_order_df))
 
     # 4. Lưu thông tin
-    valid_order_df.to_parquet(ROOT_PATH + '/processed_data/order_full.parquet', index=False)
+    valid_order_df.to_parquet(ROOT_PATH + '/processed_data/order_test.parquet', index=False)
 
 
 if __name__ == '__main__':
@@ -105,4 +105,4 @@ if __name__ == '__main__':
     )
     options, args = parser.parse_args()
 
-    tong_hop_thong_tin_giao_dich_full(run_date_str=options.run_date)
+    tong_hop_thong_tin_giao_dich_full(run_date_str=options.run_date, n_days_back=7)
