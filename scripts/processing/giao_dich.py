@@ -52,7 +52,8 @@ def xu_ly_giao_dich():
     best_df['created_at'] = pd.to_datetime(best_df['created_at'], errors='coerce')
     best_df['carrier_delivered_at'] = pd.to_datetime(best_df['carrier_delivered_at'], errors='coerce')
 
-    best_df['carrier_delivered_at'] = best_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    best_df['carrier_delivered_at'] = best_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(
+        convert_datetime_type1)
     best_df['created_at'] = best_df['created_at'].apply(lambda x: str(x)).apply(convert_datetime_type2)
 
     print('Xử lý giao dịch Ninja Van...')
@@ -67,7 +68,8 @@ def xu_ly_giao_dich():
     njv_df['created_at'] = pd.to_datetime(njv_df['created_at'], errors='coerce')
     njv_df['carrier_delivered_at'] = pd.to_datetime(njv_df['carrier_delivered_at'], errors='coerce')
 
-    njv_df['carrier_delivered_at'] = njv_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    njv_df['carrier_delivered_at'] = njv_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(
+        convert_datetime_type1)
 
     print('Xử lý giao dịch GHN...')
     ghn_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='GHN')
@@ -81,7 +83,8 @@ def xu_ly_giao_dich():
     ghn_df['created_at'] = pd.to_datetime(ghn_df['created_at'], errors='coerce')
     ghn_df['carrier_delivered_at'] = pd.to_datetime(ghn_df['carrier_delivered_at'], errors='coerce')
 
-    ghn_df['carrier_delivered_at'] = ghn_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    ghn_df['carrier_delivered_at'] = ghn_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(
+        convert_datetime_type1)
 
     print('Xử lý giao dịch Viettel Post...')
     vtp_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='VTP')
@@ -95,7 +98,8 @@ def xu_ly_giao_dich():
     vtp_df['created_at'] = pd.to_datetime(vtp_df['created_at'], errors='coerce')
     vtp_df['carrier_delivered_at'] = pd.to_datetime(vtp_df['carrier_delivered_at'], errors='coerce')
 
-    vtp_df['carrier_delivered_at'] = vtp_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    vtp_df['carrier_delivered_at'] = vtp_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(
+        convert_datetime_type1)
 
     print('Xử lý giao dịch SPX Express...')
     spx_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='SPX')
@@ -109,7 +113,8 @@ def xu_ly_giao_dich():
     spx_df['created_at'] = pd.to_datetime(spx_df['created_at'], errors='coerce')
     spx_df['carrier_delivered_at'] = pd.to_datetime(spx_df['carrier_delivered_at'], errors='coerce')
 
-    spx_df['carrier_delivered_at'] = spx_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    spx_df['carrier_delivered_at'] = spx_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(
+        convert_datetime_type1)
 
     print('Xử lý giao dịch GHTK...')
     ghtk_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='GHTK')
@@ -123,7 +128,8 @@ def xu_ly_giao_dich():
     ghtk_df['created_at'] = pd.to_datetime(ghtk_df['created_at'], errors='coerce')
     ghtk_df['carrier_delivered_at'] = pd.to_datetime(ghtk_df['carrier_delivered_at'], errors='coerce')
 
-    ghtk_df['carrier_delivered_at'] = ghtk_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(convert_datetime_type1)
+    ghtk_df['carrier_delivered_at'] = ghtk_df['carrier_delivered_at'].apply(lambda x: str(x)).apply(
+        convert_datetime_type1)
 
     print('Tổng hợp giao dịch...')
     raw_order_df = pd.concat([best_df, njv_df, ghn_df, vtp_df, spx_df, ghtk_df], ignore_index=True)
@@ -168,7 +174,7 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
             & order_df['sender_district'].notna()
             & order_df['receiver_province'].notna()
             & order_df['receiver_district'].notna()
-        ]
+            ]
         print('Số giao dịch sau khi chuẩn hóa tỉnh/thành, quận/huyện: ', len(valid_order_df))
 
         valid_order_df = (
@@ -179,7 +185,7 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
                     'province': 'sender_province',
                     'district': 'sender_district'
                 }), on=['sender_province', 'sender_district'], how='left')
-            .merge(
+                .merge(
                 PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
                     'province_code': 'receiver_province_code',
                     'district_code': 'receiver_district_code',
@@ -225,10 +231,11 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
     else:
         port = settings.SQLALCHEMY_DATABASE_URI
         engine = create_engine(port)
-        valid_order_df = pd.read_sql_query('select * from db_schema.order', con=engine)
+        valid_order_df = pd.read_sql_query(
+            f"select * from db_schema.order where TO_DATE(date, 'YYYY-MM-DD') >= DATE '{run_date_str}' - INTERVAL '{n_days_back + 1} days'",
+            con=engine)
 
         valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
-
         # Chỉ lấy thông tin giao dịch từ n_days_back trở lại
         valid_order_df = valid_order_df.loc[
             valid_order_df['created_at'] >=

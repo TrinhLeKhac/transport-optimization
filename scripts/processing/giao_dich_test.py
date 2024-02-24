@@ -29,14 +29,16 @@ def tong_hop_thong_tin_giao_dich_test(run_date_str, n_days_back=30):
     engine = create_engine(port)
 
     print('Get order transaction...')
-    valid_order_df = pd.read_sql_query(f"select * from db_schema.order where created_at >= '{run_date_str}' - INTERVAL '{n_days_back} days'", con=engine)
+    valid_order_df = pd.read_sql_query(
+        f"select * from db_schema.order where TO_DATE(date, 'YYYY-MM-DD') >= DATE '{run_date_str}' - INTERVAL '{n_days_back + 1} days'",
+        con=engine)
 
     # Chỉ lấy thông tin giao dịch từ n_days_back trở lại
     valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
-    # valid_order_df = valid_order_df.loc[
-    #     valid_order_df['created_at'] >=
-    #     (run_date - timedelta(days=n_days_back))
-    #     ]
+    valid_order_df = valid_order_df.loc[
+        valid_order_df['created_at'] >=
+        (run_date - timedelta(days=n_days_back))
+        ]
     print(len(valid_order_df))
 
     valid_order_df['carrier'] = valid_order_df['carrier_id'].map(MAPPING_ID_CARRIER)
