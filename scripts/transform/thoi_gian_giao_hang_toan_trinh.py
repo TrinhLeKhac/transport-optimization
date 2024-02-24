@@ -180,9 +180,9 @@ def transform_data_thoi_gian_giao_hang_toan_trinh():
     giao_dich_thanh_cong = giao_dich_valid[giao_dich_valid['carrier_status'].isin(THANH_CONG_STATUS)]
 
     giao_dich_thanh_cong = giao_dich_thanh_cong.loc[
-        giao_dich_thanh_cong['carrier_delivered_at'].notna() & giao_dich_thanh_cong['created_at'].notna()]
-    giao_dich_thanh_cong['delivery_time_h'] = (giao_dich_thanh_cong['carrier_delivered_at'] - giao_dich_thanh_cong[
-        'created_at']).dt.total_seconds() / 60 / 60
+        giao_dich_thanh_cong['last_delivering_at'].notna() & giao_dich_thanh_cong['picked_at'].notna()]
+    giao_dich_thanh_cong['delivery_time_h'] = (giao_dich_thanh_cong['last_delivering_at'] - giao_dich_thanh_cong[
+        'picked_at']).dt.total_seconds() / 60 / 60
 
     # Transform bảng
     giao_dich_thanh_cong_agg = (
