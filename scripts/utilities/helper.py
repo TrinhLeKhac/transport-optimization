@@ -616,10 +616,10 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                 THEN
                     CASE
                         WHEN money_get_first < 1000000 THEN 0
-                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0
-                        WHEN (item_price >= 3000000) AND (item_price <= 10000000) THEN 0.005*(money_get_first - 3000000)
-                        WHEN (item_price >= 10000000) AND (item_price <= 100000000) THEN 0.005*(money_get_first - 3000000)
-                        WHEN item_price > 100000000 THEN -1
+                        WHEN (money_get_first >= 1000000) AND (money_get_first < 3000000) THEN 0
+                        WHEN (money_get_first >= 3000000) AND (money_get_first <= 10000000) THEN 0.005*(money_get_first - 3000000)
+                        WHEN (money_get_first >= 10000000) AND (money_get_first <= 100000000) THEN 0.005*(money_get_first - 3000000)
+                        WHEN money_get_first > 100000000 THEN -1
                     END
             WHEN carrier_id = 13 -- SuperShip
                 THEN
