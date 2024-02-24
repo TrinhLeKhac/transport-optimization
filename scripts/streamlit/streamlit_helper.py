@@ -115,7 +115,8 @@ def save_uploaded_file(uploaded_file, folder):
 def get_st_dataframe_from_db(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
-        weight, pickup
+        weight, pickup,
+        item_price, money_get_first, is_returned
 ):
     # Create connection
     connection = psycopg2.connect(
@@ -125,6 +126,7 @@ def get_st_dataframe_from_db(
     cursor = connection.cursor()
 
     table_query = QUERY_SQL_COMMAND_STREAMLIT.format(
+        item_price, money_get_first, is_returned,
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
         weight, pickup

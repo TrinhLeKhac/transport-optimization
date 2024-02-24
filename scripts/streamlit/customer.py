@@ -1,3 +1,5 @@
+import starlette.datastructures
+
 from scripts.streamlit.streamlit_helper import *
 
 
@@ -45,12 +47,17 @@ def handle_submit_form():
         pickup = '1'
     weight = st.session_state['weight']
 
+    money_get_first = st.session_state['money_get_first']
+    item_price = st.session_state['item_price']
+    is_returned = st.session_state['is_returned']
+
     # print(sender_province_code, sender_district_code, receiver_province_code, receiver_district_code)
 
     result_df = get_st_dataframe_from_db(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
-        weight, pickup
+        weight, pickup,
+        item_price, money_get_first, is_returned
     )
     # print(result_df.columns)
     st.session_state['submit_result'] = result_df
@@ -183,6 +190,10 @@ def create_customer_tab():
             'carrier',
             'description',
             'price',
+            'redeem_fee',
+            'insurance_fee',
+            'collection_fee',
+            'total_price',
             'time_data',
             'rate',
             'star',
@@ -200,7 +211,11 @@ def create_customer_tab():
                 column_config={
                     "carrier": "Nhà vận chuyển",
                     'description': "Trạng thái tuyến giao",
-                    'price': "Tiền cước",
+                    'price': "Phí giao hàng",
+                    'redeem_fee': "Phí thu hồi",
+                    'insurance_fee': "Phí bảo hiểm",
+                    'collection_fee': "Phí thu hộ",
+                    'total_price': "Tổng cước phí",
                     'time_data': "Thời gian giao dự kiến",
                     'rate': 'Tỉ lệ giao thành công',
                     "star": st.column_config.NumberColumn(
