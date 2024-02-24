@@ -22,7 +22,7 @@ NEW_DATA_COLS = [
 ]
 
 
-def tong_hop_thong_tin_giao_dich_full(run_date_str, n_days_back=30):
+def tong_hop_thong_tin_giao_dich_test(run_date_str, n_days_back=30):
     run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
 
     port = settings.SQLALCHEMY_DATABASE_URI
@@ -105,4 +105,4 @@ if __name__ == '__main__':
     )
     options, args = parser.parse_args()
 
-    tong_hop_thong_tin_giao_dich_full(run_date_str=options.run_date, n_days_back=7)
+    tong_hop_thong_tin_giao_dich_test(run_date_str=options.run_date, n_days_back=7)
