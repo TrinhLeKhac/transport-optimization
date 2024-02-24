@@ -27,7 +27,10 @@ def tong_hop_thong_tin_giao_dich_full(run_date_str, n_days_back=30):
 
     port = settings.SQLALCHEMY_DATABASE_URI
     engine = create_engine(port)
+
+    print('Get order transaction...')
     valid_order_df = pd.read_sql_query('select * from db_schema.order', con=engine)
+    print(len(valid_order_df))
 
     valid_order_df['carrier'] = valid_order_df['carrier_id'].map(MAPPING_ID_CARRIER)
     valid_order_df['delivery_type'] = valid_order_df['pickup'].map({'0': 'Gửi Bưu Cục', '1': 'Lấy Tận Nơi'})
