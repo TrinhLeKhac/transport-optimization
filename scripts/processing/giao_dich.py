@@ -227,6 +227,14 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
         engine = create_engine(port)
         valid_order_df = pd.read_sql_query('select * from db_schema.order', con=engine)
 
+        valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
+
+        # Chỉ lấy thông tin giao dịch từ n_days_back trở lại
+        valid_order_df = valid_order_df.loc[
+            valid_order_df['created_at'] >=
+            (run_date - timedelta(days=n_days_back))
+            ]
+
         valid_order_df['carrier'] = valid_order_df['carrier_id'].map(MAPPING_ID_CARRIER)
         valid_order_df['delivery_type'] = valid_order_df['pickup'].map({'0': 'Gửi Bưu Cục', '1': 'Lấy Tận Nơi'})
         valid_order_df['is_returned'] = valid_order_df['barter'].map({'0': False, '1': True})
@@ -258,7 +266,7 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
         valid_order_df = create_type_of_delivery(valid_order_df)
         valid_order_df['order_type'] = valid_order_df['order_type_id'].map(MAPPING_ID_ORDER_TYPE)
 
-        valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
+        # valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
         valid_order_df['sent_at'] = pd.to_datetime(valid_order_df['sent_at'], errors='coerce')
         valid_order_df['picked_at'] = pd.to_datetime(valid_order_df['picked_at'], errors='coerce')
         valid_order_df['carrier_updated_at'] = pd.to_datetime(valid_order_df['carrier_updated_at'], errors='coerce')
@@ -276,11 +284,6 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
             'picked_at', 'carrier_updated_at', 'last_delivering_at', 'carrier_delivered_at', 'date',
         ]]
 
-        # Chỉ lấy thông tin giao dịch từ n_days_back trở lại
-        valid_order_df = valid_order_df.loc[
-            valid_order_df['created_at'] >=
-            (run_date - timedelta(days=n_days_back))
-        ]
         valid_order_df = valid_order_df.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
         print('Min (created_at): ', valid_order_df['created_at'].min())
         print('Max (created_at): ', valid_order_df['created_at'].max())
