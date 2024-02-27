@@ -598,6 +598,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                 THEN
                     CASE
                         WHEN money_get_first > 5000000 THEN -1
+                        WHEN (money_get_first > 3000000) AND (money_get_first <= 5000000) THEN 0.005*money_get_first
                         ELSE 0
                     END
             WHEN carrier_id = 10 --- SPX Express
