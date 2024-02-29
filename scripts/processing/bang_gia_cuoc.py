@@ -8,89 +8,89 @@ def xu_ly_bang_gia_cuoc():
     bang_gia_cuoc_df = pd.read_excel(ROOT_PATH + '/input/Bảng Cước Phí.xlsx')
 
     # 2.1 Tách lấy thông tin bảng giá cước Ninja Van và xử lý
-    ninja_van_df = pd.concat([bang_gia_cuoc_df.iloc[1:21, :2], bang_gia_cuoc_df.iloc[1:21, 2:12]], axis=1).reset_index(
+    ninja_van_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 2:12]], axis=1).reset_index(
         drop=True)
     ninja_van_df.columns = COLUMNS_CUOC_PHI
-    for i in range(80):
-        ninja_van_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 70 + 9 * int(i / 2), 70 + 9 * int(i / 2),
-                                       70 + 9 * int(i / 2), 70 + 9 * int(i / 2), 82 + 11 * int(i / 2),
-                                       124 + 16 * int(i / 2), 124 + 16 * int(i / 2), 82 + 11 * int(i / 2),
-                                       124 + 16 * int(i / 2), 124 + 16 * int(i / 2)]
+    # for i in range(80):
+    #     ninja_van_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 70 + 9 * int(i / 2), 70 + 9 * int(i / 2),
+    #                                    70 + 9 * int(i / 2), 70 + 9 * int(i / 2), 82 + 11 * int(i / 2),
+    #                                    124 + 16 * int(i / 2), 124 + 16 * int(i / 2), 82 + 11 * int(i / 2),
+    #                                    124 + 16 * int(i / 2), 124 + 16 * int(i / 2)]
     ninja_van_df['carrier'] = 'Ninja Van'
     ninja_van_df['carrier_id'] = 7
 
     # 2.2 Tách lấy thông tin bảng giá cước BEST Express và xử lý
-    best_df = pd.concat([bang_gia_cuoc_df.iloc[1:21, :2], bang_gia_cuoc_df.iloc[1:21, 12:22]], axis=1).reset_index(
+    best_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 12:22]], axis=1).reset_index(
         drop=True)
     best_df.columns = COLUMNS_CUOC_PHI
-    for i in range(80):
-        best_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i,
-                                  38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i]
+    # for i in range(80):
+    #     best_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i,
+    #                               38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i]
     best_df['carrier'] = 'BEST Express'
     best_df['carrier_id'] = 6
 
     # 2.3 Tách lấy thông tin bảng giá cước SPX Express và xử lý
-    shopee_express_df = pd.concat([bang_gia_cuoc_df.iloc[1:21, :2], bang_gia_cuoc_df.iloc[1:21, 22:32]],
+    shopee_express_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 22:32]],
                                   axis=1).reset_index(drop=True)
     shopee_express_df.columns = COLUMNS_CUOC_PHI
-    for i in range(80):
-        shopee_express_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 58.5 + 2.5 * i, 58.5 + 2.5 * i,
-                                            58.5 + 2.5 * i,
-                                            58.5 + 2.5 * i, 58.5 + 2.5 * i, 103 + 5 * i, 103 + 5 * i,
-                                            58.5 + 2.5 * i, 103 + 5 * i, 103 + 5 * i]
+    # for i in range(80):
+    #     shopee_express_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 58.5 + 2.5 * i, 58.5 + 2.5 * i,
+    #                                         58.5 + 2.5 * i,
+    #                                         58.5 + 2.5 * i, 58.5 + 2.5 * i, 103 + 5 * i, 103 + 5 * i,
+    #                                         58.5 + 2.5 * i, 103 + 5 * i, 103 + 5 * i]
     shopee_express_df['carrier'] = 'SPX Express'
     shopee_express_df['carrier_id'] = 10
 
     # 2.4 Tách lấy thông tin bảng giá cước GHN và xử lý
-    ghn_df = pd.concat([bang_gia_cuoc_df.iloc[1:21, :2], bang_gia_cuoc_df.iloc[1:21, 32:42]], axis=1).reset_index(
+    ghn_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 32:42]], axis=1).reset_index(
         drop=True)
     ghn_df.columns = COLUMNS_CUOC_PHI
-    for i in range(80):
-        ghn_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-                                 54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-                                 54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-                                 54 + 5 * int(i / 2)]
+    # for i in range(80):
+    #     ghn_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
+    #                              54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
+    #                              54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
+    #                              54 + 5 * int(i / 2)]
     ghn_df['carrier'] = 'GHN'
     ghn_df['carrier_id'] = 2
 
     # 2.5 Tách lấy thông tin bảng giá cước Viettel Post và xử lý
-    viettel_post_df = pd.concat([bang_gia_cuoc_df.iloc[1:21, :2], bang_gia_cuoc_df.iloc[1:21, 42:52]],
+    viettel_post_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 42:52]],
                                 axis=1).reset_index(drop=True)
     viettel_post_df.columns = COLUMNS_CUOC_PHI
-    for i in range(40):
-        viettel_post_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 50 + 4 * int(i / 2), 50 + 4 * int(i / 2),
-                                          50 + 4 * int(i / 2), 50 + 4 * int(i / 2), 63 + 5 * int(i / 2),
-                                          63 + 5 * int(i / 2), 63 + 5 * int(i / 2),
-                                          63 + 5 * int(i / 2), 63 + 5 * int(i / 2), 63 + 5 * int(i / 2)]
-    for i in range(40):
-        viettel_post_df.loc[60 + i, :] = [30000 + 500 * i, 30500 + 500 * i, 120 + 4 * int(i / 2), 120 + 4 * int(i / 2),
-                                          120 + 4 * int(i / 2), 120 + 4 * int(i / 2), 150 + 5.5 * int(i / 2),
-                                          150 + 5.5 * int(i / 2), 150 + 5.5 * int(i / 2),
-                                          150 + 5.5 * int(i / 2), 150 + 5.5 * int(i / 2), 150 + 5.5 * int(i / 2)]
+    # for i in range(40):
+    #     viettel_post_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 50 + 4 * int(i / 2), 50 + 4 * int(i / 2),
+    #                                       50 + 4 * int(i / 2), 50 + 4 * int(i / 2), 63 + 5 * int(i / 2),
+    #                                       63 + 5 * int(i / 2), 63 + 5 * int(i / 2),
+    #                                       63 + 5 * int(i / 2), 63 + 5 * int(i / 2), 63 + 5 * int(i / 2)]
+    # for i in range(40):
+    #     viettel_post_df.loc[60 + i, :] = [30000 + 500 * i, 30500 + 500 * i, 120 + 4 * int(i / 2), 120 + 4 * int(i / 2),
+    #                                       120 + 4 * int(i / 2), 120 + 4 * int(i / 2), 150 + 5.5 * int(i / 2),
+    #                                       150 + 5.5 * int(i / 2), 150 + 5.5 * int(i / 2),
+    #                                       150 + 5.5 * int(i / 2), 150 + 5.5 * int(i / 2), 150 + 5.5 * int(i / 2)]
     viettel_post_df['carrier'] = 'Viettel Post'
     viettel_post_df['carrier_id'] = 4
 
     # 2.6 Tách lấy thông tin bảng giá cước GHTK và xử lý
-    ghtk_df = pd.concat([bang_gia_cuoc_df.iloc[1:21, :2], bang_gia_cuoc_df.iloc[1:21, 52:62]], axis=1).reset_index(
+    ghtk_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 52:62]], axis=1).reset_index(
         drop=True)
     ghtk_df.columns = COLUMNS_CUOC_PHI
-    for i in range(80):
-        ghtk_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 85 + 2.5 * i, 85 + 2.5 * i, 59.5 + 2.5 * i,
-                                  67.5 + 2.5 * i, 85 + 2.5 * i, 127.5 + 2.5 * i, 127.5 + 2.5 * i,
-                                  85 + 2.5 * i, 127.5 + 2.5 * i, 127.5 + 2.5 * i]
+    # for i in range(80):
+    #     ghtk_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 85 + 2.5 * i, 85 + 2.5 * i, 59.5 + 2.5 * i,
+    #                               67.5 + 2.5 * i, 85 + 2.5 * i, 127.5 + 2.5 * i, 127.5 + 2.5 * i,
+    #                               85 + 2.5 * i, 127.5 + 2.5 * i, 127.5 + 2.5 * i]
     ghtk_df['carrier'] = 'GHTK'
     ghtk_df['carrier_id'] = 1
 
     # 2.7 Tách lấy thông tin bảng giá cước SuperShip và xử lý
-    supership_df = pd.concat([bang_gia_cuoc_df.iloc[1:21, :2], bang_gia_cuoc_df.iloc[1:21, 62:72]], axis=1).reset_index(
+    supership_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 62:72]], axis=1).reset_index(
         drop=True)
     supership_df.columns = COLUMNS_CUOC_PHI
-    for i in range(80):
-        supership_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-                                       54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-                                       54 + 5 * int(i / 2),
-                                       54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-                                       54 + 5 * int(i / 2)]
+    # for i in range(80):
+    #     supership_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
+    #                                    54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
+    #                                    54 + 5 * int(i / 2),
+    #                                    54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
+    #                                    54 + 5 * int(i / 2)]
     supership_df['carrier'] = 'SuperShip'
     supership_df['carrier_id'] = 13
 
