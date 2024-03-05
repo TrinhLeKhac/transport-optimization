@@ -42,9 +42,9 @@ def handle_submit_form():
             ]['district_code'].values[0]
     )
     if st.session_state['pickup'] == 'Lấy Tận Nơi':
-        pickup = '0'
-    elif st.session_state['pickup'] == 'Gửi Bưu Cục':
         pickup = '1'
+    elif st.session_state['pickup'] == 'Gửi Bưu Cục':
+        pickup = '0'
     weight = st.session_state['weight']
 
     money_get_first = st.session_state['money_get_first']
