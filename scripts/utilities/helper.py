@@ -658,7 +658,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             WHEN carrier_id = 13 -- SuperShip
                 THEN
                     CASE
-                        WHEN is_returned = 'Có' THEN price*0.5
+                        WHEN is_returned = 'Có' THEN 10000
                         ELSE 0
                     END
         END AS redeem_fee,
