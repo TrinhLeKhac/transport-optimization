@@ -9,7 +9,7 @@ ROOT_PATH = str(Path(__file__).parent.parent.parent)
 sys.path.append(ROOT_PATH)
 from scripts.streamlit.manual_short import create_manual_tab
 from scripts.streamlit.customer import create_customer_tab
-from scripts.streamlit.authenticator import Authenticator
+from scripts.streamlit.authenticator_short import Authenticator
 
 
 def main(run_date_str, is_auth=True):
@@ -78,4 +78,4 @@ if __name__ == '__main__':
         help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
     )
     options, args = parser.parse_args()
-    main(options.run_date, is_auth=False)
+    main(options.run_date, is_auth=True)

@@ -1,8 +1,4 @@
-from scripts.output.out_data_api import out_data_api, assign_supership_carrier
-from scripts.output.out_data_final import out_data_final, get_data_viz
-from scripts.processing.total_processing import total_processing
 from scripts.streamlit.streamlit_helper import *
-import scripts.streamlit.redirect as rd
 
 
 def create_manual_tab():
