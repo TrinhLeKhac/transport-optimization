@@ -422,10 +422,10 @@ QUERY_SQL_COMMAND_API = """
         ON tbl_ord.carrier_id = tbl_api.carrier_id --6
         AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code
         AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code --713
-        AND tbl_ord.new_type = tbl_api.new_type --7
+        AND tbl_ord.new_type = tbl_api.new_type --10
         INNER JOIN db_schema.tbl_service_fee tbl_fee
         ON tbl_ord.carrier_id = tbl_fee.carrier_id --6
-        AND tbl_ord.new_type = tbl_fee.new_type  --7
+        AND tbl_ord.order_type = tbl_fee.order_type  --11
         CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score
         WHERE tbl_ord.sender_province_code = '{}' 
         AND tbl_ord.sender_district_code = '{}'
@@ -528,10 +528,10 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ON tbl_ord.carrier_id = tbl_api.carrier_id --6
         AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code
         AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code --713
-        AND tbl_ord.new_type = tbl_api.new_type --7
+        AND tbl_ord.new_type = tbl_api.new_type --10
         INNER JOIN db_schema.tbl_service_fee tbl_fee
         ON tbl_ord.carrier_id = tbl_fee.carrier_id --6
-        AND tbl_ord.new_type = tbl_fee.new_type  --7
+        AND tbl_ord.order_type = tbl_fee.order_type  --11
         CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score
         WHERE tbl_ord.sender_province_code = '{}' 
         AND tbl_ord.sender_district_code = '{}'
