@@ -1,6 +1,6 @@
 from scripts.utilities.helper import *
 
-COLUMNS_CUOC_PHI = ['gt', 'lt_or_eq'] + list(MAPPING_ORDER_TYPE_ID.keys())
+COLUMNS_CUOC_PHI = ['gt', 'lt_or_eq'] + list(MAPPING_ORDER_TYPE_ID.keys()) + ['Liên Thành']
 
 
 def xu_ly_bang_gia_cuoc():
@@ -8,7 +8,8 @@ def xu_ly_bang_gia_cuoc():
     bang_gia_cuoc_df = pd.read_excel(ROOT_PATH + '/input/Bảng Cước Phí.xlsx')
 
     # 2.1 Tách lấy thông tin bảng giá cước Ninja Van và xử lý
-    ninja_van_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 2:12]], axis=1).reset_index(
+    ninja_van_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 2:13]],
+                             axis=1).reset_index(
         drop=True)
     ninja_van_df.columns = COLUMNS_CUOC_PHI
     # for i in range(80):
@@ -20,7 +21,7 @@ def xu_ly_bang_gia_cuoc():
     ninja_van_df['carrier_id'] = 7
 
     # 2.2 Tách lấy thông tin bảng giá cước BEST Express và xử lý
-    best_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 12:22]], axis=1).reset_index(
+    best_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 13:24]], axis=1).reset_index(
         drop=True)
     best_df.columns = COLUMNS_CUOC_PHI
     # for i in range(80):
@@ -30,7 +31,7 @@ def xu_ly_bang_gia_cuoc():
     best_df['carrier_id'] = 6
 
     # 2.3 Tách lấy thông tin bảng giá cước SPX Express và xử lý
-    shopee_express_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 22:32]],
+    shopee_express_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 24:35]],
                                   axis=1).reset_index(drop=True)
     shopee_express_df.columns = COLUMNS_CUOC_PHI
     # for i in range(80):
@@ -42,7 +43,7 @@ def xu_ly_bang_gia_cuoc():
     shopee_express_df['carrier_id'] = 10
 
     # 2.4 Tách lấy thông tin bảng giá cước GHN và xử lý
-    ghn_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 32:42]], axis=1).reset_index(
+    ghn_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 35:46]], axis=1).reset_index(
         drop=True)
     ghn_df.columns = COLUMNS_CUOC_PHI
     # for i in range(80):
@@ -54,7 +55,7 @@ def xu_ly_bang_gia_cuoc():
     ghn_df['carrier_id'] = 2
 
     # 2.5 Tách lấy thông tin bảng giá cước Viettel Post và xử lý
-    viettel_post_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 42:52]],
+    viettel_post_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 46:57]],
                                 axis=1).reset_index(drop=True)
     viettel_post_df.columns = COLUMNS_CUOC_PHI
     # for i in range(40):
@@ -71,7 +72,7 @@ def xu_ly_bang_gia_cuoc():
     viettel_post_df['carrier_id'] = 4
 
     # 2.6 Tách lấy thông tin bảng giá cước GHTK và xử lý
-    ghtk_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 52:62]], axis=1).reset_index(
+    ghtk_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 57:68]], axis=1).reset_index(
         drop=True)
     ghtk_df.columns = COLUMNS_CUOC_PHI
     # for i in range(80):
@@ -82,7 +83,8 @@ def xu_ly_bang_gia_cuoc():
     ghtk_df['carrier_id'] = 1
 
     # 2.7 Tách lấy thông tin bảng giá cước SuperShip và xử lý
-    supership_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 62:72]], axis=1).reset_index(
+    supership_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 68:79]],
+                             axis=1).reset_index(
         drop=True)
     supership_df.columns = COLUMNS_CUOC_PHI
     # for i in range(80):
@@ -103,7 +105,7 @@ def xu_ly_bang_gia_cuoc():
     cuoc_phi_df = pd.melt(
         cuoc_phi_df,
         id_vars=['carrier_id', 'carrier', 'gt', 'lt_or_eq'],
-        value_vars=list(MAPPING_ORDER_TYPE_ID.keys()),
+        value_vars=list(MAPPING_ORDER_TYPE_ID.keys()) + ['Liên Thành'],
         var_name='order_type', value_name='service_fee'
     )
 
