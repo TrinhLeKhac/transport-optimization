@@ -59,6 +59,7 @@ TABLE_SCHEMA = {
     },
     'tbl_service_fee': {
         'carrier_id': SMALLINT,
+        'order_type': VARCHAR(length=50),
         'new_type': VARCHAR(length=2),
         'pickup': VARCHAR(length=1),
         'weight': INTEGER,

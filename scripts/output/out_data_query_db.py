@@ -51,7 +51,7 @@ def out_data_service_fee():
     cuoc_phi_df = pd.read_parquet(ROOT_PATH + '/processed_data/cuoc_phi.parquet')
     cuoc_phi_df['order_type_id'] = cuoc_phi_df['order_type'].map(MAPPING_ORDER_TYPE_ID)
 
-    cuoc_phi_df = cuoc_phi_df[['carrier_id', 'lt_or_eq', 'order_type_id', 'service_fee']].rename(
+    cuoc_phi_df = cuoc_phi_df[['carrier_id', 'lt_or_eq', 'order_type', 'order_type_id', 'service_fee']].rename(
         columns={'lt_or_eq': 'weight', 'order_type_id': 'new_type', 'service_fee': 'price'})
     cuoc_phi_df['new_type'] = cuoc_phi_df['new_type'].astype(str)
 
@@ -68,7 +68,7 @@ def out_data_service_fee():
     service_fee_df.loc[(service_fee_df['pickup'] == '1') & (service_fee_df['carrier_id'] == 2), 'price'] = \
         service_fee_df['price'] + 1000
 
-    service_fee_df = service_fee_df[['carrier_id', 'new_type', 'pickup', 'weight', 'price']]
+    service_fee_df = service_fee_df[['carrier_id', 'order_type', 'new_type', 'pickup', 'weight', 'price']]
     service_fee_df.to_parquet(ROOT_PATH + '/output/service_fee.parquet', index=False)
     print('-' * 100)
 
