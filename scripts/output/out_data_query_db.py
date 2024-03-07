@@ -38,7 +38,7 @@ def out_data_order_type(carriers=ACTIVE_CARRIER, include_supership=True, show_lo
     order_type_df = order_type_df[[
         'id', 'carrier_id', 'sender_province_code', 'sender_district_code',
         'receiver_province_code', 'receiver_district_code',
-        'new_type', 'route_type'
+        'order_type', 'new_type', 'route_type'
     ]]
 
     if show_logs:

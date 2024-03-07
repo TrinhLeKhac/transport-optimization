@@ -54,6 +54,7 @@ TABLE_SCHEMA = {
         'sender_district_code': VARCHAR(length=3),
         'receiver_province_code': VARCHAR(length=2),
         'receiver_district_code': VARCHAR(length=3),
+        'order_type': VARCHAR(length=50),
         'new_type': VARCHAR(length=2),
         'route_type': VARCHAR(length=1),
     },

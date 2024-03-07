@@ -316,6 +316,18 @@ def create_type_of_delivery(input_df):
         'order_type_id'
     ] = 2
 
+    target_df['order_type'] = target_df['order_type_id'].map(MAPPING_ID_ORDER_TYPE)
+    target_df.loc[
+        (target_df['carrier_id'] == 7) &
+        (
+                ((target_df['sender_province_code'] == '01') & (
+                            target_df['receiver_province_code'] == '79')) |
+                ((target_df['sender_province_code'] == '79') & (
+                            target_df['receiver_province_code'] == '01'))
+        ),
+        'order_type'
+    ] = 'Liên Thành'
+
     # target_df['sys_order_type_id'] = -1
     # target_df.loc[
     #     (target_df['sender_province_code'].isin(['79', '01'])) \

@@ -199,15 +199,16 @@ def out_data_final(
     # Thêm phân vùng mới 'Liên Thành' cho đúng Ninja Van
     # Bảng cước phí cập nhật giá đủ 11 phân vùng => effect chỉ mỗi Ninja Van
     tmp_df2.loc[
-        (tmp_df2['carrier'] == 'Ninja Van') &
+        (tmp_df2['carrier_id'] == 7) &
         (
-                ((tmp_df2['sender_province'] == 'Thành phố Hà Nội') & (
-                            tmp_df2['receiver_province'] == 'Thành phố Hồ Chí Minh')) |
-                ((tmp_df2['sender_province'] == 'Thành phố Hồ Chí Minh') & (
-                            tmp_df2['receiver_province'] == 'Thành phố Hà Nội'))
+                ((tmp_df2['sender_province_code'] == '01') & (
+                        tmp_df2['receiver_province_code'] == '79')) |
+                ((tmp_df2['sender_province_code'] == '79') & (
+                        tmp_df2['receiver_province_code'] == '01'))
         ),
         'order_type'
     ] = 'Liên Thành'
+
     tmp_df3 = calculate_service_fee(tmp_df2)
     assert len(tmp_df3) == len(tmp_df2), 'Transform data sai'
 
