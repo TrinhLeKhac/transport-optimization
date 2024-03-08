@@ -5,7 +5,7 @@ COLUMNS_CUOC_PHI = ['gt', 'lt_or_eq'] + list(MAPPING_ORDER_TYPE_ID.keys()) + ['L
 
 def xu_ly_bang_gia_cuoc():
     # 1. Lấy thông tin bảng giá cước
-    bang_gia_cuoc_df = pd.read_excel(ROOT_PATH + '/input/Bảng Cước Phí.xlsx')
+    bang_gia_cuoc_df = pd.read_excel(ROOT_PATH + '/input/bang_cuoc_phi.xlsx')
 
     # 2.1 Tách lấy thông tin bảng giá cước Ninja Van và xử lý
     ninja_van_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 2:13]],

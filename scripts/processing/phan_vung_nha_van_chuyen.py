@@ -3,7 +3,7 @@ from scripts.utilities.helper import *
 
 def xu_ly_phan_vung_nha_van_chuyen():
     # 1. Đọc thông tin raw
-    phan_vung_nvc = pd.read_excel(ROOT_PATH + '/input/Phân Vùng Ghép SuperShip.xlsx')
+    phan_vung_nvc = pd.read_excel(ROOT_PATH + '/input/phan_vung_ghep_supership.xlsx')
 
     phan_vung_nvc = phan_vung_nvc.iloc[3:, 2:19]
     phan_vung_nvc.columns = [

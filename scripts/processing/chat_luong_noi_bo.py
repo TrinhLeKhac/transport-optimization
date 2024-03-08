@@ -15,7 +15,7 @@ def get_pct_ninja_van(s):
 def xu_ly_chat_luong_noi_bo():
 
     # 1. Đọc data raw
-    clnb_njv_df = pd.read_excel(ROOT_PATH + '/input/Chất Lượng Nội Bộ NJV.xlsx')
+    clnb_njv_df = pd.read_excel(ROOT_PATH + '/input/chat_luong_noi_bo_njv.xlsx')
     clnb_njv_df = clnb_njv_df[1:]
     clnb_njv_df.columns = [
         'region', 'receiver_province', 'id_receiver_district', 'receiver_district',

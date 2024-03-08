@@ -13,7 +13,7 @@ def xu_ly_danh_gia_zns(run_date_str, from_api=True, n_days_back=30):
     run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
     if not from_api:
         # 1. Đọc dữ liệu
-        danh_gia_zns_df = pd.read_excel(ROOT_PATH + '/input/Đánh Giá ZNS.xlsx')
+        danh_gia_zns_df = pd.read_excel(ROOT_PATH + '/input/danh_gia_zns.xlsx')
         danh_gia_zns_df = danh_gia_zns_df[[
             'Tỉnh/Thành Phố Giao Hàng',
             'Quận/Huyện Giao Hàng',

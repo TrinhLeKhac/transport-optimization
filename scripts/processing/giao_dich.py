@@ -42,7 +42,7 @@ def convert_datetime_type2(s):
 
 def xu_ly_giao_dich():
     print('Xử lý giao dịch BEST Express...')
-    best_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='BEST')
+    best_df = pd.read_excel(ROOT_PATH + '/input/giao_dich_nha_van_chuyen.xlsx', sheet_name='BEST')
     best_df = best_df[OLD_DATA_COLS]
     best_df.columns = NEW_DATA_COLS
     best_df['carrier'] = 'BEST Express'
@@ -57,7 +57,7 @@ def xu_ly_giao_dich():
     best_df['created_at'] = best_df['created_at'].apply(lambda x: str(x)).apply(convert_datetime_type2)
 
     print('Xử lý giao dịch Ninja Van...')
-    njv_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='NJV')
+    njv_df = pd.read_excel(ROOT_PATH + '/input/giao_dich_nha_van_chuyen.xlsx', sheet_name='NJV')
     njv_df = njv_df[OLD_DATA_COLS]
     njv_df.columns = NEW_DATA_COLS
     njv_df['carrier'] = 'Ninja Van'
@@ -72,7 +72,7 @@ def xu_ly_giao_dich():
         convert_datetime_type1)
 
     print('Xử lý giao dịch GHN...')
-    ghn_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='GHN')
+    ghn_df = pd.read_excel(ROOT_PATH + '/input/giao_dich_nha_van_chuyen.xlsx', sheet_name='GHN')
     ghn_df = ghn_df[OLD_DATA_COLS]
     ghn_df.columns = NEW_DATA_COLS
     ghn_df['carrier'] = 'GHN'
@@ -87,7 +87,7 @@ def xu_ly_giao_dich():
         convert_datetime_type1)
 
     print('Xử lý giao dịch Viettel Post...')
-    vtp_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='VTP')
+    vtp_df = pd.read_excel(ROOT_PATH + '/input/giao_dich_nha_van_chuyen.xlsx', sheet_name='VTP')
     vtp_df = vtp_df[OLD_DATA_COLS]
     vtp_df.columns = NEW_DATA_COLS
     vtp_df['carrier'] = 'Viettel Post'
@@ -102,7 +102,7 @@ def xu_ly_giao_dich():
         convert_datetime_type1)
 
     print('Xử lý giao dịch SPX Express...')
-    spx_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='SPX')
+    spx_df = pd.read_excel(ROOT_PATH + '/input/giao_dich_nha_van_chuyen.xlsx', sheet_name='SPX')
     spx_df = spx_df[OLD_DATA_COLS]
     spx_df.columns = NEW_DATA_COLS
     spx_df['carrier'] = 'SPX Express'
@@ -117,7 +117,7 @@ def xu_ly_giao_dich():
         convert_datetime_type1)
 
     print('Xử lý giao dịch GHTK...')
-    ghtk_df = pd.read_excel(ROOT_PATH + '/input/Giao Dịch Nhà Vận Chuyển.xlsx', sheet_name='GHTK')
+    ghtk_df = pd.read_excel(ROOT_PATH + '/input/giao_dich_nha_van_chuyen.xlsx', sheet_name='GHTK')
     ghtk_df = ghtk_df[OLD_DATA_COLS]
     ghtk_df.columns = NEW_DATA_COLS
     ghtk_df['carrier'] = 'GHTK'
@@ -139,7 +139,7 @@ def xu_ly_giao_dich():
 
 
 def xu_ly_giao_dich_co_khoi_luong():
-    order_with_weight_df = pd.read_excel(ROOT_PATH + '/input/Đơn Có Khối Lượng.xlsx', sheet_name='Combined')
+    order_with_weight_df = pd.read_excel(ROOT_PATH + '/input/don_co_khoi_luong.xlsx', sheet_name='Combined')
 
     order_with_weight_df = order_with_weight_df[['Mã Đơn SuperShip', 'Khối Lượng', 'Kho Hàng']]
     order_with_weight_df.columns = ['order_code', 'weight', 'storage_address']

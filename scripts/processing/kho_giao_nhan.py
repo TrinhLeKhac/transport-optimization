@@ -11,7 +11,7 @@ def split_buu_cuc_ninja_van(s):
 def xu_ly_kho_giao_nhan():
 
     print('Ninja Van')
-    buu_cuc_njv_df = pd.read_excel(ROOT_PATH + '/input/Bưu Cục NJV.xlsx')
+    buu_cuc_njv_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_njv.xlsx')
     buu_cuc_njv_df = buu_cuc_njv_df[1:]
 
     buu_cuc_njv_df.columns = [
@@ -46,7 +46,7 @@ def xu_ly_kho_giao_nhan():
     #############################################################################################
 
     print('GHN')
-    buu_cuc_ghn_df = pd.read_excel(ROOT_PATH + '/input/Bưu Cục GHN.xlsx')
+    buu_cuc_ghn_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_ghn.xlsx')
 
     buu_cuc_ghn_df.columns = ['address', 'receiver_province', 'receiver_district']
     buu_cuc_ghn_df['receiver_province'] = buu_cuc_ghn_df['receiver_province'].astype(str)
@@ -71,7 +71,7 @@ def xu_ly_kho_giao_nhan():
     #############################################################################################
 
     print('BEST Express')
-    buu_cuc_best_df = pd.read_excel(ROOT_PATH + '/input/Bưu Cục Best.xlsx')
+    buu_cuc_best_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_best.xlsx')
 
     buu_cuc_best_df.columns = ['id', 'area', 'receiver_province', 'receiver_district', 'receiver_ward', 'best_post_office']
     buu_cuc_best_df['receiver_province'] = buu_cuc_best_df['receiver_province'].astype(str)
@@ -103,7 +103,7 @@ def xu_ly_kho_giao_nhan():
     #############################################################################################
 
     print('GHTK')
-    buu_cuc_ghtk_df = pd.read_excel(ROOT_PATH + '/input/Bưu Cục GHTK.xlsx')
+    buu_cuc_ghtk_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_ghtk.xlsx')
 
     buu_cuc_ghtk_df = buu_cuc_ghtk_df[['Tên bưu cục', 'Địa chỉ']]
     buu_cuc_ghtk_df.columns = ['ghtk_post_office', 'address']

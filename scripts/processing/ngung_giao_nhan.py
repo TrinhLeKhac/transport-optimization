@@ -3,7 +3,7 @@ from scripts.utilities.helper import *
 
 def xu_ly_ngung_giao_nhan():
     # Đọc data ngưng giao nhận
-    ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/input/Ngưng Giao Nhận.xlsx')
+    ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/input/ngung_giao_nhan.xlsx')
 
     # Chọn lấy cột cần thiết và đổi tên cột
     ngung_giao_nhan_df.columns = [
