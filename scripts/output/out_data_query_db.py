@@ -50,6 +50,8 @@ def out_data_service_fee():
     print('Xử lý data service_fee...')
     cuoc_phi_df = pd.read_parquet(ROOT_PATH + '/processed_data/cuoc_phi.parquet')
     cuoc_phi_df['order_type_id'] = cuoc_phi_df['order_type'].map(MAPPING_ORDER_TYPE_ID)
+    cuoc_phi_df.loc[cuoc_phi_df['order_type'] == 'Liên Thành', 'order_type_id'] = 10
+    cuoc_phi_df['order_type_id'] = cuoc_phi_df['order_type_id'].astype('int')
 
     cuoc_phi_df = cuoc_phi_df[['carrier_id', 'lt_or_eq', 'order_type', 'order_type_id', 'service_fee']].rename(
         columns={'lt_or_eq': 'weight', 'order_type_id': 'new_type', 'service_fee': 'price'})
