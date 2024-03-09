@@ -29,6 +29,17 @@ def out_data_order_type(carriers=ACTIVE_CARRIER, include_supership=True, show_lo
         print('2. Mapping data...')
     order_type_df = create_type_of_delivery(input_df)
 
+    order_type_df.loc[
+        (order_type_df['carrier_id'] == 7) &
+        (
+                ((order_type_df['sender_province_code'] == '01') & (
+                            order_type_df['receiver_province_code'] == '79')) |
+                ((order_type_df['sender_province_code'] == '79') & (
+                            order_type_df['receiver_province_code'] == '01'))
+        ),
+        'order_type'
+    ] = 'Liên Thành'
+
     if show_logs:
         print('3. Transform data...')
     order_type_df = order_type_df.rename(columns={'order_type_id': 'new_type', 'sys_order_type_id': 'route_type'})
