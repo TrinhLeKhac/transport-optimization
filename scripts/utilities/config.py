@@ -420,7 +420,7 @@ DANG_GIAO_STATUS = [
 ]
 HOAN_HANG_STATUS = [
     'Trả hàng thành công',
-    'Trả lại cho người gửi',
+    'Giao hàng thất bại',
     'Returned | Trả hàng thành công',
     'Trả lại cho người gửi được kích hoạt',
     'xuất hàng khỏi trung tâm khai thác (trung tâm chia chọn) để trả về',
