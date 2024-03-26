@@ -133,6 +133,7 @@ def xu_ly_giao_dich():
 
     print('Tổng hợp giao dịch...')
     raw_order_df = pd.concat([best_df, njv_df, ghn_df, vtp_df, spx_df, ghtk_df], ignore_index=True)
+    raw_order_df['carrier_status'] = raw_order_df['carrier_status'].str.strip()
 
     print('Lưu thông tin...')
     raw_order_df.to_parquet(ROOT_PATH + '/processed_data/raw_order.parquet', index=False)
@@ -292,6 +293,8 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
         ]]
 
         valid_order_df = valid_order_df.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
+        valid_order_df['carrier_status'] = valid_order_df['carrier_status'].str.strip()
+
         print('Min (created_at): ', valid_order_df['created_at'].min())
         print('Max (created_at): ', valid_order_df['created_at'].max())
         print('Shape: ', len(valid_order_df))

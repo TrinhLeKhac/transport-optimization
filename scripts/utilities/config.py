@@ -411,6 +411,11 @@ CHUA_GIAO_STATUS = [
     'Chuyển tiếp bưu cục khác',
     'Đang tương tác với người nhận',
     'Đến Khu Phân Loại Hàng',
+    'Đã đến kho trung chuyển',
+    'Đang trung chuyển đến kho tiếp theo',
+    'Đã đến bưu cục gốc',
+    'Cập nhật đo lường đơn hàng',
+    'Đã đến kho đích',
 ]
 DANG_GIAO_STATUS = [
     'Xuất hàng để đi giao',
@@ -437,6 +442,7 @@ HOAN_HANG_STATUS = [
     'Đang hoàn hàng',
     'Bưu cục phát duyệt hoàn',
     'Xác nhận chuyển hoàn',
+    'Trả lại cho người gửi',
 ]
 THANH_CONG_STATUS = [
     'Giao hàng thành công',
