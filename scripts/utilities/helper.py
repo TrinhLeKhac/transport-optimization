@@ -411,7 +411,7 @@ QUERY_SQL_API_BY_DAY = """
     carrier_id, route_type, new_type, status, description, time_data, time_display, rate, score,
     star, for_shop, for_shop as for_partner, speed_ranking, score_ranking
     FROM db_schema.tbl_data_api
-    WHERE import_date = MAX(import_date)
+    WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)
     AND receiver_district_code == {}
 """
 
