@@ -51,24 +51,22 @@ class OrderModel(BaseModel):
 
 class APIModel(BaseModel):
 
-    receiver_province_code: constr(max_length=2, strict=True)
-    receiver_district_code: constr(max_length=3, strict=True)
+    province_code: constr(max_length=2, strict=True)
+    district_code: constr(max_length=3, strict=True)
     carrier_id: conint(strict=True)
-    new_type: constr(max_length=2, strict=True)
     route_type: constr(max_length=1, strict=True)
+    new_type: constr(max_length=2, strict=True)
     status: constr(max_length=1, strict=True)
     description: constr(max_length=512, strict=True)
     time_data: confloat(ge=0, le=100.00, strict=True)
     time_display: constr(max_length=30, strict=True)
-    speed_ranking: conint(strict=True)
-    score_ranking: conint(strict=True)
-    for_shop: conint(strict=True)
-    total_order: conint(strict=True)
-    rate_ranking: conint(strict=True)
     rate: confloat(ge=0, le=100.00, strict=True)
     score: confloat(ge=0, le=5.00, strict=True)
     star: confloat(ge=0, le=5.0, strict=True)
-    import_date: constr(max_length=10, strict=True)
+    for_shop: conint(strict=True)
+    for_partner: conint(strict=True)
+    speed_ranking: conint(strict=True)
+    score_ranking: conint(strict=True)
 
     class Config:
         from_attributes = True

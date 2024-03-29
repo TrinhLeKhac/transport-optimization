@@ -405,6 +405,16 @@ def transform_dict(g):
     })
 
 
+QUERY_SQL_API_BY_DAY = """
+    -- Select properties from API data
+    SELECT receiver_province_code as province code, receiver_district_code as district_code, 
+    carrier_id, route_type, new_type, status, description, time_data, time_display, rate, score,
+    star, for_shop, for_shop as for_partner, speed_ranking, score_ranking
+    FROM db_schema.tbl_data_api
+    WHERE import_date = MAX(import_date)
+    AND receiver_district_code == {}
+"""
+
 QUERY_SQL_COMMAND_API = """
     -- Create carrier_information CTE
     -- by JOIN tbl_order_type, tbl_data_api, tbl_service_fee, tbl_optimal_score

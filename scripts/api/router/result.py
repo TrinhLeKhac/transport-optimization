@@ -1,6 +1,5 @@
 import psycopg2
-from fastapi import Depends, APIRouter
-from sqlalchemy.orm import Session
+from fastapi import APIRouter
 from scripts.api import schemas
 from scripts.api.database import *
 from scripts.utilities.helper import QUERY_SQL_COMMAND_API
@@ -45,7 +44,7 @@ def execute_query(
 
 
 @router.post("")
-def calculate(data: schemas.APIRequestModel, db: Session = Depends(get_db)):
+def calculate(data: schemas.APIRequestModel):
     sender_province_code = data.sender_province
     sender_district_code = data.sender_district
     receiver_province_code = data.receiver_province
