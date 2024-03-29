@@ -8,9 +8,8 @@ router = APIRouter()
 
 
 def execute_query(
-    receiver_district_code,
+        receiver_district_code,
 ):
-
     # Create connection
     connection = psycopg2.connect(
         settings.SQLALCHEMY_DATABASE_URI
@@ -38,10 +37,9 @@ def execute_query(
 
 
 @router.post("")
-def calculate(receiver_district_code):
-
+def calculate(code):
     result = execute_query(
-        receiver_district_code,
+        receiver_district_code=code,
     )
 
     if result is None:
