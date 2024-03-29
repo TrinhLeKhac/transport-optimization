@@ -25,7 +25,7 @@ def execute_query(
 
     # Get the field names from the Pydantic model
     field_names = schemas.APIModel.__annotations__.keys()
-    result = [schemas.APIResultModel(**dict(zip(field_names, row))) for row in rows]
+    result = [schemas.APIModel(**dict(zip(field_names, row))) for row in rows]
 
     # Commit the transaction
     connection.commit()

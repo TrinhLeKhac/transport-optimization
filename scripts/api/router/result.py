@@ -31,8 +31,8 @@ def execute_query(
     print(rows)
 
     # Get the field names from the Pydantic model
-    field_names = schemas.APIResultModel.__annotations__.keys()
-    result = [schemas.APIResultModel(**dict(zip(field_names, row))) for row in rows]
+    field_names = schemas.SuggestCarrierOutput.__annotations__.keys()
+    result = [schemas.SuggestCarrierOutput(**dict(zip(field_names, row))) for row in rows]
 
     # Commit the transaction
     connection.commit()
@@ -44,7 +44,7 @@ def execute_query(
 
 
 @router.post("")
-def calculate(data: schemas.APIRequestModel):
+def calculate(data: schemas.SuggestCarrierInput):
     sender_province_code = data.sender_province
     sender_district_code = data.sender_district
     receiver_province_code = data.receiver_province

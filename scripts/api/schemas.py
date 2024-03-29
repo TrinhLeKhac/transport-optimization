@@ -72,7 +72,7 @@ class APIModel(BaseModel):
         from_attributes = True
 
 
-class APIRequestModel(BaseModel):
+class SuggestCarrierInput(BaseModel):
     sender_province: constr(max_length=2, strict=True)
     sender_district: constr(max_length=3, strict=True)
     receiver_province: constr(max_length=2, strict=True)
@@ -81,7 +81,7 @@ class APIRequestModel(BaseModel):
     pickup: constr(max_length=1, strict=True)
 
 
-class APIResultModel(BaseModel):
+class SuggestCarrierOutput(BaseModel):
     carrier_id: int
     route_type: constr(max_length=1, strict=True)
     price: int
