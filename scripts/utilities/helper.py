@@ -407,12 +407,13 @@ def transform_dict(g):
 
 QUERY_SQL_API_BY_DAY = """
     -- Select properties from API data
+    
     SELECT receiver_province_code as province_code, receiver_district_code as district_code, 
     carrier_id, route_type, new_type, status, description, time_data, time_display, rate, score,
     star, for_shop, for_shop as for_partner, speed_ranking, score_ranking
     FROM db_schema.tbl_data_api
     WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)
-    AND receiver_district_code == '{}'
+    AND tbl_data_api.receiver_district_code = '{}'
 """
 
 QUERY_SQL_COMMAND_API = """
