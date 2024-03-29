@@ -83,39 +83,22 @@ class API(Base):
     __table_args__ = (PrimaryKeyConstraint("id", name="data_api_pkey"), {"schema": "db_schema"})
 
     @classmethod
-    async def find_by_batch(cls, db_session: AsyncSession, batch: int = 10):
-        stmt = select(cls).limit(batch)
-        result = await db_session.execute(stmt)
-        instances = result.scalars().all()
-
-        if instances is None:
-            return {
-                "error": True,
-                "message": "Resources not found",
-                "data": [],
-            }
-        else:
-            return {
-                "error": False,
-                "message": "",
-                "data": instances,
-            }
-
-    @classmethod
     async def find_by_district(cls, db_session: AsyncSession, district_code: str = "001"):
         stmt = select(cls).where(cls.receiver_district_code == district_code)
         result = await db_session.execute(stmt)
         instances = result.scalars().all()
 
-        if instances is None:
-            return {
-                "error": True,
-                "message": "Resources not found",
-                "data": [],
-            }
-        else:
-            return {
-                "error": False,
-                "message": "",
-                "data": instances,
-            }
+        return instances
+
+        # if instances is None:
+        #     return {
+        #         "error": True,
+        #         "message": "Resources not found",
+        #         "data": [],
+        #     }
+        # else:
+        #     return {
+        #         "error": False,
+        #         "message": "",
+        #         "data": instances,
+        #     }
