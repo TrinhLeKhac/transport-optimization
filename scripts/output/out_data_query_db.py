@@ -96,7 +96,7 @@ if __name__ == '__main__':
     options, args = parser.parse_args()
     # print(options.mode)
 
-    include_supership = True
+    include_supership = False
 
     if options.mode == 'init':
         if include_supership:

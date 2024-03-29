@@ -386,7 +386,7 @@ if __name__ == '__main__':
     )
     options, args = parser.parse_args()
 
-    include_supership = True
+    include_supership = False
     if include_supership:
         print('Out data visualization and assigning SuperShip carrier...')
     else:

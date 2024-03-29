@@ -418,7 +418,7 @@ if __name__ == '__main__':
         error = type(e).__name__ + " – " + str(e)
         telegram_bot_send_error_message(error)
 
-    include_supership = True
+    include_supership = False
     if include_supership:
         try:
             print('Assigning SuperShip carrier...')
