@@ -64,7 +64,7 @@ class API(Base):
     receiver_province_code: Mapped[str] = mapped_column(String(2))
     receiver_district_code: Mapped[str] = mapped_column(String(3))
     carrier_id: Mapped[int] = mapped_column(Integer)
-    # new_type: Mapped[str] = mapped_column(String(2))
+    new_type: Mapped[str] = mapped_column(String(2))
     route_type: Mapped[str] = mapped_column(String(1))
     status: Mapped[str] = mapped_column(String(1))
     description: Mapped[str] = mapped_column(String(512))
@@ -83,8 +83,8 @@ class API(Base):
     __table_args__ = (PrimaryKeyConstraint("id", name="data_api_pkey"), {"schema": "db_schema"})
 
     @classmethod
-    async def find_by_district(cls, db_session: AsyncSession, date: str, district_code: str = "001"):
-        stmt = select(cls).where(cls.import_date == date).where(cls.receiver_district_code == district_code)
+    async def find_by_district(cls, db_session: AsyncSession, date: str, code: str = "001"):
+        stmt = select(cls).where(cls.import_date == date).where(cls.receiver_district_code == code)
         result = await db_session.execute(stmt)
         instances = result.scalars().all()
 
