@@ -9,35 +9,35 @@ from scripts.api.database import *
 router = APIRouter()
 
 
-@router.get("")
-async def get_all_rows(
-    batch: int = 10,
-    db_session: AsyncSession = Depends(get_db)
-):
-    try:
-        result = await models.API.find_by_batch(db_session, batch)
-    except SQLAlchemyError as e:
-        return {
-            "error": True,
-            "message": "Request to the API can not be processed",
-            "data": {}
-        }
-    else:
-        if result is None:
-            return {
-                "error": True,
-                "message": "Resources not found",
-                "data": [],
-            }
-        else:
-            return {
-                "error": False,
-                "message": "",
-                "data": result,
-            }
+# @router.post("")
+# async def get_all_rows(
+#     batch: int = 10,
+#     db_session: AsyncSession = Depends(get_db)
+# ):
+#     try:
+#         result = await models.API.find_by_batch(db_session, batch)
+#     except SQLAlchemyError as e:
+#         return {
+#             "error": True,
+#             "message": "Request to the API can not be processed",
+#             "data": {}
+#         }
+#     else:
+#         if result is None:
+#             return {
+#                 "error": True,
+#                 "message": "Resources not found",
+#                 "data": [],
+#             }
+#         else:
+#             return {
+#                 "error": False,
+#                 "message": "",
+#                 "data": result,
+#             }
 
 
-@router.get("/district")
+@router.post("")
 async def get_rows_by_district_code(
     district_code: str = "001",
     db_session: AsyncSession = Depends(get_db)

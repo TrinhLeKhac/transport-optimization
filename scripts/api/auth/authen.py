@@ -6,7 +6,7 @@ from scripts.api.schemas import LoginModel
 router = APIRouter()
 
 
-@router.post('')
+@router.post("")
 def login(request_data: LoginModel):
     print(f'[x] request_data: {request_data.__dict__}')
     if verify_password(username=request_data.username, password=request_data.password):
