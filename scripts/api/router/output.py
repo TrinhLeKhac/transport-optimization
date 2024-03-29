@@ -11,11 +11,12 @@ router = APIRouter()
 
 @router.post("")
 async def get_rows_by_district_code(
+    date: str,
     district_code: str = "001",
     db_session: AsyncSession = Depends(get_db)
 ):
     try:
-        result = await models.API.find_by_district(db_session, district_code)
+        result = await models.API.find_by_district(db_session, date, district_code)
     except SQLAlchemyError as e:
         return {
             "error": True,

@@ -78,13 +78,13 @@ class API(Base):
     score_ranking: Mapped[int] = mapped_column(Integer)
     # total_order: Mapped[int] = mapped_column(Integer)
     # rate_ranking: Mapped[int] = mapped_column(Integer)
-    # import_date: Mapped[str] = mapped_column(String(10))
+    import_date: Mapped[str] = mapped_column(String(10))
 
     __table_args__ = (PrimaryKeyConstraint("id", name="data_api_pkey"), {"schema": "db_schema"})
 
     @classmethod
-    async def find_by_district(cls, db_session: AsyncSession, district_code: str = "001"):
-        stmt = select(cls).where(cls.receiver_district_code == district_code)
+    async def find_by_district(cls, db_session: AsyncSession, date: str, district_code: str = "001"):
+        stmt = select(cls).where(cls.import_date == date).where(cls.receiver_district_code == district_code)
         result = await db_session.execute(stmt)
         instances = result.scalars().all()
 
