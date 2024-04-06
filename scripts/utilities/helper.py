@@ -699,7 +699,6 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, 
         CASE WHEN insurance_fee != -1 THEN insurance_fee ELSE 0 END AS insurance_fee_modified,
         CASE WHEN collection_fee != -1 THEN collection_fee ELSE 0 END AS collection_fee_modified,
-        CASE WHEN redeem_fee != -1 THEN redeem_fee ELSE 0 END AS redeem_fee_modified,
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         price_ranking, speed_ranking, score_ranking
@@ -708,7 +707,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     
     carrier_information AS (
         SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, 
-        price + insurance_fee_modified + collection_fee_modified + redeem_fee_modified AS total_price,
+        price + insurance_fee_modified + collection_fee_modified + redeem_fee AS total_price,
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         price_ranking, speed_ranking, score_ranking
@@ -724,13 +723,13 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ) AS smallint) AS for_partner,
         price_ranking, speed_ranking, score_ranking
         FROM carrier_information
-        WHERE score >= optimal_score
+        WHERE (score >= optimal_score) AND (insurance_fee != -1) AND (collection_fee != -1)
     ), 
 
     -- Create carrier_information_below_tmp CTE by 
     -- FILTER carrier_information WHERE score < optimal_score and
     -- RANKING for_partner by score DESC
-
+    
     carrier_information_below_tmp1 AS (
         SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
         status, description, time_data, 
@@ -740,7 +739,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ) AS smallint) AS for_partner,
         price_ranking, speed_ranking, score_ranking
         FROM carrier_information
-        WHERE score < optimal_score
+        WHERE (score < optimal_score) AND (insurance_fee != -1) AND (collection_fee != -1)
     ),
 
     -- Create carrier_information_below CTE by 
@@ -766,10 +765,45 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     -- Create carrier_information_final CTE by 
     -- UNION carrier_information_above and carrier_information_below
 
-    carrier_information_union AS (
+    carrier_information_union_tmp1 AS (
         SELECT * FROM carrier_information_above
         UNION ALL
         SELECT * FROM carrier_information_below
+    ),
+    
+    carrier_information_refuse_tmp1 AS (
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+        status, description, time_data, 
+        time_display, rate, score, optimal_score, star, for_shop, 
+        CAST (DENSE_RANK() OVER (
+            ORDER BY score DESC
+        ) AS smallint) AS for_partner,
+        price_ranking, speed_ranking, score_ranking
+        FROM carrier_information
+        WHERE (insurance_fee = -1) OR (collection_fee = -1)
+    ),
+    
+    carrier_information_refuse_tmp2 AS (
+        SELECT * FROM carrier_information_refuse_tmp1
+        CROSS JOIN
+        -- using COALESCE in case 
+        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp1) AS tbl_max_idx_partner
+    ),
+
+    carrier_information_refuse AS (
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+        status, description, time_data, 
+        time_display, rate, score, optimal_score, star, for_shop, 
+        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
+        price_ranking, speed_ranking, score_ranking
+        FROM carrier_information_refuse_tmp2
+    ),
+    
+    carrier_information_union AS (
+        SELECT * FROM carrier_information_union_tmp1
+        UNION ALL
+        SELECT * FROM carrier_information_refuse
     ),
 
     -- UPDATE for_fshop EQUAL for_partner
@@ -777,7 +811,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, 
-        for_partner AS for_shop, -- UPDATE for_fshop = for_partner
+        for_partner AS for_shop, -- UPDATE for_shop = for_partner
         for_partner,
         price_ranking, speed_ranking, score_ranking FROM carrier_information_union
     )
