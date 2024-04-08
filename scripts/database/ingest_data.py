@@ -151,7 +151,7 @@ if __name__ == '__main__':
     parser.add_option(
         '-m', '--mode',
         action="store", dest="mode",
-        help="mode string", default=True
+        help="mode string", default="init"
     )
     parser.add_option(
         '-d', '--run_date',

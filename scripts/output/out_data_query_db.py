@@ -91,7 +91,7 @@ if __name__ == '__main__':
     parser.add_option(
         '-m', '--mode',
         action="store", dest="mode",
-        help="mode string", default=True
+        help="mode string", default="init"
     )
     options, args = parser.parse_args()
     # print(options.mode)
