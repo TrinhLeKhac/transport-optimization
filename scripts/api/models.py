@@ -81,24 +81,3 @@ class API(Base):
     import_date: Mapped[str] = mapped_column(String(10))
 
     __table_args__ = (PrimaryKeyConstraint("id", name="data_api_pkey"), {"schema": "db_schema"})
-
-    @classmethod
-    async def find_by_district(cls, db_session: AsyncSession, date: str, code: str = "001"):
-        stmt = select(cls).where(cls.import_date == date).where(cls.receiver_district_code == code)
-        result = await db_session.execute(stmt)
-        instances = result.scalars().all()
-
-        return instances
-
-        # if instances is None:
-        #     return {
-        #         "error": True,
-        #         "message": "Resources not found",
-        #         "data": [],
-        #     }
-        # else:
-        #     return {
-        #         "error": False,
-        #         "message": "",
-        #         "data": instances,
-        #     }
