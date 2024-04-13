@@ -24,14 +24,19 @@ if [ -z "$3" ]
     run_date=$(date +%F)
 fi
 
+echo $mode
+echo $run_date
+echo $get_data
+
 # Change cwd to the project's directory
-cd ~/superai
+#cd ~/superai
+cd ~/Desktop/superai
 
 # Active virtual environment
 source ./venv/bin/activate &&
 
 # Stop module supervisord for updating data
-sudo systemctl stop supervisord &&
+#sudo systemctl stop supervisord &&
 
 # Run script processing data
 python ./scripts/processing/total_processing.py --mode $get_data --run_date $run_date &&
@@ -46,10 +51,10 @@ python ./scripts/output/out_data_final.py --run_date $run_date &&
 python ./scripts/output/out_data_query_db.py --mode $mode &&
 
 # Run script ingest data to database
-python ./scripts/database/ingest_data.py --mode $mode --run_date $run_date &&
+python ./scripts/database/ingest_data.py --mode $mode --run_date $run_date
 
 # Start again module supervisord after updating data
-sudo systemctl start supervisord &&
+#sudo systemctl start supervisord &&
 
 # Call python module to alert SUCCESS to telegram group
-python -c "from scripts.utilities.helper import *; telegram_bot_send_success_message()"
+#python -c "from scripts.utilities.helper import *; telegram_bot_send_success_message()"
