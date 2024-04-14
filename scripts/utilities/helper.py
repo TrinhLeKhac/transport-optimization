@@ -449,11 +449,11 @@ QUERY_SQL_COMMAND_API = """
         AND tbl_fee.weight = CEIL({}/500.0)*500 
         AND tbl_fee.pickup = '{}'
     ),
-
+    
     -- Create carrier_information_above CTE by 
     -- FILTER carrier_information WHERE score >= optimal_score and
     -- RANKING for_partner by price ASC
-
+    
     carrier_information_above AS (
         SELECT carrier_id, route_type, price, status, description, time_data, 
         time_display, rate, score, star, for_shop, 
@@ -464,11 +464,11 @@ QUERY_SQL_COMMAND_API = """
         FROM carrier_information
         WHERE (score >= optimal_score) AND (description != 'Quá tải')
     ), 
-
+    
     -- Create carrier_information_below_tmp CTE by 
     -- FILTER carrier_information WHERE score < optimal_score and
     -- RANKING for_partner by score DESC
-
+    
     carrier_information_below_tmp1 AS (
         SELECT carrier_id, route_type, price, status, description, time_data, 
         time_display, rate, score, star, for_shop, 
@@ -479,10 +479,10 @@ QUERY_SQL_COMMAND_API = """
         FROM carrier_information
         WHERE (score < optimal_score) AND (description != 'Quá tải')
     ),
-
+    
     -- Create carrier_information_below CTE by 
     -- ADD for_partner with max_idx_partner in carrier_information_above CTE
-
+    
     carrier_information_below_tmp2 AS (
         SELECT * FROM carrier_information_below_tmp1
         CROSS JOIN
@@ -490,7 +490,7 @@ QUERY_SQL_COMMAND_API = """
         -- n_rows of carrier_information_above == 0 => max_idx_partner is Null
         (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_above) AS tbl_max_idx_partner
     ),
-
+    
     carrier_information_below AS (
         SELECT carrier_id, route_type, price, status, description, time_data, 
         time_display, rate, score, star, for_shop, 
@@ -498,10 +498,10 @@ QUERY_SQL_COMMAND_API = """
         price_ranking, speed_ranking, score_ranking
         FROM carrier_information_below_tmp2
     ),
-
+    
     -- Create carrier_information_final CTE by 
     -- UNION carrier_information_above and carrier_information_below
-
+    
     carrier_information_union_tmp1 AS (
         SELECT * FROM carrier_information_above
         UNION ALL
@@ -509,9 +509,8 @@ QUERY_SQL_COMMAND_API = """
     ),
     
     carrier_information_overload_tmp1 AS (
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
-        status, description, time_data, 
-        time_display, rate, score, optimal_score, star, for_shop, 
+        SELECT carrier_id, route_type, price, status, description, time_data, 
+        time_display, rate, score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
             ORDER BY score DESC
         ) AS smallint) AS for_partner,
@@ -523,15 +522,12 @@ QUERY_SQL_COMMAND_API = """
     carrier_information_overload_tmp2 AS (
         SELECT * FROM carrier_information_overload_tmp1
         CROSS JOIN
-        -- using COALESCE in case 
-        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null
         (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp1) AS tbl_max_idx_partner
     ),
-
+    
     carrier_information_overload AS (
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
-        status, description, time_data, 
-        time_display, rate, score, optimal_score, star, for_shop, 
+        SELECT carrier_id, route_type, price, status, description, time_data, 
+        time_display, rate, score, star, for_shop, 
         for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
         price_ranking, speed_ranking, score_ranking
         FROM carrier_information_overload_tmp2
@@ -542,7 +538,7 @@ QUERY_SQL_COMMAND_API = """
         UNION ALL
         SELECT * FROM carrier_information_overload
     ),
-
+    
     -- UPDATE for_fshop EQUAL for_partner
     carrier_information_final AS (
         SELECT carrier_id, route_type, price, status, description, time_data, 
@@ -551,7 +547,7 @@ QUERY_SQL_COMMAND_API = """
         for_partner,
         price_ranking, speed_ranking, score_ranking FROM carrier_information_union
     )
-
+    
     SELECT * FROM carrier_information_final ORDER BY carrier_id;
 """
 
@@ -821,8 +817,6 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     carrier_information_overload_tmp2 AS (
         SELECT * FROM carrier_information_overload_tmp1
         CROSS JOIN
-        -- using COALESCE in case 
-        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null
         (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp1) AS tbl_max_idx_partner
     ),
 
@@ -856,8 +850,6 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     carrier_information_refuse_tmp2 AS (
         SELECT * FROM carrier_information_refuse_tmp1
         CROSS JOIN
-        -- using COALESCE in case 
-        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null
         (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp2) AS tbl_max_idx_partner
     ),
 
