@@ -61,13 +61,12 @@ TABLE_SCHEMA = {
     #     "import_time": TIMESTAMP,
     # },
     'tbl_ngung_giao_nhan': {
-        "receiver_province": VARCHAR(length=30),
-        "receiver_district": VARCHAR(length=30),
-        'carrier': VARCHAR(length=30),
+        'sender_province_code': VARCHAR(length=2),
+        'sender_district_code': VARCHAR(length=3),
+        'receiver_province_code': VARCHAR(length=2),
+        'receiver_district_code': VARCHAR(length=3),
+        'carrier_id': SMALLINT,
         'status': VARCHAR(length=500),
-        'score': SMALLINT,
-        'criteria': VARCHAR(length=50),
-        'criteria_weight': SMALLINT,
         "import_time": TIMESTAMP,
     },
     'tbl_phan_vung_nvc': {
