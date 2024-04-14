@@ -20,11 +20,8 @@ ENGINE = create_engine(PORT)
 
 # (path, tbl_name, is_id_col, is_churn_size)
 config_init = [
-    (ROOT_PATH + '/processed_data/buu_cuc_best.parquet', 'tbl_buu_cuc_best', False, False),
-    (ROOT_PATH + '/processed_data/buu_cuc_ghn.parquet', 'tbl_buu_cuc_ghn', False, False),
-    (ROOT_PATH + '/processed_data/buu_cuc_ghtk.parquet', 'tbl_buu_cuc_ghtk', False, False),
-    (ROOT_PATH + '/processed_data/buu_cuc_ninja_van.parquet', 'tbl_buu_cuc_ninja_van', False, False),
     (ROOT_PATH + '/processed_data/phan_vung_nvc.parquet', 'tbl_phan_vung_nvc', False, False),
+    (ROOT_PATH + '/transform/buu_cuc.parquet', 'tbl_buu_cuc', False, False),
     (ROOT_PATH + '/output/data_order_type.parquet', 'tbl_order_type', False, True),
     (ROOT_PATH + '/output/service_fee.parquet', 'tbl_service_fee', False, False),
 ]
@@ -32,8 +29,8 @@ config_init = [
 # ------------------------------------ config daily ------------------------------------
 
 config_daily = [
-    (ROOT_PATH + '/processed_data/chat_luong_noi_bo_njv.parquet', 'tbl_clnb_ninja_van', False, False),
-    (ROOT_PATH + '/processed_data/ngung_giao_nhan.parquet', 'tbl_ngung_giao_nhan', False, False),
+    (ROOT_PATH + '/transform/chat_luong_noi_bo_njv.parquet', 'tbl_clnb_ninja_van', False, False),
+    (ROOT_PATH + '/transform/ngung_giao_nhan.parquet', 'tbl_ngung_giao_nhan', False, False),
     (ROOT_PATH + '/output/data_api.parquet', 'tbl_data_api', True, False),
     (ROOT_PATH + '/output/total_optimal_score.parquet', 'tbl_optimal_score', False, False),
     # (ROOT_PATH + '/output/data_visualization.parquet', 'tbl_data_visualization', True, True),

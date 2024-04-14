@@ -2,6 +2,7 @@ import optparse
 import sys
 from datetime import datetime
 from pathlib import Path
+import os
 
 from scripts.transform.don_ton_dong import get_khu_vuc_ton_dong
 
@@ -17,6 +18,9 @@ from scripts.transform.ti_le_giao_hang import transform_data_ti_le_giao_hang
 
 
 def total_transform(run_date_str, show_logs=True):
+
+    if not os.path.exists(ROOT_PATH + '/transform'):
+        os.makedirs(ROOT_PATH + '/transform')
 
     if show_logs:
         print('1. Transform data kho giao nhận...')

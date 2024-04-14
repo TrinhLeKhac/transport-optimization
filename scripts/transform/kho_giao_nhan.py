@@ -76,4 +76,7 @@ def transform_data_kho_giao_nhan():
     # Kiểm tra data kho giao nhan
     assert kho_giao_nhan.isna().sum().all() == 0, 'Transform data có vấn đề'
 
-    return kho_giao_nhan[['receiver_province', 'receiver_district', 'carrier', 'status', 'score', 'criteria', 'criteria_weight']]
+    kho_giao_nhan = kho_giao_nhan[['receiver_province', 'receiver_district', 'carrier', 'status', 'score', 'criteria', 'criteria_weight']]
+    kho_giao_nhan.to_parquet(ROOT_PATH + '/transform/buu_cuc.parquet', index=False)
+
+    return kho_giao_nhan

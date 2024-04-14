@@ -46,4 +46,7 @@ def transform_data_chat_luong_noi_bo():
     chat_luong_noi_bo_df['criteria'] = 'Chất lượng nội bộ'
     chat_luong_noi_bo_df['criteria_weight'] = TRONG_SO['Chất lượng nội bộ']['Tiêu chí']
 
-    return chat_luong_noi_bo_df[['receiver_province', 'receiver_district', 'carrier', 'status', 'score', 'criteria', 'criteria_weight']]
+    chat_luong_noi_bo_df = chat_luong_noi_bo_df[['receiver_province', 'receiver_district', 'carrier', 'status', 'score', 'criteria', 'criteria_weight']]
+    chat_luong_noi_bo_df.to_parquet(ROOT_PATH + '/transform/chat_luong_noi_bo_njv.parquet', index=False)
+
+    return chat_luong_noi_bo_df

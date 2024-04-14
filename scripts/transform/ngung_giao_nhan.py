@@ -20,4 +20,7 @@ def transform_data_ngung_giao_nhan():
     ngung_giao_nhan_df['criteria'] = 'Ngưng giao nhận'
     ngung_giao_nhan_df['criteria_weight'] = TRONG_SO['Ngưng giao nhận']['Tiêu chí']
 
-    return ngung_giao_nhan_df[['receiver_province', 'receiver_district', 'carrier', 'status', 'score', 'criteria', 'criteria_weight']]
+    ngung_giao_nhan_df = ngung_giao_nhan_df[['receiver_province', 'receiver_district', 'carrier', 'status', 'score', 'criteria', 'criteria_weight']]
+    ngung_giao_nhan_df.to_parquet(ROOT_PATH + '/transform/ngung_giao_nhan.parquet', index=False)
+
+    return ngung_giao_nhan_df
