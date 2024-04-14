@@ -723,7 +723,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ) AS smallint) AS for_partner,
         price_ranking, speed_ranking, score_ranking
         FROM carrier_information
-        WHERE (score >= optimal_score) AND (insurance_fee != -1) AND (collection_fee != -1)
+        WHERE (score >= optimal_score) AND (insurance_fee != -1) AND (collection_fee != -1) AND (description != 'Quá tải')
     ), 
 
     -- Create carrier_information_below_tmp CTE by 
@@ -739,7 +739,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ) AS smallint) AS for_partner,
         price_ranking, speed_ranking, score_ranking
         FROM carrier_information
-        WHERE (score < optimal_score) AND (insurance_fee != -1) AND (collection_fee != -1)
+        WHERE (score < optimal_score) AND (insurance_fee != -1) AND (collection_fee != -1) AND (description != 'Quá tải')
     ),
 
     -- Create carrier_information_below CTE by 
@@ -780,7 +780,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ) AS smallint) AS for_partner,
         price_ranking, speed_ranking, score_ranking
         FROM carrier_information
-        WHERE (insurance_fee = -1) OR (collection_fee = -1)
+        WHERE (insurance_fee = -1) OR (collection_fee = -1) OR (description = 'Quá tải')
     ),
     
     carrier_information_refuse_tmp2 AS (
