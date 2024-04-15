@@ -60,36 +60,6 @@ def merge_left_only(df1, df2, keys=list()):
     return result
 
 
-def get_data_province_mapping_district():
-    response = requests.get('https://api.mysupership.vn/v1/partner/areas/province', verify=False).json()
-
-    province_df = pd.DataFrame(data={
-        'province_code': [c['code'] for c in response['results']],
-        'province': [c['name'] for c in response['results']]
-    })
-
-    list_df = []
-    for province_code in province_df['province_code'].tolist():
-        result = requests.get('https://api.mysupership.vn/v1/partner/areas/district?province={}'.format(province_code),
-                              verify=False).json()['results']
-        for c in result:
-            tmp_df = pd.DataFrame(data={
-                'district_code': [c['code']],
-                'district': [c['name']],
-                'province_code': [province_code]
-            })
-            list_df.append(tmp_df)
-    district_df = pd.concat(list_df, ignore_index=True)
-
-    province_district_df = (
-        province_df.merge(
-            district_df, on='province_code', how='inner')
-        .sort_values(['province_code', 'district_code'])
-        .reset_index(drop=True)
-    )
-    province_district_df.to_parquet(ROOT_PATH + '/input/province_mapping_district.parquet', index=False)
-
-
 PROVINCE_MAPPING_DISTRICT_DF = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
 
 active_carrier_df = pd.DataFrame(data={'carrier': ACTIVE_CARRIER})
