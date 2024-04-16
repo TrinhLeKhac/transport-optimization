@@ -48,7 +48,7 @@ def get_latest_province_mapping_district_json():
         district_list = [item['name'] for item in district_api_res]
         province_mapping_district_dict[province] = district_list
 
-    with open(ROOT_PATH + '/input/province_mapping_district_from_api.json') as file:
+    with open(ROOT_PATH + '/input/province_mapping_district_from_api.json', 'w') as file:
         json.dump(province_mapping_district_dict, file)
 
 
