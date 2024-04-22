@@ -31,7 +31,7 @@ cd ~/superai
 source ./venv/bin/activate &&
 
 # Stop module supervisord for updating data
-sudo systemctl stop supervisord &&
+#sudo systemctl stop supervisord &&
 
 # Run script processing data
 python ./scripts/processing/total_processing.py --mode $get_data --run_date $run_date &&
@@ -49,7 +49,7 @@ python ./scripts/output/out_data_query_db.py --mode $mode &&
 python ./scripts/database/ingest_data.py --mode $mode --run_date $run_date &&
 
 # Start again module supervisord after updating data
-sudo systemctl start supervisord &&
+#sudo systemctl start supervisord &&
 
 # Call python module to alert SUCCESS to telegram group
 python -c "from scripts.utilities.helper import *; telegram_bot_send_success_message()"
