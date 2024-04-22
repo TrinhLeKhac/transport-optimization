@@ -414,7 +414,7 @@ QUERY_SQL_COMMAND_API = """
         INNER JOIN db_schema.tbl_service_fee tbl_fee
         ON tbl_ord.carrier_id = tbl_fee.carrier_id
         AND tbl_ord.order_type = tbl_fee.order_type
-        INNER JOIN db_schema.tbl_ngung_giao_nhan tbl_ngn
+        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code
         AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code
@@ -556,7 +556,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         INNER JOIN db_schema.tbl_service_fee tbl_fee
         ON tbl_ord.carrier_id = tbl_fee.carrier_id
         AND tbl_ord.order_type = tbl_fee.order_type
-        INNER JOIN db_schema.tbl_ngung_giao_nhan tbl_ngn
+        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code
         AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code
