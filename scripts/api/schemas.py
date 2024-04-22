@@ -96,12 +96,16 @@ class Price(BaseModel):
     value: conint(gt=0, strict=True)
 
 
+class PriceList(BaseModel):
+    items: List[Price]
+
+
 class SuggestCarrierInputSuper(BaseModel):
     sender_province: constr(max_length=2, strict=True)
     sender_district: constr(max_length=3, strict=True)
     receiver_province: constr(max_length=2, strict=True)
     receiver_district: constr(max_length=3, strict=True)
-    price: List[Price]
+    price: PriceList
     weight: conint(gt=0, le=50000, strict=True)
     pickup: constr(max_length=1, strict=True)
 
