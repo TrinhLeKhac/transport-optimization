@@ -24,7 +24,6 @@ class MessageZNSModel(BaseModel):
 
 
 class OrderModel(BaseModel):
-
     order_code: constr(max_length=30, strict=True)
     created_at: constr(max_length=20, strict=True)
     weight: conint(gt=0, strict=True)
@@ -50,7 +49,6 @@ class OrderModel(BaseModel):
 
 
 class APIModel(BaseModel):
-
     province_code: constr(max_length=2, strict=True)
     district_code: constr(max_length=3, strict=True)
     carrier_id: conint(strict=True)
@@ -77,6 +75,33 @@ class SuggestCarrierInput(BaseModel):
     sender_district: constr(max_length=3, strict=True)
     receiver_province: constr(max_length=2, strict=True)
     receiver_district: constr(max_length=3, strict=True)
+    weight: conint(gt=0, le=50000, strict=True)
+    pickup: constr(max_length=1, strict=True)
+
+
+class SuggestCarrierInputFinal(BaseModel):
+    sender_province: constr(max_length=2, strict=True)
+    sender_district: constr(max_length=3, strict=True)
+    receiver_province: constr(max_length=2, strict=True)
+    receiver_district: constr(max_length=3, strict=True)
+    weight: conint(gt=0, le=50000, strict=True)
+    value: conint(ge=0, strict=True)
+    collection: conint(ge=0, strict=True)
+    barter: constr(strict=True)
+    pickup: constr(max_length=1, strict=True)
+
+
+class Price(BaseModel):
+    id: constr(max_length=2, strict=True)
+    value: conint(gt=0, strict=True)
+
+
+class SuggestCarrierInputSuper(BaseModel):
+    sender_province: constr(max_length=2, strict=True)
+    sender_district: constr(max_length=3, strict=True)
+    receiver_province: constr(max_length=2, strict=True)
+    receiver_district: constr(max_length=3, strict=True)
+    price: List[Price]
     weight: conint(gt=0, le=50000, strict=True)
     pickup: constr(max_length=1, strict=True)
 
