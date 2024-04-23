@@ -407,4 +407,7 @@ def create_analytic_tab(run_date_str):
             save_excel(failed_df, key='failed')
         # ----------------------------------------------------------------------------------------------
         div_3, _, _ = st.columns(3)
-        div_3.info(f"👉 :red[**Tỉ lệ giao thành công**]: :red[**{round(len(success_df)/(len(success_df) + len(failed_df))*100, 2)}%**]")
+        try:
+            div_3.info(f"👉 :red[**Tỉ lệ giao thành công**]: :red[**{round(len(success_df)/(len(success_df) + len(failed_df))*100, 2)}%**]")
+        except:
+            div_3.warning(f"👉 :red[**Tổng số đơn giao**]: :red[**{len(success_df) + len(failed_df)}%**]")

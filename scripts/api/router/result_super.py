@@ -7,12 +7,11 @@ from scripts.utilities.helper import QUERY_SQL_COMMAND_API
 router = APIRouter()
 
 
-def execute_query(
-    sender_province_code, sender_district_code,
-    receiver_province_code, receiver_district_code,
-    price, weight, pickup
+def execute_query_super(
+        sender_province_code, sender_district_code,
+        receiver_province_code, receiver_district_code,
+        price, weight, pickup
 ):
-
     # Create connection
     connection = psycopg2.connect(
         settings.SQLALCHEMY_DATABASE_URI
@@ -49,11 +48,12 @@ def calculate(data: schemas.SuggestCarrierInputSuper):
     sender_district_code = data.sender_district
     receiver_province_code = data.receiver_province
     receiver_district_code = data.receiver_district
-    price = data.price
+    # price = data.price  # ===> List[Price]
+    price = data.price.model_dump()  # ===> List[dict]
     weight = data.weight
     pickup = data.pickup
 
-    result = execute_query(
+    result = execute_query_super(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
         price, weight, pickup

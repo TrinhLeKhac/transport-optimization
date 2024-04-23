@@ -7,7 +7,7 @@ from scripts.utilities.helper import QUERY_SQL_COMMAND_STREAMLIT
 router = APIRouter()
 
 
-def execute_query(
+def execute_query_final(
     sender_province_code, sender_district_code,
     receiver_province_code, receiver_district_code,
     weight, value, collection, barter, pickup
@@ -58,7 +58,7 @@ def calculate(data: schemas.SuggestCarrierInputFinal):
     barter = data.barter
     pickup = data.pickup
 
-    result = execute_query(
+    result = execute_query_final(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
         weight, value, collection, barter, pickup
