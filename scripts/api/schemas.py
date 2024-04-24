@@ -85,9 +85,9 @@ class SuggestCarrierInputFinal(BaseModel):
     receiver_province: constr(max_length=2, strict=True)
     receiver_district: constr(max_length=3, strict=True)
     weight: conint(gt=0, le=50000, strict=True)
-    value: conint(ge=0, strict=True)
     collection: conint(ge=0, strict=True)
-    barter: constr(strict=True)
+    value: conint(ge=0, strict=True)
+    barter: constr(max_length=1, strict=True)
     pickup: constr(max_length=1, strict=True)
 
 

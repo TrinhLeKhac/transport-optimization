@@ -2,7 +2,7 @@ import psycopg2
 from fastapi import APIRouter
 from scripts.api import schemas
 from scripts.api.database import *
-from scripts.utilities.helper import QUERY_SQL_COMMAND_STREAMLIT
+from scripts.utilities.helper import QUERY_SQL_COMMAND_API_FINAL
 
 router = APIRouter()
 
@@ -22,7 +22,7 @@ def execute_query_final(
 
     barter = "Có" if barter == "1" else "Không"
 
-    table_query = QUERY_SQL_COMMAND_STREAMLIT.format(
+    table_query = QUERY_SQL_COMMAND_API_FINAL.format(
         value, collection, barter,
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
@@ -53,8 +53,8 @@ def calculate(data: schemas.SuggestCarrierInputFinal):
     receiver_province_code = data.receiver_province
     receiver_district_code = data.receiver_district
     weight = data.weight
-    value = data.value
     collection = data.collection
+    value = data.value
     barter = data.barter
     pickup = data.pickup
 
