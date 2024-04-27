@@ -402,9 +402,6 @@ QUERY_SQL_COMMAND_API = """
         ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
         tbl_optimal_score.optimal_score, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY tbl_fee.price ASC
-        ) AS smallint) AS price_ranking
         FROM db_schema.tbl_order_type tbl_ord
         INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api
         ON tbl_ord.carrier_id = tbl_api.carrier_id
@@ -437,7 +434,7 @@ QUERY_SQL_COMMAND_API = """
         CAST (DENSE_RANK() OVER (
             ORDER BY price ASC
         ) AS smallint) AS for_partner,
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information
         WHERE (score >= optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải')
     ), 
@@ -452,7 +449,7 @@ QUERY_SQL_COMMAND_API = """
         CAST (DENSE_RANK() OVER (
             ORDER BY score DESC
         ) AS smallint) AS for_partner,
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information
         WHERE (score < optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải')
     ),
@@ -472,7 +469,7 @@ QUERY_SQL_COMMAND_API = """
         SELECT carrier_id, route_type, price, status, description, time_data, 
         time_display, rate, score, star, for_shop, 
         for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_below_tmp2
     ),
     
@@ -491,7 +488,7 @@ QUERY_SQL_COMMAND_API = """
         CAST (DENSE_RANK() OVER (
             ORDER BY score DESC
         ) AS smallint) AS for_partner,
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information
         WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải')
     ),
@@ -506,7 +503,7 @@ QUERY_SQL_COMMAND_API = """
         SELECT carrier_id, route_type, price, status, description, time_data, 
         time_display, rate, score, star, for_shop, 
         for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_overload_tmp2
     ),
     
@@ -522,7 +519,10 @@ QUERY_SQL_COMMAND_API = """
         time_display, rate, score, star, 
         for_partner AS for_shop, -- UPDATE for_fshop = for_partner
         for_partner,
-        price_ranking, speed_ranking, score_ranking FROM carrier_information_union
+        CAST (DENSE_RANK() OVER (
+            ORDER BY price ASC
+        ) AS smallint) AS price_ranking 
+        speed_ranking, score_ranking FROM carrier_information_union
     )
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id;
@@ -538,9 +538,6 @@ QUERY_SQL_COMMAND_API_FINAL = """
         tbl_api.time_display, tbl_api.rate, tbl_api.score, tbl_api.star, 
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
         tbl_optimal_score.optimal_score, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY tbl_fee.price ASC
-        ) AS smallint) AS price_ranking,
         CAST('{}' AS INTEGER) AS item_price,
         CAST('{}' AS INTEGER) AS money_get_first,
         '{}' AS is_returned
@@ -701,7 +698,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         END AS redeem_fee,
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_tmp1
         ), 
         
@@ -711,7 +708,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         CASE WHEN collection_fee != -1 THEN collection_fee ELSE 0 END AS collection_fee_modified,
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_tmp2
         ), 
         
@@ -720,7 +717,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         price + insurance_fee_modified + collection_fee_modified + redeem_fee AS total_price,
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_tmp3
         ), 
         
@@ -731,7 +728,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         CAST (DENSE_RANK() OVER (
             ORDER BY total_price ASC -- price
         ) AS smallint) AS for_partner,
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information
         WHERE 
             (score >= optimal_score) 
@@ -752,7 +749,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         CAST (DENSE_RANK() OVER (
             ORDER BY score DESC
         ) AS smallint) AS for_partner,
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information
         WHERE 
             (score < optimal_score) 
@@ -778,7 +775,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_below_tmp2
         ),
         
@@ -798,7 +795,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         CAST (DENSE_RANK() OVER (
             ORDER BY score DESC
         ) AS smallint) AS for_partner,
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information
         WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải')
         ),
@@ -814,7 +811,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_overload_tmp2
         ),
         
@@ -831,7 +828,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         CAST (DENSE_RANK() OVER (
             ORDER BY score DESC
         ) AS smallint) AS for_partner,
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information
         WHERE 
             ((insurance_fee = -1) OR (collection_fee = -1)) 
@@ -850,7 +847,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_refuse_tmp2
         ),
         
@@ -867,7 +864,10 @@ QUERY_SQL_COMMAND_API_FINAL = """
         time_display, rate, score, star, 
         for_partner AS for_shop, -- UPDATE for_shop = for_partner
         for_partner,
-        price_ranking, speed_ranking, score_ranking FROM carrier_information_union
+        CAST (DENSE_RANK() OVER (
+            ORDER BY total_price ASC
+        ) AS smallint) AS price_ranking, 
+        score_ranking FROM carrier_information_union
         )
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id;
@@ -885,9 +885,6 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         tbl_api.time_display, tbl_api.rate, tbl_api.score, tbl_api.star, 
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
         tbl_optimal_score.optimal_score, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY tbl_fee.price ASC
-        ) AS smallint) AS price_ranking,
         CAST('{}' AS INTEGER) AS item_price,
         CAST('{}' AS INTEGER) AS money_get_first,
         '{}' AS is_returned
@@ -1048,7 +1045,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         END AS redeem_fee,
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_tmp1
     ), 
     
@@ -1058,7 +1055,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         CASE WHEN collection_fee != -1 THEN collection_fee ELSE 0 END AS collection_fee_modified,
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_tmp2
     ), 
     
@@ -1067,7 +1064,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         price + insurance_fee_modified + collection_fee_modified + redeem_fee AS total_price,
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_tmp3
     ), 
 
@@ -1078,7 +1075,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         CAST (DENSE_RANK() OVER (
             ORDER BY total_price ASC -- price
         ) AS smallint) AS for_partner,
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information
         WHERE 
             (score >= optimal_score) 
@@ -1099,7 +1096,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         CAST (DENSE_RANK() OVER (
             ORDER BY score DESC
         ) AS smallint) AS for_partner,
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information
         WHERE 
             (score < optimal_score) 
@@ -1125,7 +1122,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_below_tmp2
     ),
 
@@ -1145,7 +1142,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         CAST (DENSE_RANK() OVER (
             ORDER BY score DESC
         ) AS smallint) AS for_partner,
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information
         WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải')
     ),
@@ -1161,7 +1158,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_overload_tmp2
     ),
     
@@ -1178,7 +1175,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         CAST (DENSE_RANK() OVER (
             ORDER BY score DESC
         ) AS smallint) AS for_partner,
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information
         WHERE 
             ((insurance_fee = -1) OR (collection_fee = -1)) 
@@ -1197,7 +1194,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        price_ranking, speed_ranking, score_ranking
+        speed_ranking, score_ranking
         FROM carrier_information_refuse_tmp2
     ),
     
@@ -1214,7 +1211,10 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         time_display, rate, score, optimal_score, star, 
         for_partner AS for_shop, -- UPDATE for_shop = for_partner
         for_partner,
-        price_ranking, speed_ranking, score_ranking FROM carrier_information_union
+        CAST (DENSE_RANK() OVER (
+            ORDER BY total_price ASC
+        ) AS smallint) AS price_ranking, 
+        speed_ranking, score_ranking FROM carrier_information_union
     )
 
     SELECT * FROM carrier_information_final ORDER BY carrier_id;
