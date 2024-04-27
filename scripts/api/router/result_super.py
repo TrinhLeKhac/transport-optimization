@@ -2,7 +2,7 @@ import psycopg2
 from fastapi import APIRouter
 from scripts.api import schemas
 from scripts.api.database import *
-from scripts.utilities.helper import QUERY_SQL_COMMAND_API
+from scripts.utilities.helper import QUERY_SQL_COMMAND_API_SUPER
 
 router = APIRouter()
 
@@ -10,7 +10,8 @@ router = APIRouter()
 def execute_query_super(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
-        price, weight, pickup
+        price,
+        # weight, pickup
 ):
     # Create connection
     connection = psycopg2.connect(
@@ -19,10 +20,11 @@ def execute_query_super(
 
     cursor = connection.cursor()
 
-    table_query = QUERY_SQL_COMMAND_API.format(
+    table_query = QUERY_SQL_COMMAND_API_SUPER.format(
+        *price,
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
-        price, weight, pickup
+        # weight, pickup
     )
 
     cursor.execute(table_query)
@@ -44,19 +46,19 @@ def execute_query_super(
 
 @router.post("")
 def calculate(data: schemas.SuggestCarrierInputSuper):
-    sender_province_code = data.sender_province
-    sender_district_code = data.sender_district
-    receiver_province_code = data.receiver_province
-    receiver_district_code = data.receiver_district
-    # price = data.price  # ===> List[Price]
-    price = data.price.model_dump()  # ===> List[dict]
-    weight = data.weight
-    pickup = data.pickup
+    sender_province_code = data['sender_province']
+    sender_district_code = data['sender_district']
+    receiver_province_code = data['receiver_province']
+    receiver_district_code = data['receiver_district']
+    price = [(item['id'], item['value']) for item in data['price']]
+    # weight = data['weight']
+    # pickup = data['pickup']
 
     result = execute_query_super(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
-        price, weight, pickup
+        price,
+        # weight, pickup
     )
 
     return {

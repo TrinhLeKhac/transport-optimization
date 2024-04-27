@@ -92,7 +92,7 @@ class SuggestCarrierInputFinal(BaseModel):
 
 
 class Price(BaseModel):
-    id: constr(max_length=2, strict=True)
+    id: conint(gt=1, strict=True)
     value: conint(gt=0, strict=True)
 
 
