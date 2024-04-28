@@ -401,7 +401,7 @@ QUERY_SQL_COMMAND_API = """
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
         ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
-        tbl_optimal_score.optimal_score, 
+        tbl_optimal_score.optimal_score
         FROM db_schema.tbl_order_type tbl_ord
         INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api
         ON tbl_ord.carrier_id = tbl_api.carrier_id
@@ -521,7 +521,7 @@ QUERY_SQL_COMMAND_API = """
         for_partner,
         CAST (DENSE_RANK() OVER (
             ORDER BY price ASC
-        ) AS smallint) AS price_ranking 
+        ) AS smallint) AS price_ranking, 
         speed_ranking, score_ranking FROM carrier_information_union
     )
     
@@ -541,7 +541,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
         ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
-        tbl_optimal_score.optimal_score, 
+        tbl_optimal_score.optimal_score
         FROM db_schema.tbl_order_type tbl_ord
         INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api
         ON tbl_ord.carrier_id = tbl_api.carrier_id
@@ -662,7 +662,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         for_partner,
         CAST (DENSE_RANK() OVER (
             ORDER BY price ASC
-        ) AS smallint) AS price_ranking 
+        ) AS smallint) AS price_ranking, 
         speed_ranking, score_ranking FROM carrier_information_union
     )
 
@@ -1008,7 +1008,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         CAST (DENSE_RANK() OVER (
             ORDER BY total_price ASC
         ) AS smallint) AS price_ranking, 
-        score_ranking FROM carrier_information_union
+        speed_ranking, score_ranking FROM carrier_information_union
         )
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id;
