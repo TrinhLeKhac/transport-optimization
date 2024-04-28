@@ -20,8 +20,9 @@ def execute_query_super(
 
     cursor = connection.cursor()
 
+    price_stm = ", ".join(["({}, {})".format(c, p) for c, p in price])
     table_query = QUERY_SQL_COMMAND_API_SUPER.format(
-        *price,
+        price_stm,
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
         # weight, pickup
