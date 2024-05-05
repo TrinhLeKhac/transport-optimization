@@ -432,7 +432,7 @@ QUERY_SQL_COMMAND_API = """
         SELECT carrier_id, route_type, price, status, description, time_data, 
         time_display, rate, score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY price ASC
+            ORDER BY price ASC, score DESC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -447,7 +447,7 @@ QUERY_SQL_COMMAND_API = """
         SELECT carrier_id, route_type, price, status, description, time_data, 
         time_display, rate, score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC
+            ORDER BY score DESC, price ASC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -486,7 +486,7 @@ QUERY_SQL_COMMAND_API = """
         SELECT carrier_id, route_type, price, status, description, time_data, 
         time_display, rate, score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC
+            ORDER BY score DESC, price ASC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -573,7 +573,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         SELECT carrier_id, route_type, price, status, description, time_data, 
         time_display, rate, score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY price ASC
+            ORDER BY price ASC, score DESC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -588,7 +588,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         SELECT carrier_id, route_type, price, status, description, time_data, 
         time_display, rate, score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC
+            ORDER BY score DESC, price ASC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -627,7 +627,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         SELECT carrier_id, route_type, price, status, description, time_data, 
         time_display, rate, score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC
+            ORDER BY score DESC, price ASC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -867,7 +867,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY total_price ASC -- price
+            ORDER BY total_price ASC, score DESC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -888,7 +888,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC
+            ORDER BY score DESC, total_price ASC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -934,7 +934,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC
+            ORDER BY score DESC, total_price ASC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -967,7 +967,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC
+            ORDER BY score DESC, total_price ASC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -1216,7 +1216,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY total_price ASC -- price
+            ORDER BY total_price ASC, score DESC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -1237,7 +1237,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC
+            ORDER BY score DESC, total_price ASC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -1283,7 +1283,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC
+            ORDER BY score DESC, total_price ASC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
@@ -1316,7 +1316,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC
+            ORDER BY score DESC, total_price ASC
         ) AS smallint) AS for_partner,
         speed_ranking, score_ranking
         FROM carrier_information
