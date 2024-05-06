@@ -329,7 +329,7 @@ def find_intersection(x1, y1, x2, y2, x3, y3, x4, y4):
     return px, py
 
 
-def get_optimal_point(run_date_str, step=2):
+def get_optimal_point(run_date_str, delta=0.9, step=2):
     input_df = pd.read_parquet(ROOT_PATH + '/output/st_data_visualization_p1.parquet',
                                columns=['score', 'monetary', 'total_error'])
     target_df = input_df.drop_duplicates().reset_index(drop=True)
@@ -363,7 +363,7 @@ def get_optimal_point(run_date_str, step=2):
 
         if (R[0] >= target_df.loc[idx, 'score']) and (R[0] <= target_df.loc[idx + step, 'score']):
             optimal_point = idx + step // 2
-            score = target_df.loc[optimal_point, 'score']
+            score = target_df.loc[optimal_point, 'score'] - delta
             score = round(score, 3)
             break
     print('Optimal score: ', score)
