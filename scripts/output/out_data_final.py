@@ -345,6 +345,7 @@ def get_optimal_point(run_date_str, delta=0.9, step=2):
     error_range = error_max - error_min
     scale = monetary_range / error_range
 
+    score = 2.75
     for idx in range(len(target_df) - step):
         # print(idx)
         # (x - amin)/(amax - amin) = (y - bmin)/(bmax - bmin)
@@ -365,6 +366,7 @@ def get_optimal_point(run_date_str, delta=0.9, step=2):
             optimal_point = idx + step // 2
             score = target_df.loc[optimal_point, 'score'] - delta
             score = round(score, 3)
+            print('>>> FOUND OPTIMAL SCORE !!!')
             break
     print('Optimal score: ', score)
     try:
@@ -392,9 +394,9 @@ if __name__ == '__main__':
     else:
         print('Out data visualization...')
     try:
-        out_data_final(run_date_str=options.run_date, include_supership=include_supership)
+        out_data_final(run_date_str=options.run_date, carriers=ACTIVE_CARRIER, show_logs=False, include_supership=include_supership)
         get_data_viz()
-        get_optimal_point(run_date_str=options.run_date)
+        get_optimal_point(run_date_str=options.run_date, delta=0.9, step=2)
     except Exception as e:
         error = type(e).__name__ + " – " + str(e)
         telegram_bot_send_error_message(error)

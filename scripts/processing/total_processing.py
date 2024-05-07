@@ -66,7 +66,7 @@ def total_processing(run_date_str, from_api=True, n_days_back=30):
         print('>>> Done\n')
 
         print('9. Tổng hợp thông tin giao dịch...')
-        tong_hop_thong_tin_giao_dich(from_api=from_api)
+        tong_hop_thong_tin_giao_dich(run_date_str, from_api=from_api, n_days_back=n_days_back)
         print('>>> Done\n')
 
 
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     elif options.mode == 'excel':
         try:
             print('Processing data from Excel File...')
-            total_processing(options.run_date, from_api=False)
+            total_processing(options.run_date, from_api=False, n_days_back=n_days_back)
         except Exception as e:
             error = type(e).__name__ + " – " + str(e)
             telegram_bot_send_error_message(error)
