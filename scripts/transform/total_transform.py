@@ -4,8 +4,6 @@ from datetime import datetime
 from pathlib import Path
 import os
 
-from scripts.transform.don_ton_dong import get_khu_vuc_ton_dong
-
 ROOT_PATH = str(Path(__file__).parent.parent.parent)
 sys.path.append(ROOT_PATH)
 
@@ -15,6 +13,7 @@ from scripts.transform.kho_giao_nhan import transform_data_kho_giao_nhan
 from scripts.transform.ngung_giao_nhan import transform_data_ngung_giao_nhan
 from scripts.transform.thoi_gian_giao_hang_toan_trinh import transform_data_thoi_gian_giao_hang_toan_trinh
 from scripts.transform.ti_le_giao_hang import transform_data_ti_le_giao_hang
+from scripts.transform.don_ton_dong import get_khu_vuc_ton_dong
 
 
 def total_transform(run_date_str, show_logs=True):

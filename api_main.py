@@ -10,7 +10,6 @@ from scripts.api.auth.security import validate_token
 app = FastAPI(
     title="API SUPERSHIP",
     description="There are APIs getting calculation result from history transactions of SUPERSHIP",
-    # docs_url="/",
     docs_url=None,
     redoc_url=None,
     openapi_url=None,
