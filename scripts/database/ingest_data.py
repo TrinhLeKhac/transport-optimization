@@ -78,6 +78,7 @@ def ingest_tbl_to_db(
 
     print(f'>>> Ingest data into {tbl_name}')
     tmp_df = pd.read_parquet(path)
+    print('Shape: ', len(tmp_df))
     if is_id_col:
         tmp_df = tmp_df.reset_index().rename(columns={"index": "id"})
     tmp_df['import_date'] = date_str
