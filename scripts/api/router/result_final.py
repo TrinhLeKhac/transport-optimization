@@ -47,7 +47,7 @@ def execute_query_final(
 
 
 @router.post("")
-def calculate(data: schemas.SuggestCarrierInputFinal):
+def calculate_final(data: schemas.SuggestCarrierInputFinal):
     sender_province_code = data.sender_province
     sender_district_code = data.sender_district
     receiver_province_code = data.receiver_province

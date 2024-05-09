@@ -46,7 +46,7 @@ def execute_query_super(
 
 
 @router.post("")
-def calculate(data: schemas.SuggestCarrierInputSuper):
+def calculate_super(data: schemas.SuggestCarrierInputSuper):
     sender_province_code = data.sender_province
     sender_district_code = data.sender_district
     receiver_province_code = data.receiver_province
