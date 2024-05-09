@@ -392,181 +392,181 @@ QUERY_SQL_COMMAND_API = """
     -- Create carrier_information CTE
     -- by JOIN tbl_order_type, tbl_data_api, tbl_service_fee, tbl_optimal_score
 
-    WITH carrier_information AS (
+    WITH carrier_information AS ( 
         SELECT 
         tbl_ord.carrier_id, tbl_ord.route_type, 
         tbl_fee.price, 
-        tbl_ngn.status AS ngn_status,
-        tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data,
+        tbl_ngn.status AS ngn_status, 
+        tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
-        ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
+        ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score 
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
-        tbl_optimal_score.optimal_score
-        FROM db_schema.tbl_order_type tbl_ord
-        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api
-        ON tbl_ord.carrier_id = tbl_api.carrier_id
-        AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code
-        AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code
-        AND tbl_ord.new_type = tbl_api.new_type
-        INNER JOIN db_schema.tbl_service_fee tbl_fee
-        ON tbl_ord.carrier_id = tbl_fee.carrier_id
-        AND tbl_ord.order_type = tbl_fee.order_type
-        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn
-        ON tbl_ord.carrier_id = tbl_ngn.carrier_id
-        AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code
-        AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code
-        CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score
+        tbl_optimal_score.optimal_score 
+        FROM db_schema.tbl_order_type tbl_ord 
+        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api 
+        ON tbl_ord.carrier_id = tbl_api.carrier_id 
+        AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code 
+        AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code 
+        AND tbl_ord.new_type = tbl_api.new_type 
+        INNER JOIN db_schema.tbl_service_fee tbl_fee 
+        ON tbl_ord.carrier_id = tbl_fee.carrier_id 
+        AND tbl_ord.order_type = tbl_fee.order_type 
+        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn 
+        ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
+        AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
+        AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
+        CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score 
         WHERE tbl_ord.sender_province_code = '{}' 
-        AND tbl_ord.sender_district_code = '{}'
+        AND tbl_ord.sender_district_code = '{}' 
         AND tbl_ord.receiver_province_code = '{}' 
         AND tbl_ord.receiver_district_code = '{}' 
         AND tbl_fee.weight = CEIL({}/500.0)*500 
-        AND tbl_fee.pickup = '{}'
+        AND tbl_fee.pickup = '{}' 
     ),
     
     -- Create carrier_information_above CTE by 
     -- FILTER carrier_information WHERE score >= optimal_score and
     -- RANKING for_partner by price ASC
     
-    carrier_information_above AS (
+    carrier_information_above AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY price ASC, score DESC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
-        WHERE (score >= optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải')
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY price ASC, score DESC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
+        WHERE (score >= optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải') 
     ), 
     
     -- Create carrier_information_below_tmp CTE by 
     -- FILTER carrier_information WHERE score < optimal_score and
     -- RANKING for_partner by score DESC
     
-    carrier_information_below_tmp1 AS (
+    carrier_information_below_tmp1 AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC, price ASC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
-        WHERE (score < optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải')
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY score DESC, price ASC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
+        WHERE (score < optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải') 
     ),
     
     -- Create carrier_information_below CTE by 
     -- ADD for_partner with max_idx_partner in carrier_information_above CTE
     
-    carrier_information_below_tmp2 AS (
-        SELECT * FROM carrier_information_below_tmp1
-        CROSS JOIN
+    carrier_information_below_tmp2 AS ( 
+        SELECT * FROM carrier_information_below_tmp1 
+        CROSS JOIN 
         -- using COALESCE in case 
-        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null
-        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_above) AS tbl_max_idx_partner
+        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null 
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_above) AS tbl_max_idx_partner 
     ),
     
-    carrier_information_below AS (
+    carrier_information_below AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner
-        speed_ranking, score_ranking
-        FROM carrier_information_below_tmp2
+        for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner 
+        speed_ranking, score_ranking 
+        FROM carrier_information_below_tmp2 
     ),
     
     -- Create carrier_information_final CTE by 
-    -- UNION carrier_information_above and carrier_information_below
+    -- UNION carrier_information_above and carrier_information_below 
     
-    carrier_information_union_tmp1 AS (
-        SELECT * FROM carrier_information_above
-        UNION ALL
-        SELECT * FROM carrier_information_below
+    carrier_information_union_tmp1 AS ( 
+        SELECT * FROM carrier_information_above 
+        UNION ALL 
+        SELECT * FROM carrier_information_below 
     ),
     
-    carrier_information_overload_tmp1 AS (
+    carrier_information_overload_tmp1 AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC, price ASC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
-        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải')
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY score DESC, price ASC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
+        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải') 
     ),
     
     carrier_information_overload_tmp2 AS (
-        SELECT * FROM carrier_information_overload_tmp1
-        CROSS JOIN
-        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp1) AS tbl_max_idx_partner
+        SELECT * FROM carrier_information_overload_tmp1 
+        CROSS JOIN 
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp1) AS tbl_max_idx_partner 
     ),
     
-    carrier_information_overload AS (
+    carrier_information_overload AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        speed_ranking, score_ranking
-        FROM carrier_information_overload_tmp2
+        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner 
+        speed_ranking, score_ranking 
+        FROM carrier_information_overload_tmp2 
     ),
     
-    carrier_information_union AS (
-        SELECT * FROM carrier_information_union_tmp1
-        UNION ALL
-        SELECT * FROM carrier_information_overload
+    carrier_information_union AS ( 
+        SELECT * FROM carrier_information_union_tmp1 
+        UNION ALL 
+        SELECT * FROM carrier_information_overload 
     ),
     
     -- UPDATE for_fshop EQUAL for_partner
-    carrier_information_final AS (
+    carrier_information_final AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, 
-        for_partner AS for_shop, -- UPDATE for_shop = for_partner
-        for_partner,
-        CAST (DENSE_RANK() OVER (
-            ORDER BY price ASC
+        for_partner AS for_shop, -- UPDATE for_shop = for_partner 
+        for_partner, 
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY price ASC 
         ) AS smallint) AS price_ranking, 
-        speed_ranking, score_ranking FROM carrier_information_union
+        speed_ranking, score_ranking FROM carrier_information_union 
     )
     
-    SELECT * FROM carrier_information_final ORDER BY carrier_id;
+    SELECT * FROM carrier_information_final ORDER BY carrier_id; 
 """
 
 QUERY_SQL_COMMAND_API_SUPER = """
     -- Create carrier_information CTE
     -- by JOIN tbl_order_type, tbl_data_api, tbl_service_fee, tbl_optimal_score
 
-    WITH carrier_information AS (
+    WITH carrier_information AS ( 
         SELECT 
         tbl_ord.carrier_id, tbl_ord.route_type, 
         tbl_price.price, 
-        tbl_ngn.status AS ngn_status,
-        tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data,
+        tbl_ngn.status AS ngn_status, 
+        tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
-        ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
+        ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score 
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
-        tbl_optimal_score.optimal_score
-        FROM db_schema.tbl_order_type tbl_ord
-        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api
-        ON tbl_ord.carrier_id = tbl_api.carrier_id
-        AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code
-        AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code
-        AND tbl_ord.new_type = tbl_api.new_type
-        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn
-        ON tbl_ord.carrier_id = tbl_ngn.carrier_id
-        AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code
-        AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code
-        -- (6, 18000), (7, 17000), (2, 19000), (4, 20000), (10, 15000)
+        tbl_optimal_score.optimal_score 
+        FROM db_schema.tbl_order_type tbl_ord 
+        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api 
+        ON tbl_ord.carrier_id = tbl_api.carrier_id 
+        AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code 
+        AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code 
+        AND tbl_ord.new_type = tbl_api.new_type 
+        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn 
+        ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
+        AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
+        AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
+        -- (6, 18000), (7, 17000), (2, 19000), (4, 20000), (10, 15000) 
         INNER JOIN (VALUES {}) AS tbl_price(carrier_id, price) 
-        ON tbl_ord.carrier_id = tbl_price.carrier_id
-        CROSS JOIN (
+        ON tbl_ord.carrier_id = tbl_price.carrier_id 
+        CROSS JOIN ( 
             SELECT score AS optimal_score FROM db_schema.tbl_optimal_score 
-            WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)
-        ) AS tbl_optimal_score
+            WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score) 
+        ) AS tbl_optimal_score 
         WHERE tbl_ord.sender_province_code = '{}' 
-        AND tbl_ord.sender_district_code = '{}'
+        AND tbl_ord.sender_district_code = '{}' 
         AND tbl_ord.receiver_province_code = '{}' 
         AND tbl_ord.receiver_district_code = '{}' 
     ),
@@ -575,153 +575,153 @@ QUERY_SQL_COMMAND_API_SUPER = """
     -- FILTER carrier_information WHERE score >= optimal_score and
     -- RANKING for_partner by price ASC
 
-    carrier_information_above AS (
+    carrier_information_above AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY price ASC, score DESC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
-        WHERE (score >= optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải')
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY price ASC, score DESC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
+        WHERE (score >= optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải') 
     ), 
 
     -- Create carrier_information_below_tmp CTE by 
     -- FILTER carrier_information WHERE score < optimal_score and
     -- RANKING for_partner by score DESC
 
-    carrier_information_below_tmp1 AS (
+    carrier_information_below_tmp1 AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC, price ASC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
-        WHERE (score < optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải')
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY score DESC, price ASC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
+        WHERE (score < optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải') 
     ),
 
     -- Create carrier_information_below CTE by 
     -- ADD for_partner with max_idx_partner in carrier_information_above CTE
 
-    carrier_information_below_tmp2 AS (
-        SELECT * FROM carrier_information_below_tmp1
-        CROSS JOIN
+    carrier_information_below_tmp2 AS ( 
+        SELECT * FROM carrier_information_below_tmp1 
+        CROSS JOIN 
         -- using COALESCE in case 
-        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null
-        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_above) AS tbl_max_idx_partner
+        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null 
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_above) AS tbl_max_idx_partner 
     ),
 
-    carrier_information_below AS (
+    carrier_information_below AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner
-        speed_ranking, score_ranking
-        FROM carrier_information_below_tmp2
+        for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner 
+        speed_ranking, score_ranking 
+        FROM carrier_information_below_tmp2 
     ),
 
     -- Create carrier_information_final CTE by 
     -- UNION carrier_information_above and carrier_information_below
 
-    carrier_information_union_tmp1 AS (
-        SELECT * FROM carrier_information_above
-        UNION ALL
-        SELECT * FROM carrier_information_below
+    carrier_information_union_tmp1 AS ( 
+        SELECT * FROM carrier_information_above 
+        UNION ALL 
+        SELECT * FROM carrier_information_below 
     ),
 
-    carrier_information_overload_tmp1 AS (
+    carrier_information_overload_tmp1 AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC, price ASC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
-        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải')
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY score DESC, price ASC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
+        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải') 
     ),
 
-    carrier_information_overload_tmp2 AS (
-        SELECT * FROM carrier_information_overload_tmp1
-        CROSS JOIN
-        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp1) AS tbl_max_idx_partner
+    carrier_information_overload_tmp2 AS ( 
+        SELECT * FROM carrier_information_overload_tmp1 
+        CROSS JOIN 
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp1) AS tbl_max_idx_partner 
     ),
 
-    carrier_information_overload AS (
+    carrier_information_overload AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        speed_ranking, score_ranking
-        FROM carrier_information_overload_tmp2
+        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner 
+        speed_ranking, score_ranking 
+        FROM carrier_information_overload_tmp2 
     ),
 
-    carrier_information_union AS (
-        SELECT * FROM carrier_information_union_tmp1
-        UNION ALL
-        SELECT * FROM carrier_information_overload
+    carrier_information_union AS ( 
+        SELECT * FROM carrier_information_union_tmp1 
+        UNION ALL 
+        SELECT * FROM carrier_information_overload 
     ),
 
-    -- UPDATE for_fshop EQUAL for_partner
-    carrier_information_final AS (
+    -- UPDATE for_fshop EQUAL for_partner 
+    carrier_information_final AS ( 
         SELECT carrier_id, route_type, price, 
         status, description, time_data, 
         time_display, rate, score, star, 
-        for_partner AS for_shop, -- UPDATE for_shop = for_partner
-        for_partner,
-        CAST (DENSE_RANK() OVER (
-            ORDER BY price ASC
+        for_partner AS for_shop, -- UPDATE for_shop = for_partner 
+        for_partner, 
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY price ASC 
         ) AS smallint) AS price_ranking, 
-        speed_ranking, score_ranking FROM carrier_information_union
+        speed_ranking, score_ranking FROM carrier_information_union 
     )
 
-    SELECT * FROM carrier_information_final ORDER BY carrier_id;
+    SELECT * FROM carrier_information_final ORDER BY carrier_id; 
 """
 
 QUERY_SQL_COMMAND_API_FINAL = """
-    WITH carrier_information_tmp1 AS (
+    WITH carrier_information_tmp1 AS ( 
         SELECT 
         tbl_ord.carrier_id, tbl_ord.route_type, 
         tbl_fee.price, 
-        tbl_ngn.status AS ngn_status,
-        tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data,
+        tbl_ngn.status AS ngn_status, 
+        tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
-        ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
+        ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score 
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
         tbl_optimal_score.optimal_score, 
-        CAST('{}' AS INTEGER) AS item_price,
-        CAST('{}' AS INTEGER) AS money_get_first,
-        '{}' AS is_returned
-        FROM db_schema.tbl_order_type tbl_ord
-        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api
-        ON tbl_ord.carrier_id = tbl_api.carrier_id
-        AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code
-        AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code
-        AND tbl_ord.new_type = tbl_api.new_type
-        INNER JOIN db_schema.tbl_service_fee tbl_fee
-        ON tbl_ord.carrier_id = tbl_fee.carrier_id
-        AND tbl_ord.order_type = tbl_fee.order_type
-        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn
-        ON tbl_ord.carrier_id = tbl_ngn.carrier_id
-        AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code
-        AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code
-        CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score
+        CAST('{}' AS INTEGER) AS item_price, 
+        CAST('{}' AS INTEGER) AS money_get_first, 
+        '{}' AS is_returned 
+        FROM db_schema.tbl_order_type tbl_ord 
+        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api 
+        ON tbl_ord.carrier_id = tbl_api.carrier_id 
+        AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code 
+        AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code 
+        AND tbl_ord.new_type = tbl_api.new_type 
+        INNER JOIN db_schema.tbl_service_fee tbl_fee 
+        ON tbl_ord.carrier_id = tbl_fee.carrier_id 
+        AND tbl_ord.order_type = tbl_fee.order_type 
+        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn 
+        ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
+        AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
+        AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
+        CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score 
         WHERE tbl_ord.sender_province_code = '{}' 
-        AND tbl_ord.sender_district_code = '{}'
+        AND tbl_ord.sender_district_code = '{}' 
         AND tbl_ord.receiver_province_code = '{}' 
         AND tbl_ord.receiver_district_code = '{}' 
         AND tbl_fee.weight = CEIL({}/500.0)*500 
-        AND tbl_fee.pickup = '{}'
+        AND tbl_fee.pickup = '{}' 
     ),
     
     -- Create carrier_information_above CTE by 
     -- FILTER carrier_information WHERE score >= optimal_score and
     -- RANKING for_partner by price ASC
     
-    carrier_information_tmp2 AS (
+    carrier_information_tmp2 AS ( 
         SELECT carrier_id, route_type, price, 
         CASE
             WHEN carrier_id = 7 -- Ninja Van
@@ -849,62 +849,62 @@ QUERY_SQL_COMMAND_API_FINAL = """
                         WHEN is_returned = 'Có' THEN 10000
                         ELSE 0
                     END
-        END AS redeem_fee,
+        END AS redeem_fee, 
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        speed_ranking, score_ranking
-        FROM carrier_information_tmp1
+        speed_ranking, score_ranking 
+        FROM carrier_information_tmp1 
     ), 
     
-    carrier_information_tmp3 AS (
+    carrier_information_tmp3 AS ( 
         SELECT carrier_id, route_type, price, insurance_fee, collection_fee, redeem_fee, 
-        CASE WHEN insurance_fee != -1 THEN insurance_fee ELSE 0 END AS insurance_fee_modified,
-        CASE WHEN collection_fee != -1 THEN collection_fee ELSE 0 END AS collection_fee_modified,
+        CASE WHEN insurance_fee != -1 THEN insurance_fee ELSE 0 END AS insurance_fee_modified, 
+        CASE WHEN collection_fee != -1 THEN collection_fee ELSE 0 END AS collection_fee_modified, 
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        speed_ranking, score_ranking
-        FROM carrier_information_tmp2
+        speed_ranking, score_ranking 
+        FROM carrier_information_tmp2 
     ), 
     
-    carrier_information AS (
+    carrier_information AS ( 
         SELECT carrier_id, route_type, insurance_fee, collection_fee, 
-        price + insurance_fee_modified + collection_fee_modified + redeem_fee AS total_price,
+        price + insurance_fee_modified + collection_fee_modified + redeem_fee AS total_price, 
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        speed_ranking, score_ranking
-        FROM carrier_information_tmp3
+        speed_ranking, score_ranking 
+        FROM carrier_information_tmp3 
     ), 
     
-    carrier_information_above AS (
-        SELECT carrier_id, route_type, total_price,
+    carrier_information_above AS ( 
+        SELECT carrier_id, route_type, total_price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY total_price ASC, score DESC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY total_price ASC, score DESC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
         WHERE 
             (score >= optimal_score) 
             AND (insurance_fee != -1) 
             AND (collection_fee != -1) 
             AND (description != 'Quá tải') 
-            AND (ngn_status != 'Quá tải')
+            AND (ngn_status != 'Quá tải') 
     ), 
     
     -- Create carrier_information_below_tmp CTE by 
     -- FILTER carrier_information WHERE score < optimal_score and
     -- RANKING for_partner by score DESC
     
-    carrier_information_below_tmp1 AS (
-        SELECT carrier_id, route_type, total_price,
-        status, description, time_data,
-        time_display, rate, score, star, for_shop,
-        CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC, total_price ASC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
+    carrier_information_below_tmp1 AS ( 
+        SELECT carrier_id, route_type, total_price, 
+        status, description, time_data, 
+        time_display, rate, score, star, for_shop, 
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY score DESC, total_price ASC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
         WHERE 
             (score < optimal_score) 
             AND (insurance_fee != -1) 
@@ -916,115 +916,115 @@ QUERY_SQL_COMMAND_API_FINAL = """
     -- Create carrier_information_below CTE by 
     -- ADD for_partner with max_idx_partner in carrier_information_above CTE
     
-    carrier_information_below_tmp2 AS (
-        SELECT * FROM carrier_information_below_tmp1
-        CROSS JOIN
+    carrier_information_below_tmp2 AS ( 
+        SELECT * FROM carrier_information_below_tmp1 
+        CROSS JOIN 
         -- using COALESCE in case 
-        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null
-        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_above) AS tbl_max_idx_partner
+        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null 
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_above) AS tbl_max_idx_partner 
     ),
     
-    carrier_information_below AS (
-        SELECT carrier_id, route_type, total_price,
-        status, description, time_data,
-        time_display, rate, score, star, for_shop,
-        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        speed_ranking, score_ranking
-        FROM carrier_information_below_tmp2
+    carrier_information_below AS ( 
+        SELECT carrier_id, route_type, total_price, 
+        status, description, time_data, 
+        time_display, rate, score, star, for_shop, 
+        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner 
+        speed_ranking, score_ranking 
+        FROM carrier_information_below_tmp2 
     ),
     
     -- Create carrier_information_final CTE by 
     -- UNION carrier_information_above and carrier_information_below
     
-    carrier_information_union_tmp1 AS (
-        SELECT * FROM carrier_information_above
-        UNION ALL
-        SELECT * FROM carrier_information_below
+    carrier_information_union_tmp1 AS ( 
+        SELECT * FROM carrier_information_above 
+        UNION ALL 
+        SELECT * FROM carrier_information_below 
     ),
     
-    carrier_information_overload_tmp1 AS (
-        SELECT carrier_id, route_type, total_price,
-        status, description, time_data,
-        time_display, rate, score, star, for_shop,
-        CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC, total_price ASC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
-        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải')
+    carrier_information_overload_tmp1 AS ( 
+        SELECT carrier_id, route_type, total_price, 
+        status, description, time_data, 
+        time_display, rate, score, star, for_shop, 
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY score DESC, total_price ASC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
+        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải') 
     ),
     
-    carrier_information_overload_tmp2 AS (
-        SELECT * FROM carrier_information_overload_tmp1
-        CROSS JOIN
-        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp1) AS tbl_max_idx_partner
+    carrier_information_overload_tmp2 AS ( 
+        SELECT * FROM carrier_information_overload_tmp1 
+        CROSS JOIN 
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp1) AS tbl_max_idx_partner 
     ),
     
-    carrier_information_overload AS (
-        SELECT carrier_id, route_type, total_price,
-        status, description, time_data,
-        time_display, rate, score, star, for_shop,
-        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        speed_ranking, score_ranking
-        FROM carrier_information_overload_tmp2
+    carrier_information_overload AS ( 
+        SELECT carrier_id, route_type, total_price, 
+        status, description, time_data, 
+        time_display, rate, score, star, for_shop, 
+        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner 
+        speed_ranking, score_ranking 
+        FROM carrier_information_overload_tmp2 
     ),
     
-    carrier_information_union_tmp2 AS (
-        SELECT * FROM carrier_information_union_tmp1
-        UNION ALL
-        SELECT * FROM carrier_information_overload
+    carrier_information_union_tmp2 AS ( 
+        SELECT * FROM carrier_information_union_tmp1 
+        UNION ALL 
+        SELECT * FROM carrier_information_overload 
     ),
     
-    carrier_information_refuse_tmp1 AS (
-        SELECT carrier_id, route_type, total_price,
-        status, description, time_data,
-        time_display, rate, score, star, for_shop,
-        CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC, total_price ASC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
+    carrier_information_refuse_tmp1 AS ( 
+        SELECT carrier_id, route_type, total_price, 
+        status, description, time_data, 
+        time_display, rate, score, star, for_shop, 
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY score DESC, total_price ASC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
         WHERE 
             ((insurance_fee = -1) OR (collection_fee = -1))
             AND (description != 'Quá tải') 
             AND (ngn_status != 'Quá tải')
     ),
     
-    carrier_information_refuse_tmp2 AS (
-        SELECT * FROM carrier_information_refuse_tmp1
-        CROSS JOIN
-        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp2) AS tbl_max_idx_partner
+    carrier_information_refuse_tmp2 AS ( 
+        SELECT * FROM carrier_information_refuse_tmp1 
+        CROSS JOIN 
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp2) AS tbl_max_idx_partner 
     ),
     
-    carrier_information_refuse AS (
-        SELECT carrier_id, route_type, total_price,
+    carrier_information_refuse AS ( 
+        SELECT carrier_id, route_type, total_price, 
         status, description, time_data, 
         time_display, rate, score, star, for_shop, 
-        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        speed_ranking, score_ranking
-        FROM carrier_information_refuse_tmp2
+        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner 
+        speed_ranking, score_ranking 
+        FROM carrier_information_refuse_tmp2 
     ),
     
-    carrier_information_union AS (
-        SELECT * FROM carrier_information_union_tmp2
-        UNION ALL
-        SELECT * FROM carrier_information_refuse
+    carrier_information_union AS ( 
+        SELECT * FROM carrier_information_union_tmp2 
+        UNION ALL 
+        SELECT * FROM carrier_information_refuse 
     ),
     
         -- UPDATE for_fshop EQUAL for_partner
-    carrier_information_final AS (
-        SELECT carrier_id, route_type, total_price as price,
+    carrier_information_final AS ( 
+        SELECT carrier_id, route_type, total_price as price, 
         status, description, time_data, 
         time_display, rate, score, star, 
-        for_partner AS for_shop, -- UPDATE for_shop = for_partner
-        for_partner,
-        CAST (DENSE_RANK() OVER (
-            ORDER BY total_price ASC
+        for_partner AS for_shop, -- UPDATE for_shop = for_partner 
+        for_partner, 
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY total_price ASC 
         ) AS smallint) AS price_ranking, 
-        speed_ranking, score_ranking FROM carrier_information_union
+        speed_ranking, score_ranking FROM carrier_information_union 
     )
     
-    SELECT * FROM carrier_information_final ORDER BY carrier_id;
+    SELECT * FROM carrier_information_final ORDER BY carrier_id; 
 """
 
 
@@ -1032,39 +1032,39 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     -- Create carrier_information CTE
     -- by JOIN tbl_order_type, tbl_data_api, tbl_service_fee, tbl_optimal_score
     
-    WITH carrier_information_tmp1 AS (
+    WITH carrier_information_tmp1 AS ( 
         SELECT 
         tbl_ord.carrier_id, tbl_ord.new_type, 
         tbl_fee.price, 
-        tbl_ngn.status AS ngn_status,
-        tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data,
+        tbl_ngn.status AS ngn_status, 
+        tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
-        ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
+        ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score 
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
         tbl_optimal_score.optimal_score, 
-        CAST('{}' AS INTEGER) AS item_price,
-        CAST('{}' AS INTEGER) AS money_get_first,
-        '{}' AS is_returned
-        FROM db_schema.tbl_order_type tbl_ord
-        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api
-        ON tbl_ord.carrier_id = tbl_api.carrier_id
-        AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code
-        AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code
-        AND tbl_ord.new_type = tbl_api.new_type
-        INNER JOIN db_schema.tbl_service_fee tbl_fee
-        ON tbl_ord.carrier_id = tbl_fee.carrier_id
-        AND tbl_ord.order_type = tbl_fee.order_type
-        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn
-        ON tbl_ord.carrier_id = tbl_ngn.carrier_id
-        AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code
-        AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code
-        CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score
+        CAST('{}' AS INTEGER) AS item_price, 
+        CAST('{}' AS INTEGER) AS money_get_first, 
+        '{}' AS is_returned 
+        FROM db_schema.tbl_order_type tbl_ord 
+        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api 
+        ON tbl_ord.carrier_id = tbl_api.carrier_id 
+        AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code 
+        AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code 
+        AND tbl_ord.new_type = tbl_api.new_type 
+        INNER JOIN db_schema.tbl_service_fee tbl_fee 
+        ON tbl_ord.carrier_id = tbl_fee.carrier_id 
+        AND tbl_ord.order_type = tbl_fee.order_type 
+        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn 
+        ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
+        AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
+        AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
+        CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score 
         WHERE tbl_ord.sender_province_code = '{}' 
-        AND tbl_ord.sender_district_code = '{}'
+        AND tbl_ord.sender_district_code = '{}' 
         AND tbl_ord.receiver_province_code = '{}' 
         AND tbl_ord.receiver_district_code = '{}' 
         AND tbl_fee.weight = CEIL({}/500.0)*500 
-        AND tbl_fee.pickup = '{}'
+        AND tbl_fee.pickup = '{}' 
     ),
 
     -- Create carrier_information_above CTE by 
@@ -1199,41 +1199,41 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                         WHEN is_returned = 'Có' THEN 10000
                         ELSE 0
                     END
-        END AS redeem_fee,
+        END AS redeem_fee, 
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        speed_ranking, score_ranking
-        FROM carrier_information_tmp1
+        speed_ranking, score_ranking 
+        FROM carrier_information_tmp1 
     ), 
     
-    carrier_information_tmp3 AS (
+    carrier_information_tmp3 AS ( 
         SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, 
-        CASE WHEN insurance_fee != -1 THEN insurance_fee ELSE 0 END AS insurance_fee_modified,
-        CASE WHEN collection_fee != -1 THEN collection_fee ELSE 0 END AS collection_fee_modified,
+        CASE WHEN insurance_fee != -1 THEN insurance_fee ELSE 0 END AS insurance_fee_modified, 
+        CASE WHEN collection_fee != -1 THEN collection_fee ELSE 0 END AS collection_fee_modified, 
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        speed_ranking, score_ranking
-        FROM carrier_information_tmp2
+        speed_ranking, score_ranking 
+        FROM carrier_information_tmp2 
     ), 
     
-    carrier_information AS (
+    carrier_information AS ( 
         SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, 
-        price + insurance_fee_modified + collection_fee_modified + redeem_fee AS total_price,
+        price + insurance_fee_modified + collection_fee_modified + redeem_fee AS total_price, 
         status, ngn_status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        speed_ranking, score_ranking
-        FROM carrier_information_tmp3
+        speed_ranking, score_ranking 
+        FROM carrier_information_tmp3 
     ), 
 
     carrier_information_above AS (
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price, 
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY total_price ASC, score DESC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY total_price ASC, score DESC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
         WHERE 
             (score >= optimal_score) 
             AND (insurance_fee != -1) 
@@ -1246,15 +1246,15 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     -- FILTER carrier_information WHERE score < optimal_score and
     -- RANKING for_partner by score DESC
     
-    carrier_information_below_tmp1 AS (
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+    carrier_information_below_tmp1 AS ( 
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price, 
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC, total_price ASC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY score DESC, total_price ASC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
         WHERE 
             (score < optimal_score) 
             AND (insurance_fee != -1) 
@@ -1266,113 +1266,113 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     -- Create carrier_information_below CTE by 
     -- ADD for_partner with max_idx_partner in carrier_information_above CTE
 
-    carrier_information_below_tmp2 AS (
-        SELECT * FROM carrier_information_below_tmp1
-        CROSS JOIN
+    carrier_information_below_tmp2 AS ( 
+        SELECT * FROM carrier_information_below_tmp1 
+        CROSS JOIN 
         -- using COALESCE in case 
-        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null
-        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_above) AS tbl_max_idx_partner
+        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null 
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_above) AS tbl_max_idx_partner 
     ),
 
-    carrier_information_below AS (
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+    carrier_information_below AS ( 
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price, 
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        speed_ranking, score_ranking
-        FROM carrier_information_below_tmp2
+        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner 
+        speed_ranking, score_ranking 
+        FROM carrier_information_below_tmp2 
     ),
 
     -- Create carrier_information_final CTE by 
     -- UNION carrier_information_above and carrier_information_below
 
-    carrier_information_union_tmp1 AS (
-        SELECT * FROM carrier_information_above
-        UNION ALL
-        SELECT * FROM carrier_information_below
+    carrier_information_union_tmp1 AS ( 
+        SELECT * FROM carrier_information_above 
+        UNION ALL 
+        SELECT * FROM carrier_information_below 
     ),
     
-    carrier_information_overload_tmp1 AS (
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+    carrier_information_overload_tmp1 AS ( 
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price, 
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC, total_price ASC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
-        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải')
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY score DESC, total_price ASC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
+        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải') 
     ),
     
-    carrier_information_overload_tmp2 AS (
-        SELECT * FROM carrier_information_overload_tmp1
-        CROSS JOIN
-        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp1) AS tbl_max_idx_partner
+    carrier_information_overload_tmp2 AS ( 
+        SELECT * FROM carrier_information_overload_tmp1 
+        CROSS JOIN 
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp1) AS tbl_max_idx_partner 
     ),
 
-    carrier_information_overload AS (
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+    carrier_information_overload AS ( 
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price, 
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        speed_ranking, score_ranking
-        FROM carrier_information_overload_tmp2
+        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner 
+        speed_ranking, score_ranking 
+        FROM carrier_information_overload_tmp2 
     ),
     
-    carrier_information_union_tmp2 AS (
-        SELECT * FROM carrier_information_union_tmp1
-        UNION ALL
-        SELECT * FROM carrier_information_overload
+    carrier_information_union_tmp2 AS ( 
+        SELECT * FROM carrier_information_union_tmp1 
+        UNION ALL 
+        SELECT * FROM carrier_information_overload 
     ),
     
-    carrier_information_refuse_tmp1 AS (
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+    carrier_information_refuse_tmp1 AS ( 
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price, 
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        CAST (DENSE_RANK() OVER (
-            ORDER BY score DESC, total_price ASC, time_data ASC
-        ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking
-        FROM carrier_information
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY score DESC, total_price ASC, time_data ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking 
+        FROM carrier_information 
         WHERE 
             ((insurance_fee = -1) OR (collection_fee = -1)) 
             AND (description != 'Quá tải') 
             AND (ngn_status != 'Quá tải')
     ),
     
-    carrier_information_refuse_tmp2 AS (
-        SELECT * FROM carrier_information_refuse_tmp1
-        CROSS JOIN
-        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp2) AS tbl_max_idx_partner
+    carrier_information_refuse_tmp2 AS ( 
+        SELECT * FROM carrier_information_refuse_tmp1 
+        CROSS JOIN 
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_union_tmp2) AS tbl_max_idx_partner 
     ),
 
-    carrier_information_refuse AS (
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+    carrier_information_refuse AS ( 
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price, 
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
-        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner
-        speed_ranking, score_ranking
-        FROM carrier_information_refuse_tmp2
+        for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner 
+        speed_ranking, score_ranking 
+        FROM carrier_information_refuse_tmp2 
     ),
     
-    carrier_information_union AS (
-        SELECT * FROM carrier_information_union_tmp2
-        UNION ALL
-        SELECT * FROM carrier_information_refuse
+    carrier_information_union AS ( 
+        SELECT * FROM carrier_information_union_tmp2 
+        UNION ALL 
+        SELECT * FROM carrier_information_refuse 
     ),
 
     -- UPDATE for_fshop EQUAL for_partner
-    carrier_information_final AS (
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+    carrier_information_final AS ( 
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price, 
         status, description, time_data, 
         time_display, rate, score, optimal_score, star, 
-        for_partner AS for_shop, -- UPDATE for_shop = for_partner
-        for_partner,
-        CAST (DENSE_RANK() OVER (
-            ORDER BY total_price ASC
+        for_partner AS for_shop, -- UPDATE for_shop = for_partner 
+        for_partner, 
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY total_price ASC 
         ) AS smallint) AS price_ranking, 
-        speed_ranking, score_ranking FROM carrier_information_union
+        speed_ranking, score_ranking FROM carrier_information_union 
     )
 
-    SELECT * FROM carrier_information_final ORDER BY carrier_id;
+    SELECT * FROM carrier_information_final ORDER BY carrier_id; 
 """
