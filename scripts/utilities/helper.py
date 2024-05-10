@@ -384,8 +384,7 @@ QUERY_SQL_API_BY_DAY = """
     carrier_id, route_type, new_type, status, description, time_data, time_display, rate, score,
     star, for_shop, for_shop as for_partner, speed_ranking, score_ranking
     FROM db_schema.tbl_data_api
-    WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)
-    AND tbl_data_api.receiver_district_code = '{}'
+    WHERE tbl_data_api.receiver_district_code = '{}'
 """
 
 QUERY_SQL_COMMAND_API = """
@@ -415,7 +414,7 @@ QUERY_SQL_COMMAND_API = """
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
         tbl_optimal_score.optimal_score 
         FROM db_schema.tbl_order_type tbl_ord 
-        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api 
+        INNER JOIN db_schema.tbl_data_api AS tbl_api 
         ON tbl_ord.carrier_id = tbl_api.carrier_id 
         AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code 
         AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code 
@@ -423,11 +422,14 @@ QUERY_SQL_COMMAND_API = """
         INNER JOIN db_schema.tbl_service_fee tbl_fee 
         ON tbl_ord.carrier_id = tbl_fee.carrier_id 
         AND tbl_ord.order_type = tbl_fee.order_type 
-        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn 
+        INNER JOIN db_schema.tbl_ngung_giao_nhan AS tbl_ngn 
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
         AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
-        CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score 
+        CROSS JOIN (
+        SELECT score AS optimal_score FROM db_schema.tbl_optimal_score 
+        WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)
+        ) AS tbl_optimal_score 
         WHERE tbl_ord.sender_province_code = '{}' 
         AND tbl_ord.sender_district_code = '{}' 
         AND tbl_ord.receiver_province_code = '{}' 
@@ -561,12 +563,12 @@ QUERY_SQL_COMMAND_API_SUPER = """
         tbl_api.for_shop, tbl_api.speed_ranking, tbl_api.score_ranking, tbl_api.rate_ranking, 
         tbl_optimal_score.optimal_score 
         FROM db_schema.tbl_order_type tbl_ord 
-        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api 
+        INNER JOIN db_schema.tbl_data_api AS tbl_api 
         ON tbl_ord.carrier_id = tbl_api.carrier_id 
         AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code 
         AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code 
         AND tbl_ord.new_type = tbl_api.new_type 
-        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn 
+        INNER JOIN db_schema.tbl_ngung_giao_nhan AS tbl_ngn 
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
         AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
@@ -708,7 +710,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         CAST('{}' AS INTEGER) AS money_get_first, 
         '{}' AS is_returned 
         FROM db_schema.tbl_order_type tbl_ord 
-        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api 
+        INNER JOIN db_schema.tbl_data_api AS tbl_api 
         ON tbl_ord.carrier_id = tbl_api.carrier_id 
         AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code 
         AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code 
@@ -716,11 +718,14 @@ QUERY_SQL_COMMAND_API_FINAL = """
         INNER JOIN db_schema.tbl_service_fee tbl_fee 
         ON tbl_ord.carrier_id = tbl_fee.carrier_id 
         AND tbl_ord.order_type = tbl_fee.order_type 
-        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn 
+        INNER JOIN db_schema.tbl_ngung_giao_nhan AS tbl_ngn 
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
         AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
-        CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score 
+        CROSS JOIN (
+        SELECT score AS optimal_score FROM db_schema.tbl_optimal_score 
+        WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)
+        ) AS tbl_optimal_score 
         WHERE tbl_ord.sender_province_code = '{}' 
         AND tbl_ord.sender_district_code = '{}' 
         AND tbl_ord.receiver_province_code = '{}' 
@@ -1058,7 +1063,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         CAST('{}' AS INTEGER) AS money_get_first, 
         '{}' AS is_returned 
         FROM db_schema.tbl_order_type tbl_ord 
-        INNER JOIN (SELECT * FROM db_schema.tbl_data_api WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_data_api)) AS tbl_api 
+        INNER JOIN db_schema.tbl_data_api AS tbl_api 
         ON tbl_ord.carrier_id = tbl_api.carrier_id 
         AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code 
         AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code 
@@ -1066,11 +1071,14 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         INNER JOIN db_schema.tbl_service_fee tbl_fee 
         ON tbl_ord.carrier_id = tbl_fee.carrier_id 
         AND tbl_ord.order_type = tbl_fee.order_type 
-        INNER JOIN (SELECT * FROM db_schema.tbl_ngung_giao_nhan WHERE import_date = (SELECT MAX(import_date) FROM db_schema.tbl_ngung_giao_nhan)) AS tbl_ngn 
+        INNER JOIN db_schema.tbl_ngung_giao_nhan AS tbl_ngn 
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
         AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
-        CROSS JOIN (SELECT score AS optimal_score FROM db_schema.tbl_optimal_score WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)) AS tbl_optimal_score 
+        CROSS JOIN (
+        SELECT score AS optimal_score FROM db_schema.tbl_optimal_score 
+        WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)
+        ) AS tbl_optimal_score 
         WHERE tbl_ord.sender_province_code = '{}' 
         AND tbl_ord.sender_district_code = '{}' 
         AND tbl_ord.receiver_province_code = '{}' 
