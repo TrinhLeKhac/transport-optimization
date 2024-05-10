@@ -18,25 +18,37 @@ ENGINE = create_engine(PORT)
 
 # ------------------------------------ config init ------------------------------------
 
-# (path, tbl_name, is_id_col, is_churn_size)
+# (path, tbl_name, is_id_col, is_churn_size, idx_cols)
 config_init = [
-    (ROOT_PATH + '/processed_data/phan_vung_nvc.parquet', 'tbl_phan_vung_nvc', False, False),
-    (ROOT_PATH + '/transform/buu_cuc.parquet', 'tbl_buu_cuc', False, False),
-    (ROOT_PATH + '/output/data_order_type.parquet', 'tbl_order_type', False, True),
-    (ROOT_PATH + '/output/service_fee.parquet', 'tbl_service_fee', False, False),
+    (ROOT_PATH + '/processed_data/phan_vung_nvc.parquet', 'tbl_phan_vung_nvc', False, False, None),
+    (ROOT_PATH + '/transform/buu_cuc.parquet', 'tbl_buu_cuc', False, False, None),
+    (
+        ROOT_PATH + '/output/data_order_type.parquet', 'tbl_order_type', False, True,
+        'carrier_id, sender_province_code, sender_district_code, receiver_province_code, receiver_district_code'
+    ),
+    (
+        ROOT_PATH + '/output/service_fee.parquet', 'tbl_service_fee', False, False,
+        'carrier_id, order_type, weight, pickup'
+    ),
 ]
 
 # ------------------------------------ config daily ------------------------------------
 
 config_daily = [
-    (ROOT_PATH + '/transform/chat_luong_noi_bo_njv.parquet', 'tbl_clnb_ninja_van', False, False),
-    (ROOT_PATH + '/transform/ngung_giao_nhan.parquet', 'tbl_ngung_giao_nhan', False, False),
-    (ROOT_PATH + '/output/data_api.parquet', 'tbl_data_api', True, False),
-    (ROOT_PATH + '/output/total_optimal_score.parquet', 'tbl_optimal_score', False, False),
+    (ROOT_PATH + '/transform/chat_luong_noi_bo_njv.parquet', 'tbl_clnb_ninja_van', False, False, None),
+    (
+        ROOT_PATH + '/transform/ngung_giao_nhan.parquet', 'tbl_ngung_giao_nhan', False, False,
+        'carrier_id, sender_province_code, sender_district_code'
+    ),
+    (
+        ROOT_PATH + '/output/data_api.parquet', 'tbl_data_api', True, False,
+        'carrier_id, receiver_province_code, receiver_district_code, new_type'
+    ),
+    (ROOT_PATH + '/output/total_optimal_score.parquet', 'tbl_optimal_score', False, False, None),
 ]
 
 
-def delete_partition_by_import_date(schema_name, tbl_name, date_str):
+def delete_repeated_partition(schema_name, tbl_name, date_str):
     # Create connection
     connection = psycopg2.connect(
         settings.SQLALCHEMY_DATABASE_URI
@@ -59,6 +71,29 @@ def delete_partition_by_import_date(schema_name, tbl_name, date_str):
     connection.close()
 
 
+def create_index_of_table(
+    schema_name,
+    tbl_name,
+    idx_cols=None
+):
+    # Create connection
+    connection = psycopg2.connect(
+        settings.SQLALCHEMY_DATABASE_URI
+    )
+
+    cursor = connection.cursor()
+
+    create_idx_query = f"CREATE UNIQUE INDEX {tbl_name}_idx ON {schema_name}.{tbl_name}({idx_cols})"
+
+    cursor.execute(create_idx_query)
+
+    # Commit the transaction
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+
 def ingest_tbl_to_db(
         schema_name,
         path,
@@ -68,11 +103,11 @@ def ingest_tbl_to_db(
         is_churn_size=False,
         mode: Literal["fail", "replace", "append"] = "append",
 ):
-    # Replace partition if exists
+    # Replace repeated partition
     if mode == "append":
         try:
-            delete_partition_by_import_date(schema_name, tbl_name, date_str)
-            print(f'Delete rows from partition import_date={date_str}')
+            delete_repeated_partition(schema_name, tbl_name, date_str)
+            print(f'Delete repeated partition from import_date={date_str}')
         except:
             print("Table '{}' does not exist in schema '{}'.".format(tbl_name, schema_name))
 
@@ -107,9 +142,8 @@ def ingest_tbl_to_db(
 
 
 def ingest_data_to_db(date_str, schema_name="db_schema", init=True):
-
     if init:
-        for path, tbl_name, is_id_col, is_churn_size in config_init:
+        for path, tbl_name, is_id_col, is_churn_size, idx_cols in config_init:
             ingest_tbl_to_db(
                 schema_name,
                 path,
@@ -119,8 +153,10 @@ def ingest_data_to_db(date_str, schema_name="db_schema", init=True):
                 is_churn_size=is_churn_size,
                 mode="replace",
             )
+            if idx_cols is not None:
+                create_index_of_table(schema_name, tbl_name, idx_cols)
 
-    for path, tbl_name, is_id_col, is_churn_size in config_daily:
+    for path, tbl_name, is_id_col, is_churn_size, idx_cols in config_daily:
         if tbl_name not in ['tbl_optimal_score']:
             ingest_tbl_to_db(
                 schema_name,
@@ -129,8 +165,10 @@ def ingest_data_to_db(date_str, schema_name="db_schema", init=True):
                 date_str,
                 is_id_col=is_id_col,
                 is_churn_size=is_churn_size,
-                mode="append",
+                mode="replace",
             )
+            if idx_cols is not None:
+                create_index_of_table(schema_name, tbl_name, idx_cols)
         else:
             ingest_tbl_to_db(
                 schema_name,
@@ -139,7 +177,7 @@ def ingest_data_to_db(date_str, schema_name="db_schema", init=True):
                 date_str,
                 is_id_col=is_id_col,
                 is_churn_size=is_churn_size,
-                mode="replace",
+                mode="append",
             )
 
 

@@ -391,6 +391,18 @@ QUERY_SQL_API_BY_DAY = """
 QUERY_SQL_COMMAND_API = """
     -- Create carrier_information CTE
     -- by JOIN tbl_order_type, tbl_data_api, tbl_service_fee, tbl_optimal_score
+    
+    -- CREATE UNIQUE INDEX tbl_order_type_idx 
+    -- ON db_schema.tbl_order_type(carrier_id, sender_province_code, sender_district_code, receiver_province_code, receiver_district_code);
+    
+    -- CREATE UNIQUE INDEX tbl_data_api_idx 
+    -- ON db_schema.tbl_data_api(carrier_id, receiver_province_code, receiver_district_code, new_type);
+
+    -- CREATE UNIQUE INDEX tbl_service_fee_idx 
+    -- ON db_schema.tbl_service_fee(carrier_id, order_type, weight, pickup);
+    
+    -- CREATE UNIQUE INDEX tbl_ngung_giao_nhan_idx 
+    -- ON db_schema.tbl_ngung_giao_nhan(carrier_id, sender_province_code, sender_district_code);
 
     WITH carrier_information AS ( 
         SELECT 
