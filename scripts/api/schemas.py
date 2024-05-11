@@ -70,6 +70,16 @@ class APIModel(BaseModel):
         from_attributes = True
 
 
+class NGNModel(BaseModel):
+    carrier_id: conint(strict=True)
+    province: constr(max_length=2, strict=True)
+    district: constr(max_length=3, strict=True)
+    status: constr(max_length=1, strict=True)
+
+    class Config:
+        from_attributes = True
+
+
 class SuggestCarrierInput(BaseModel):
     sender_province: constr(max_length=2, strict=True)
     sender_district: constr(max_length=3, strict=True)
