@@ -2,12 +2,13 @@ import psycopg2
 from fastapi import APIRouter
 from scripts.api import schemas
 from scripts.api.database import *
+from typing import Optional
 
 router = APIRouter()
 
 
 @router.post("")
-def calculate(carrier_id):
+def calculate(carrier_id: Optional[int] = None):
 
     # Create connection
     connection = psycopg2.connect(
