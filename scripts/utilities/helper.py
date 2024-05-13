@@ -1030,7 +1030,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
     
         -- UPDATE for_fshop EQUAL for_partner
     carrier_information_final AS ( 
-        SELECT carrier_id, route_type, CAST (total_price AS int) AS price,, 
+        SELECT carrier_id, route_type, CAST (total_price AS int) AS price, 
         status, description, time_data, 
         time_display, rate, score, star, 
         for_partner AS for_shop, -- UPDATE for_shop = for_partner 
