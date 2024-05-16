@@ -12,7 +12,7 @@ def get_pct_ninja_van(s):
         return 0
 
 
-def xu_ly_chat_luong_noi_bo():
+def xu_ly_chat_luong_noi_bo_old():
 
     # 1. Đọc data raw
     clnb_njv_df = pd.read_excel(ROOT_PATH + '/input/chat_luong_noi_bo_njv.xlsx')
@@ -34,5 +34,61 @@ def xu_ly_chat_luong_noi_bo():
     clnb_njv_df = normalize_province_district(clnb_njv_df, tinh_thanh='receiver_province', quan_huyen='receiver_district')
     clnb_njv_df = clnb_njv_df.loc[clnb_njv_df['receiver_province'].notna() & clnb_njv_df['receiver_district'].notna()]
 
-    # 5. Lưu thông tin
+    return clnb_njv_df
+
+
+def xu_ly_chat_luong_noi_bo():
+
+    # 1. Dữ liệu chất lượng nội bộ cũ
+    old_njv = xu_ly_chat_luong_noi_bo_old()
+
+    # 2. Dữ liệu chất lượng nội bộ mới
+    raw_njv = pd.read_excel(ROOT_PATH + '/input/rst_cao_njv.xlsx')
+    raw_njv.columns = ['receiver_province', 'njv_post_office', 'delivery_failed_rate']
+
+    new_njv = raw_njv.sort_values('delivery_failed_rate', ascending=False).drop_duplicates(
+        subset=['receiver_province', 'njv_post_office'], keep='first')
+
+    # 3. Xử lý phần giao nhau
+    new_njv1 = old_njv.merge(new_njv[['njv_post_office', 'delivery_failed_rate']], on='njv_post_office', how='inner')
+
+    # 3.1. Tạo cột tmp_district
+    new_njv1['tmp_district'] = new_njv1['receiver_district'].str.strip().str.title()
+    new_njv1['tmp_district'] = new_njv1['tmp_district'].apply(unidecode)
+    new_njv1['tmp_district'] = new_njv1['tmp_district'].str.replace('Quan ', '').str.replace('Huyen ', '').str.replace(
+        'Thi Xa ', '').str.replace('Thanh Pho ', '').str.replace('.', '').str.replace(',', '')
+
+    # 3.2. Tạo cột tmp_post_office
+    new_njv1['tmp_post_office'] = new_njv1['njv_post_office'].str.split('-').str[1]
+    new_njv1['tmp_post_office'] = new_njv1['tmp_post_office'].str.strip()
+
+    # 3.3. Lấy đúng office thuộc quận/huyện
+    new_njv1 = new_njv1.loc[new_njv1['tmp_district'] == new_njv1['tmp_post_office']]
+
+    # 3.4. Update delivery_success_rate từ delivery_failed_rate
+    new_njv1['delivery_success_rate'] = 1 - new_njv1['delivery_failed_rate']
+
+    # 3.5. Chọn thông tin cần thiết
+    new_njv1 = new_njv1[['receiver_province', 'receiver_district', 'njv_post_office', 'delivery_success_rate', 'is_more_than_100']]
+
+    # 4. Xử lý phần riêng
+    new_njv2 = new_njv.loc[~new_njv['njv_post_office'].isin(new_njv1['njv_post_office'])]
+
+    # 4.1. Xử lý thông tin cần thiết
+    new_njv2['receiver_district'] = new_njv2['njv_post_office'].str.split('-').str[1]
+    new_njv2['receiver_district'] = new_njv2['receiver_district'].str.strip()
+
+    new_njv2['delivery_success_rate'] = 1 - new_njv2['delivery_failed_rate']
+    new_njv2['is_more_than_100'] = True
+
+    # 4.2. Chọn thông tin cần thiết
+    new_njv2 = new_njv2[['receiver_province', 'receiver_district', 'njv_post_office', 'delivery_success_rate', 'is_more_than_100']]
+
+    # 4.3. Chuẩn hóa tên quận/huyện, tỉnh/thành
+    new_njv2 = normalize_province_district(new_njv2, tinh_thanh='receiver_province', quan_huyen='receiver_district')
+    new_njv2 = new_njv2.loc[new_njv2['receiver_province'].notna() & new_njv2['receiver_district'].notna()]
+
+    # 5. Tổng hợp thông tin
+    clnb_njv_df = pd.concat([new_njv1, new_njv2, old_njv], ignore_index=True)
+    clnb_njv_df = clnb_njv_df.drop_duplicates(subset=['receiver_province', 'receiver_district'], keep='first')
     clnb_njv_df.to_parquet(ROOT_PATH + '/processed_data/chat_luong_noi_bo_njv.parquet', index=False)
