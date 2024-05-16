@@ -232,9 +232,10 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
     else:
         port = settings.SQLALCHEMY_DATABASE_URI
         engine = create_engine(port)
-        valid_order_df = pd.read_sql_query(
+        chunks = pd.read_sql_query(
             f"select * from db_schema.order where TO_DATE(date, 'YYYY-MM-DD') >= DATE '{run_date_str}' - INTERVAL '{n_days_back + 1} days'",
-            con=engine)
+            con=engine, chunksize=10000)
+        valid_order_df = pd.concat(chunk for chunk in chunks)
 
         valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
         # Chỉ lấy thông tin giao dịch từ n_days_back trở lại
