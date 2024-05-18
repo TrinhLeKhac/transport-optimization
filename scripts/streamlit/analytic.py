@@ -69,7 +69,7 @@ def create_analytic_tab(run_date_str):
         opt_zns_mess_province, opt_zns_mess_district = chart_zns_message.columns(2)
         opt_zns_mess_province.selectbox(  # multiselect
             ":blue[**Chọn Tỉnh/Thành Phố**]",
-            options=total_zns_df['receiver_province'].unique().tolist(),
+            options=sorted(total_zns_df['receiver_province'].unique().tolist()),
             key='zns_province',
         )
         filter_zns_df1 = total_zns_df.loc[
@@ -77,7 +77,7 @@ def create_analytic_tab(run_date_str):
         ]
         opt_zns_mess_district.selectbox(
             ":blue[**Chọn Quận/Huyện**]",
-            options=filter_zns_df1['receiver_district'].unique().tolist(),
+            options=sorted(filter_zns_df1['receiver_district'].unique().tolist()),
             key='zns_district',
         )
         opt_zns_mess_star, opt_zns_mess_range_date = chart_zns_message.columns([2, 3])
@@ -86,7 +86,7 @@ def create_analytic_tab(run_date_str):
         ]
         opt_zns_mess_star.selectbox(
             ":blue[**Chọn Số Sao Đánh Giá**]",
-            options=filter_zns_df2['n_stars'].unique().tolist(),
+            options=sorted(filter_zns_df2['n_stars'].unique().tolist()),
             key='zns_star',
         )
         filter_zns_df3 = filter_zns_df2.loc[
@@ -116,7 +116,7 @@ def create_analytic_tab(run_date_str):
 
         opt_zns_com_province.selectbox(
             ":blue[**Chọn Tỉnh/Thành Phố**]",
-            options=comment_zns_df['receiver_province'].unique().tolist(),
+            options=sorted(comment_zns_df['receiver_province'].unique().tolist()),
             key='zns_province2',
         )
         filter_comment_zns_df1 = comment_zns_df.loc[
@@ -124,7 +124,7 @@ def create_analytic_tab(run_date_str):
         ]
         opt_zns_com_district.selectbox(
             ":blue[**Chọn Quận/Huyện**]",
-            options=filter_comment_zns_df1['receiver_district'].unique().tolist(),
+            options=sorted(filter_comment_zns_df1['receiver_district'].unique().tolist()),
             key='zns_district2',
         )
         filter_comment_zns_df2 = filter_comment_zns_df1.loc[
@@ -132,7 +132,7 @@ def create_analytic_tab(run_date_str):
         ]
         chart_zns_comment.selectbox(
             ":blue[**Chọn Nhà Vận Chuyển**]",
-            options=filter_comment_zns_df2['carrier'].unique().tolist(),
+            options=sorted(filter_comment_zns_df2['carrier'].unique().tolist()),
             key='zns_carrier',
         )
         filter_comment_zns_df3 = filter_comment_zns_df2.loc[
@@ -165,7 +165,7 @@ def create_analytic_tab(run_date_str):
 
         opt_order_sender_province.selectbox(
             ":blue[**Chọn Tỉnh/Thành Phố Giao**]",
-            options=total_order_df['sender_province'].unique().tolist(),
+            options=sorted(total_order_df['sender_province'].unique().tolist()),
             key='order_sender_province',
         )
         filter_order_df1 = total_order_df.loc[
@@ -173,7 +173,7 @@ def create_analytic_tab(run_date_str):
             ]
         opt_order_sender_district.selectbox(
             ":blue[**Chọn Quận/Huyện Giao**]",
-            options=filter_order_df1['sender_district'].unique().tolist(),
+            options=sorted(filter_order_df1['sender_district'].unique().tolist()),
             key='order_sender_district',
         )
 
@@ -183,7 +183,7 @@ def create_analytic_tab(run_date_str):
             ]
         opt_order_receiver_province.selectbox(
             ":blue[**Chọn Tỉnh/Thành Phố Nhận**]",
-            options=filter_order_df2['receiver_province'].unique().tolist(),
+            options=sorted(filter_order_df2['receiver_province'].unique().tolist()),
             key='order_receiver_province',
         )
         filter_order_df3 = filter_order_df2.loc[
@@ -191,7 +191,7 @@ def create_analytic_tab(run_date_str):
             ]
         opt_order_receiver_district.selectbox(
             ":blue[**Chọn Quận/Huyện Nhận**]",
-            options=filter_order_df3['receiver_district'].unique().tolist(),
+            options=sorted(filter_order_df3['receiver_district'].unique().tolist()),
             key='order_receiver_district',
         )
         filter_order_df4 = filter_order_df3.loc[
@@ -204,7 +204,7 @@ def create_analytic_tab(run_date_str):
         opt_carrier_status, opt_weight_range = chart_order.columns(2)
         opt_carrier_status.selectbox(
             ":blue[**Chọn Trạng Thái Đơn Hàng**]",
-            options=options_carrier_status,
+            options=sorted(options_carrier_status),
             key='order_carrier_status',
         )
         filter_order_df5 = filter_order_df4.loc[
@@ -242,7 +242,7 @@ def create_analytic_tab(run_date_str):
 
             opt_delivery_type.selectbox(
                 ":blue[**Chọn Hình Thức Gửi Hàng**]",
-                options=filter_order_df7['delivery_type'].unique().tolist(),
+                options=sorted(filter_order_df7['delivery_type'].unique().tolist()),
                 key='order_delivery_type',
             )
             filter_order_df8 = filter_order_df7.loc[
@@ -276,7 +276,7 @@ def create_analytic_tab(run_date_str):
 
         opt_stuck_receiver_province.selectbox(
             ":blue[**Chọn Tỉnh/Thành Phố Nhận**]",
-            options=ton_dong_df['receiver_province'].unique().tolist(),
+            options=sorted(ton_dong_df['receiver_province'].unique().tolist()),
             key='stuck_receiver_province',
         )
         filter_ton_dong_df1 = ton_dong_df.loc[
@@ -284,7 +284,7 @@ def create_analytic_tab(run_date_str):
             ]
         opt_stuck_receiver_district.selectbox(
             ":blue[**Chọn Quận/Huyện Nhận**]",
-            options=filter_ton_dong_df1['receiver_district'].unique().tolist(),
+            options=sorted(filter_ton_dong_df1['receiver_district'].unique().tolist()),
             key='stuck_receiver_district',
         )
         filter_ton_dong_df2 = filter_ton_dong_df1.loc[
@@ -292,7 +292,7 @@ def create_analytic_tab(run_date_str):
             ]
         chart_stuck.selectbox(
             ":blue[**Chọn Hình Thức Vận Chuyển (order_type)**]",
-            options=filter_ton_dong_df2['order_type'].unique().tolist(),
+            options=sorted(filter_ton_dong_df2['order_type'].unique().tolist()),
             key='stuck_order_type',
         )
         filter_ton_dong_df3 = filter_ton_dong_df2.loc[
@@ -342,22 +342,22 @@ def create_analytic_tab(run_date_str):
 
         success_rate_div1.selectbox(
             ":blue[**Chọn Tỉnh/Thành Phố Nhận**]",
-            options=total_order_df['receiver_province'].unique().tolist(),
+            options=sorted(total_order_df['receiver_province'].unique().tolist()),
             key='success_rate_receiver_province',
         )
         success_rate_div2.selectbox(
             ":blue[**Chọn Quận/Huyện Nhận**]",
-            options=total_order_df.loc[
+            options=sorted(total_order_df.loc[
                 (total_order_df['receiver_province'] == st.session_state['success_rate_receiver_province'])
-            ]['receiver_district'].unique().tolist(),
+            ]['receiver_district'].unique().tolist()),
             key='success_rate_receiver_district',
         )
         success_rate_div3.selectbox(
             ":blue[**Chọn Nhà Vận Chuyển**]",
-            options=total_order_df.loc[
+            options=sorted(total_order_df.loc[
                 (total_order_df['receiver_province'] == st.session_state['success_rate_receiver_province'])
                 & (total_order_df['receiver_district'] == st.session_state['success_rate_receiver_district'])
-                ]['carrier'].unique().tolist(),
+                ]['carrier'].unique().tolist()),
             key='success_rate_carrier',
         )
         filter_success_rate_total_order_df = total_order_df.loc[
