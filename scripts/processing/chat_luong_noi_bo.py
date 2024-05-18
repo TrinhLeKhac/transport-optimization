@@ -45,13 +45,12 @@ def xu_ly_chat_luong_noi_bo_old():
 
 
 def xu_ly_chat_luong_noi_bo():
+
     # 1. Dữ liệu chất lượng nội bộ cũ
-    print('Dữ liệu chất lượng nội bộ cũ')
     old_njv = xu_ly_chat_luong_noi_bo_old()
 
     # 2. Dữ liệu chất lượng nội bộ mới
-    print('Dữ liệu chất lượng nội bộ mới')
-    raw_njv = pd.read_excel('./input/rst_cao_njv.xlsx')
+    raw_njv = pd.read_excel(ROOT_PATH + '/input/rst_cao_njv.xlsx')
     raw_njv.columns = ['receiver_province', 'njv_post_office', 'delivery_failed_rate']
     raw_njv['njv_post_office'] = raw_njv['njv_post_office'].astype(str).apply(lambda x: x.replace('\xa0', ' '))
 
@@ -123,4 +122,4 @@ def xu_ly_chat_luong_noi_bo():
     # 5. Tổng hợp thông tin
     clnb_njv_df = pd.concat([new_njv1, new_njv2, old_njv], ignore_index=True)
     clnb_njv_df = clnb_njv_df.drop_duplicates(subset=['receiver_province', 'receiver_district'], keep='first')
-    clnb_njv_df.to_parquet('./processed_data/chat_luong_noi_bo_njv.parquet', index=False)
+    clnb_njv_df.to_parquet(ROOT_PATH + '/processed_data/chat_luong_noi_bo_njv.parquet', index=False)
