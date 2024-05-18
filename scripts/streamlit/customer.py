@@ -95,37 +95,37 @@ def create_customer_tab():
         sender_province_field, sender_district_field = st.columns(2)
         sender_province_field.selectbox(
             ":blue[**Tỉnh/Thành Phố của Người Gửi**]",
-            options=(PROVINCE_MAPPING_DISTRICT_DF['province'].unique()),
+            options=sorted(PROVINCE_MAPPING_DISTRICT_DF['province'].unique().tolist()),
             key='sender_province',
         )
         sender_district_field.selectbox(
             ":blue[**Quận/Huyện của Người Gửi**]",
-            options=(
+            options=sorted(
                 PROVINCE_MAPPING_DISTRICT_DF.loc[
                     PROVINCE_MAPPING_DISTRICT_DF['province'] == st.session_state['sender_province']]
-                ['district'].unique()),
+                ['district'].unique().tolist()),
             key='sender_district',
         )
         # ----------------------------------------------------------------------------------------------
         receiver_province_field, receiver_district_field = st.columns(2)
         receiver_province_field.selectbox(
             ":blue[**Tỉnh/Thành Phố của Người Nhận**]",
-            options=(PROVINCE_MAPPING_DISTRICT_DF['province'].unique()),
+            options=sorted(PROVINCE_MAPPING_DISTRICT_DF['province'].unique().tolist()),
             key='receiver_province',
         )
         receiver_district_field.selectbox(
             ":blue[**Quận/Huyện của Người Nhận**]",
-            options=(
+            options=sorted(
                 PROVINCE_MAPPING_DISTRICT_DF.loc[
                     PROVINCE_MAPPING_DISTRICT_DF['province'] == st.session_state['receiver_province']]
-                ['district'].unique()),
+                ['district'].unique().tolist()),
             key='receiver_district',
         )
         # ----------------------------------------------------------------------------------------------
         pickup_field, weight_field = st.columns(2)
         pickup_field.selectbox(
             ":blue[**Hình Thức Gửi Hàng**]",
-            options=('Lấy Tận Nơi', 'Gửi Bưu Cục'),
+            options=('Gửi Bưu Cục', 'Lấy Tận Nơi'),
             key='pickup'
         )
         weight_field.number_input(
