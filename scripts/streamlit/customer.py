@@ -95,7 +95,7 @@ def create_customer_tab():
         sender_province_field, sender_district_field = st.columns(2)
         sender_province_field.selectbox(
             ":blue[**Tỉnh/Thành Phố của Người Gửi**]",
-            options=sorted(PROVINCE_MAPPING_DISTRICT_DF['province'].unique().tolist()),
+            options=sorted(PROVINCE_MAPPING_DISTRICT_DF['province'].unique().tolist(), key=vietnamese_sort_key),
             key='sender_province',
         )
         sender_district_field.selectbox(
@@ -103,14 +103,14 @@ def create_customer_tab():
             options=sorted(
                 PROVINCE_MAPPING_DISTRICT_DF.loc[
                     PROVINCE_MAPPING_DISTRICT_DF['province'] == st.session_state['sender_province']]
-                ['district'].unique().tolist()),
+                ['district'].unique().tolist(), key=vietnamese_sort_key),
             key='sender_district',
         )
         # ----------------------------------------------------------------------------------------------
         receiver_province_field, receiver_district_field = st.columns(2)
         receiver_province_field.selectbox(
             ":blue[**Tỉnh/Thành Phố của Người Nhận**]",
-            options=sorted(PROVINCE_MAPPING_DISTRICT_DF['province'].unique().tolist()),
+            options=sorted(PROVINCE_MAPPING_DISTRICT_DF['province'].unique().tolist(), key=vietnamese_sort_key),
             key='receiver_province',
         )
         receiver_district_field.selectbox(
@@ -118,7 +118,7 @@ def create_customer_tab():
             options=sorted(
                 PROVINCE_MAPPING_DISTRICT_DF.loc[
                     PROVINCE_MAPPING_DISTRICT_DF['province'] == st.session_state['receiver_province']]
-                ['district'].unique().tolist()),
+                ['district'].unique().tolist(), key=vietnamese_sort_key),
             key='receiver_district',
         )
         # ----------------------------------------------------------------------------------------------

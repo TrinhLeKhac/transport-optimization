@@ -60,6 +60,17 @@ def merge_left_only(df1, df2, keys=list()):
     return result
 
 
+def vietnamese_sort_key(s):
+    # Define the Vietnamese alphabet order
+    vietnamese_order = 'aăâbcdđeêghiklmnoôơpqrstuưvxyáàảãạắằẳẵặấầẩẫậéèẻẽẹếềểễệíìỉĩịóòỏõọốồổỗộớờởỡợúùủũụứừửữựýỳỷỹỵ'
+
+    # Create a mapping of each character to its order index
+    char_order = {char: idx for idx, char in enumerate(vietnamese_order)}
+
+    # Convert the string to lower case and replace characters with their order index
+    return [char_order.get(char, len(vietnamese_order)) for char in s.lower()]
+
+
 PROVINCE_MAPPING_DISTRICT_DF = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
 
 active_carrier_df = pd.DataFrame(data={'carrier': ACTIVE_CARRIER})
