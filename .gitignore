@@ -1,7 +1,6 @@
 /test.py
 /test_mysql_database.py
 /crontab/test_run.sh
-/input
 /processed_data
 /transform
 /output
