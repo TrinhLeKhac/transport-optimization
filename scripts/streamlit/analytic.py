@@ -86,7 +86,7 @@ def create_analytic_tab(run_date_str):
         ]
         opt_zns_mess_star.selectbox(
             ":blue[**Chọn Số Sao Đánh Giá**]",
-            options=sorted(filter_zns_df2['n_stars'].unique().tolist(), key=vietnamese_sort_key),
+            options=sorted(filter_zns_df2['n_stars'].unique().tolist()),
             key='zns_star',
         )
         filter_zns_df3 = filter_zns_df2.loc[
