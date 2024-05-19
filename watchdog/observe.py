@@ -68,6 +68,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         print("Usage: python /Users/trinhlk2/Desktop/superai/watchdog/observe.py <file1>:<command1> <file2>:<command2> ...")
+        # print("Usage: python /root/superai/watchdog/observe.py <file1>:<command1> <file2>:<command2> ...")
         sys.exit(1)
 
     files_to_commands = {}
