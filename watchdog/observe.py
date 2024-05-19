@@ -77,7 +77,7 @@ if __name__ == "__main__":
             file, command = arg.split(':')
             files_to_commands[file] = command
         except ValueError:
-            print(f"Invalid argument format: {arg}. Expected format: <command>:<file>")
+            print(f"Invalid argument format: {arg}. Expected format: <file>:<command>")
             sys.exit(1)
 
     watcher = Watcher(files_to_commands)
