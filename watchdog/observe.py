@@ -8,6 +8,7 @@ import os
 class Watcher:
     def __init__(self, files_to_watch):
         self.files_to_watch = {os.path.abspath(file): command for file, command in files_to_watch.items()}
+        print(self.files_to_watch)
         self.event_handler = Handler(self.files_to_watch)
         self.observer = Observer()
 
@@ -47,24 +48,30 @@ class Handler(FileSystemEventHandler):
 if __name__ == "__main__":
 
     # example command in Desktop
-    # file1 = "source1.txt"
+
+    # file1 = "./watchdog/source1.txt"
     # command1 = "python /Users/trinhlk2/Desktop/superai/watchdog/process1.py"
-    # file2 = "source2.txt"
+
+    # file2 = "./watchdog/source2.txt"
     # command2 = "python /Users/trinhlk2/Desktop/superai/watchdog/process2.py"
+
     # observe_command = f"python /Users/trinhlk2/Desktop/superai/watchdog/observe.py {file1}:{command1} {file2}:{command2}"
-    #  python /Users/trinhlk2/Desktop/superai/watchdog/observe.py source1.txt:"python /Users/trinhlk2/Desktop/superai/watchdog/process1.py" source2.txt:"python /Users/trinhlk2/Desktop/superai/watchdog/process2.py"
+    #  python /Users/trinhlk2/Desktop/superai/watchdog/observe.py ./watchdog/source1.txt:"python /Users/trinhlk2/Desktop/superai/watchdog/process1.py" ./watchdog/source2.txt:"python /Users/trinhlk2/Desktop/superai/watchdog/process2.py"
 
     # example command in server
-    # file1 = "bang_cuoc_phi.xlsx"
+
+    # file1 = "/root/superai/input/bang_cuoc_phi.xlsx"
     # command1 = "/root/superai/crontab/run.sh --mode=init --get-data=api"
-    # file2 = "phan_vung_ghep_supership.xlsx"
+    # file2 = "/root/superai/input/phan_vung_ghep_supership.xlsx"
     # command2 = "/root/superai/crontab/run.sh --mode=init --get-data=api"
-    # file3 = "ngung_giao_nhan.xlsx"
+
+    # file3 = "/root/superai/input/ngung_giao_nhan.xlsx"
     # command3 = "/root/superai/crontab/run.sh --mode=daily --get-data=api"
-    # file4 = "rst_cao_njv.xlsx"
+    # file4 = "/root/superai/input/rst_cao_njv.xlsx"
     # command4 = "/root/superai/crontab/run.sh --mode=daily --get-data=api"
+
     # observe_command = f"python /root/superai/watchdog/observe.py {file1}:{command1} {file2}:{command2} {file3}:{command3} {file4}:{command4}"
-    #  python /root/superai/watchdog/observe.py bang_cuoc_phi.xlsx:"/root/superai/crontab/run.sh --mode=init --get-data=api" phan_vung_ghep_supership.xlsx:"/root/superai/crontab/run.sh --mode=init --get-data=api" ngung_giao_nhan.xlsx:"/root/superai/crontab/run.sh --mode=daily --get-data=api" rst_cao_njv.xlsx:"/root/superai/crontab/run.sh --mode=daily --get-data=api"
+    #  python /root/superai/watchdog/observe.py /root/superai/input/bang_cuoc_phi.xlsx:"/root/superai/crontab/run.sh --mode=init --get-data=api" /root/superai/input/phan_vung_ghep_supership.xlsx:"/root/superai/crontab/run.sh --mode=init --get-data=api" /root/superai/input/ngung_giao_nhan.xlsx:"/root/superai/crontab/run.sh --mode=daily --get-data=api" /root/superai/input/rst_cao_njv.xlsx:"/root/superai/crontab/run.sh --mode=daily --get-data=api"
 
     if len(sys.argv) < 2:
         print("Usage: python /Users/trinhlk2/Desktop/superai/watchdog/observe.py <file1>:<command1> <file2>:<command2> ...")
@@ -79,6 +86,7 @@ if __name__ == "__main__":
         except ValueError:
             print(f"Invalid argument format: {arg}. Expected format: <file>:<command>")
             sys.exit(1)
+    print(files_to_commands)
 
     watcher = Watcher(files_to_commands)
     watcher.run()
