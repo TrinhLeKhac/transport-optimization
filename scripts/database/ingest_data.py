@@ -20,14 +20,14 @@ ENGINE = create_engine(PORT)
 
 # (path, tbl_name, is_id_col, is_churn_size, idx_cols)
 config_init = [
-    (ROOT_PATH + '/processed_data/phan_vung_nvc.parquet', 'tbl_phan_vung_nvc', False, False, None),
-    (ROOT_PATH + '/transform/buu_cuc.parquet', 'tbl_buu_cuc', False, False, None),
+    (ROOT_PATH + '/processed_data/phan_vung_nvc.parquet', 'tbl_phan_vung_nvc', False, False, None),  # Đẩy lên database, nhưng không có trong câu query. Dùng để tổng hợp order_type, new_type trong tbl_order_type
+    (ROOT_PATH + '/transform/buu_cuc.parquet', 'tbl_buu_cuc', False, False, None),  # Đẩy lên database, nhưng không có trong câu query.
     (
-        ROOT_PATH + '/output/data_order_type.parquet', 'tbl_order_type', False, True,
+        ROOT_PATH + '/output/data_order_type.parquet', 'tbl_order_type', False, True,  # observe, trigger run.sh mode init khi file phan_vung_ghep_supership.xlsx thay đổi => phan_vung_nvc.parquet thay đổi => data_order_type.parquet thay đổi.
         'carrier_id, sender_province_code, sender_district_code, receiver_province_code, receiver_district_code'
     ),
     (
-        ROOT_PATH + '/output/service_fee.parquet', 'tbl_service_fee', False, False,
+        ROOT_PATH + '/output/service_fee.parquet', 'tbl_service_fee', False, False,  # observe, trigger run.sh mode init khi file bang_cuoc_phi.xlsx thay đổi.
         'carrier_id, order_type, weight, pickup'
     ),
 ]
@@ -35,9 +35,9 @@ config_init = [
 # ------------------------------------ config daily ------------------------------------
 
 config_daily = [
-    (ROOT_PATH + '/transform/chat_luong_noi_bo_njv.parquet', 'tbl_clnb_ninja_van', False, False, None),
+    (ROOT_PATH + '/transform/chat_luong_noi_bo_njv.parquet', 'tbl_clnb_ninja_van', False, False, None),  # observe, run.sh script mode daily khi file rst_cao_njv.xlsx thay đổi.
     (
-        ROOT_PATH + '/transform/ngung_giao_nhan.parquet', 'tbl_ngung_giao_nhan', False, False,
+        ROOT_PATH + '/transform/ngung_giao_nhan.parquet', 'tbl_ngung_giao_nhan', False, False,  # observe, trigger rum.sh mode daily khi file ngung_giao_nhan.xlsx thay đổi.
         'carrier_id, sender_province_code, sender_district_code'
     ),
     (
