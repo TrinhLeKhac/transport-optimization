@@ -236,7 +236,7 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
             f"select * from db_schema.order where TO_DATE(date, 'YYYY-MM-DD') >= DATE '{run_date_str}' - INTERVAL '{n_days_back + 1} days'",
             con=engine, chunksize=10000)
         valid_order_df = pd.concat(chunk for chunk in chunks)
-        print('Shape: ', len(valid_order_df))
+        print('Shape phase1: ', len(valid_order_df))
 
         valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
         # Chỉ lấy thông tin giao dịch từ n_days_back trở lại
@@ -273,7 +273,10 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
             )
         )
 
+        print('Shape phase2: ', len(valid_order_df))
         valid_order_df = create_type_of_delivery(valid_order_df)
+        print('Shape phase3: ', len(valid_order_df))
+
         valid_order_df['order_type'] = valid_order_df['order_type_id'].map(MAPPING_ID_ORDER_TYPE)
 
         # valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
@@ -299,7 +302,7 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
 
         print('Min (created_at): ', valid_order_df['created_at'].min())
         print('Max (created_at): ', valid_order_df['created_at'].max())
-        print('Shape: ', len(valid_order_df))
+        print('Shape final: ', len(valid_order_df))
 
         # 4. Lưu thông tin
         valid_order_df.to_parquet(ROOT_PATH + '/processed_data/order.parquet', index=False)
