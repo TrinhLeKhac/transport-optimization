@@ -239,11 +239,15 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
         print('Shape phase1: ', len(valid_order_df))
 
         valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
-        # Chỉ lấy thông tin giao dịch từ n_days_back trở lại
+        valid_order_df['date'] = pd.to_datetime(valid_order_df['date'], errors='coerce')
+
+        # Chỉ lấy thông tin giao dịch từ n_days_back trở lại và drop_duplicates theo order_code
         valid_order_df = valid_order_df.loc[
             valid_order_df['created_at'] >=
             (run_date - timedelta(days=n_days_back))
             ]
+        valid_order_df = valid_order_df.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
+        print('Shape phase2: ', len(valid_order_df))
 
         valid_order_df['carrier'] = valid_order_df['carrier_id'].map(MAPPING_ID_CARRIER)
         valid_order_df['delivery_type'] = valid_order_df['pickup'].map({'0': 'Gửi Bưu Cục', '1': 'Lấy Tận Nơi'})
@@ -272,10 +276,10 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
                 }), on=['receiver_province_code', 'receiver_district_code'], how='left'
             )
         )
-
-        print('Shape phase2: ', len(valid_order_df))
-        valid_order_df = create_type_of_delivery(valid_order_df)
         print('Shape phase3: ', len(valid_order_df))
+
+        valid_order_df = create_type_of_delivery(valid_order_df)
+        print('Shape phase4: ', len(valid_order_df))
 
         valid_order_df['order_type'] = valid_order_df['order_type_id'].map(MAPPING_ID_ORDER_TYPE)
 
@@ -285,7 +289,7 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
         valid_order_df['carrier_updated_at'] = pd.to_datetime(valid_order_df['carrier_updated_at'], errors='coerce')
         valid_order_df['last_delivering_at'] = pd.to_datetime(valid_order_df['last_delivering_at'], errors='coerce')
         valid_order_df['carrier_delivered_at'] = pd.to_datetime(valid_order_df['carrier_delivered_at'], errors='coerce')
-        valid_order_df['date'] = pd.to_datetime(valid_order_df['date'], errors='coerce')
+        # valid_order_df['date'] = pd.to_datetime(valid_order_df['date'], errors='coerce')
 
         valid_order_df = valid_order_df[[
             'created_at', 'order_code', 'carrier', 'weight',
@@ -297,7 +301,7 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
             'picked_at', 'carrier_updated_at', 'last_delivering_at', 'carrier_delivered_at', 'date',
         ]]
 
-        valid_order_df = valid_order_df.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
+        # valid_order_df = valid_order_df.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
         valid_order_df['carrier_status'] = valid_order_df['carrier_status'].str.strip()
 
         print('Min (created_at): ', valid_order_df['created_at'].min())
