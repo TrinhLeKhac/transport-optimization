@@ -420,7 +420,7 @@ def create_analytic_tab(run_date_str):
         # except:
         #     div_3.warning(f"👉 :red[**Tổng số đơn giao**]: :red[**{len(success_df) + len(failed_df)}%**]")
 
-        if len(success_df) + len(failed_df) == 0:
+        if (len(success_df) + len(failed_df)) == 0:
             div_3.warning(f"👉 :red[**Tổng số đơn giao**]: :red[**{len(success_df) + len(failed_df)}%**]")
         else:
             div_3.info(f"👉 :red[**Tỉ lệ giao thành công**]: :red[**{round(delivery_success_rate * 100, 2)}%**]")
