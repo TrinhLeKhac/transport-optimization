@@ -49,6 +49,12 @@ def st_get_data_order():
     return df_order
 
 
+@st.cache_data
+def st_get_ti_le_giao_hang():
+    df_ti_le_giao_hang = pd.read_parquet(ROOT_PATH + '/transform/ti_le_giao_hang.parquet')
+    return df_ti_le_giao_hang
+
+
 @st.cache_data(experimental_allow_widgets=True)
 def save_excel(df, key):
     # buffer to use for excel writer

@@ -206,5 +206,6 @@ def transform_data_ti_le_giao_hang(run_date_str, n_days_back=30):
         'total_failed_order', 'total_order', 'delivery_success_rate',
         'status', 'score', 'criteria', 'criteria_weight'
     ]]
+    ti_le_giao_hang.to_parquet(ROOT_PATH + '/transform/ti_le_giao_hang.parquet', index=False)
 
     return ti_le_giao_hang

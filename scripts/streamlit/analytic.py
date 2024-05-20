@@ -149,6 +149,8 @@ def create_analytic_tab(run_date_str):
         # 3. Thống kê đơn hàng
         # 3.1 Load data
         total_order_df = st_get_data_order()
+        ti_le_giao_hang = st_get_ti_le_giao_hang()
+
         # 3.2 Thống kê data
         st.info(
             f"""
@@ -374,6 +376,12 @@ def create_analytic_tab(run_date_str):
             filter_success_rate_total_order_df['carrier_status'].isin(HOAN_HANG_STATUS)
         ]
 
+        delivery_success_rate = ti_le_giao_hang.loc[
+            (ti_le_giao_hang['receiver_province'] == st.session_state['success_rate_receiver_province'])
+            & (ti_le_giao_hang['receiver_district'] == st.session_state['success_rate_receiver_district'])
+            & (ti_le_giao_hang['carrier'] == st.session_state['success_rate_carrier'])
+        ]['delivery_success_rate'].tolist()[0]
+
         # ----------------------------------------------------------------------------------------------
         div_3, _, _ = st.columns(3)
         div_3.info(f"👉 Số đơn :red[**thành công**]: :red[**{len(success_df)}**]")
@@ -407,7 +415,12 @@ def create_analytic_tab(run_date_str):
             save_excel(failed_df, key='failed')
         # ----------------------------------------------------------------------------------------------
         div_3, _, _ = st.columns(3)
-        try:
-            div_3.info(f"👉 :red[**Tỉ lệ giao thành công**]: :red[**{round(len(success_df)/(len(success_df) + len(failed_df))*100, 2)}%**]")
-        except:
+        # try:
+        #     div_3.info(f"👉 :red[**Tỉ lệ giao thành công**]: :red[**{round(len(success_df)/(len(success_df) + len(failed_df))*100, 2)}%**]")
+        # except:
+        #     div_3.warning(f"👉 :red[**Tổng số đơn giao**]: :red[**{len(success_df) + len(failed_df)}%**]")
+
+        if len(success_df) + len(failed_df) == 0:
             div_3.warning(f"👉 :red[**Tổng số đơn giao**]: :red[**{len(success_df) + len(failed_df)}%**]")
+        else:
+            div_3.info(f"👉 :red[**Tỉ lệ giao thành công**]: :red[**{round(delivery_success_rate * 100, 2)}%**]")
