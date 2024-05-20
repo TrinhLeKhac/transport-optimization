@@ -236,6 +236,7 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
             f"select * from db_schema.order where TO_DATE(date, 'YYYY-MM-DD') >= DATE '{run_date_str}' - INTERVAL '{n_days_back + 1} days'",
             con=engine, chunksize=10000)
         valid_order_df = pd.concat(chunk for chunk in chunks)
+        print('Shape: ', len(valid_order_df))
 
         valid_order_df['created_at'] = pd.to_datetime(valid_order_df['created_at'], errors='coerce')
         # Chỉ lấy thông tin giao dịch từ n_days_back trở lại
