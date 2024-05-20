@@ -26,7 +26,7 @@ TRONG_SO = {
         },
     },
     'Tỉ lệ giao hàng': {
-        'Tiêu chí': 10,
+        'Tiêu chí': 15,
         'Phân loại': {
             'Tổng đơn hàng từ 30 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 10,
             'Tổng đơn hàng từ 20 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 8,
@@ -63,7 +63,7 @@ TRONG_SO = {
         }
     },
     'Thời gian giao hàng': {
-        'Tiêu chí': 2,  # total 10 order_type => scale weight 20 -> 20/10=2
+        'Tiêu chí': 1,  # total 10 order_type => scale weight 20 -> 20/10=2
         'Phân loại': {
             'Cách Miền': {
                 # 96h
