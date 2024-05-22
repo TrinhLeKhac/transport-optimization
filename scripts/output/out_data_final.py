@@ -396,7 +396,7 @@ if __name__ == '__main__':
     try:
         out_data_final(run_date_str=options.run_date, carriers=ACTIVE_CARRIER, show_logs=False, include_supership=include_supership)
         get_data_viz()
-        get_optimal_point(run_date_str=options.run_date, delta=0.9, step=2)
+        get_optimal_point(run_date_str=options.run_date, delta=1.1, step=2)
     except Exception as e:
         error = type(e).__name__ + " – " + str(e)
         telegram_bot_send_error_message(error)
