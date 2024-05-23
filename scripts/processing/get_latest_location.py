@@ -87,7 +87,8 @@ def get_latest_province_mapping_district_mapping_ward():
             district_df, on='province_code', how='inner'
         ).merge(
             commune_df, on='district_code', how='inner'
-        ).sort_values(['province_code', 'district_code', 'commune_code'])
+        ).sort_values(['province', 'district', 'commune', 'commune_code'], ascending=[True, True, True, False])
+        .drop_duplicates(['province', 'district', 'commune'])
         .reset_index(drop=True)
     )
 
@@ -114,7 +115,7 @@ def get_latest_province_mapping_district_mapping_ward_json():
             commune_api_res = \
             requests.get('https://api.mysupership.vn/v1/partner/areas/commune?district={}'.format(district_code),
                          verify=False).json()['results']
-            commune_list = [item['name'] for item in commune_api_res]
+            commune_list = list(set([item['name'] for item in commune_api_res]))
             district_mapping_commune_dict[district] = commune_list
 
         province_mapping_district_mapping_ward_dict[province] = district_mapping_commune_dict
