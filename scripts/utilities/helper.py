@@ -72,6 +72,7 @@ def vietnamese_sort_key(s):
 
 
 PROVINCE_MAPPING_DISTRICT_DF = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
+PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district_mapping_ward.parquet')
 
 active_carrier_df = pd.DataFrame(data={'carrier': ACTIVE_CARRIER})
 PROVINCE_MAPPING_DISTRICT_CROSS_CARRIER_DF = (
