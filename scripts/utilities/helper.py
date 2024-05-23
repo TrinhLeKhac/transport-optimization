@@ -83,6 +83,8 @@ PROVINCE_MAPPING_DISTRICT_CROSS_CARRIER_DF = (
 
 with open(ROOT_PATH + '/input/province_mapping_district_from_api.json') as file:
     PROVINCE_MAPPING_DISTRICT = json.load(file)
+with open(ROOT_PATH + '/input/province_mapping_district_mapping_ward_from_api.json') as file:
+    PROVINCE_MAPPING_DISTRICT_MAPPING_WARD = json.load(file)
 
 
 # để norm được case dấu đặt khác vị trí => dùng unidecode
@@ -140,13 +142,39 @@ def get_norm_district(province, district):
         return None
 
 
+def get_norm_commune(province, district, commune):
+    if commune is not None:
+        # province, district đưa vào hàm phải ở dạng chuẩn
+        # 1. sử dụng get_norm_province => 2. sử dụng hàm get_norm_district => 3. sử dụng hàm get_norm_commune
+        short_commune = unidecode(
+            preprocess_str(commune).replace('xã ', '').replace('phường ', '').replace('thị trấn ', '').replace('.', '').replace(',', ''))
+        # if short_commune == 'phan rang thap cham':
+        #     return 'Thành phố Phan Rang-Tháp Chàm'
+        # if province == 'Tỉnh Bình Định' and district == 'Thành phố Quy Nhơn' and short_commune == 'abc':
+        #     return 'abc'
+        try:
+            for n_commune in PROVINCE_MAPPING_DISTRICT_MAPPING_WARD[province][district]:
+                if unidecode(n_commune.lower()).endswith(unidecode(preprocess_str(commune))):
+                    return n_commune
+            for n_commune in PROVINCE_MAPPING_DISTRICT_MAPPING_WARD[province][district]:
+                if unidecode(n_commune.lower()).endswith(short_commune):
+                    return n_commune
+        except:
+            return None
+    else:
+        return None
+
+
 def normalize_province_district(target_df, tinh_thanh='tinh_thanh', quan_huyen='quan_huyen'):
     # 1. province
     print('Normalizing province...')
-    print('Before: ', target_df.shape[0])
-    target_df[tinh_thanh] = target_df[tinh_thanh].apply(get_norm_province)
     target_df = target_df[target_df[tinh_thanh].notna()]
-    print('After: ', target_df.shape[0])
+    print('Before: ', len(target_df))
+
+    target_df[tinh_thanh] = target_df[tinh_thanh].apply(get_norm_province)
+
+    target_df = target_df[target_df[tinh_thanh].notna()]
+    print('After: ', len(target_df))
 
     # 2. district
     print('Normalizing district...')
@@ -155,6 +183,44 @@ def normalize_province_district(target_df, tinh_thanh='tinh_thanh', quan_huyen='
         target_df[[tinh_thanh, quan_huyen]] \
             .apply(lambda x: get_norm_district(x[tinh_thanh], x[quan_huyen]), axis=1)
     print('After: ', target_df[target_df[quan_huyen].notna()].shape[0])
+
+    return target_df
+
+
+def normalize_province_district_ward(focus_df, tinh_thanh='tinh_thanh', quan_huyen='quan_huyen', phuong_xa='phuong_xa'):
+    target_df = focus_df.copy()
+    # 1. province
+    print('Normalizing province...')
+    target_df = target_df[target_df[tinh_thanh].notna()]
+    print('Before: ', len(target_df))
+
+    target_df[tinh_thanh] = target_df[tinh_thanh].apply(get_norm_province)
+
+    target_df = target_df[target_df[tinh_thanh].notna()]
+    print('After: ', len(target_df))
+
+    # 2. district
+    print('Normalizing district...')
+    target_df = target_df[target_df[quan_huyen].notna()]
+    print('Before: ', len(target_df))
+
+    target_df[quan_huyen] = \
+        target_df[[tinh_thanh, quan_huyen]] \
+            .apply(lambda x: get_norm_district(x[tinh_thanh], x[quan_huyen]), axis=1)
+    target_df = target_df[target_df[quan_huyen].notna()]
+    print('After: ', len(target_df))
+
+    # 3. commune
+    print('Normalizing commune...')
+    target_df = target_df[target_df[phuong_xa].notna()]
+    print('Before: ', len(target_df))
+
+    target_df[phuong_xa] = \
+        target_df[[tinh_thanh, quan_huyen, phuong_xa]] \
+            .apply(lambda x: get_norm_commune(x[tinh_thanh], x[quan_huyen], x[phuong_xa]), axis=1)
+
+    target_df = target_df[target_df[phuong_xa].notna()]
+    print('After: ', len(target_df))
 
     return target_df
 
