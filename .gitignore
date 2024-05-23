@@ -5,8 +5,9 @@
 /transform
 /output
 /.idea
-*.pyc
-*.xml
+**/*.pyc
+**/*.xml
 /venv
 /.env
+**/.DS_Store
 **/__pycache__/
