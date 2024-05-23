@@ -41,6 +41,7 @@ def xu_ly_ngung_giao_nhan():
 
 
 def xu_ly_ngung_giao_nhan_2():
+
     # Đọc data shopee ngưng giao nhận
     ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/input/shopee_ngung_giao_nhan.xlsx', header=None)
 
@@ -51,7 +52,14 @@ def xu_ly_ngung_giao_nhan_2():
     ngung_giao_nhan_final_df = normalize_province_district_ward(ngung_giao_nhan_df, tinh_thanh='receiver_province',
                                                                 quan_huyen='receiver_district',
                                                                 phuong_xa='receiver_commune')
-    ngung_giao_nhan_final_df = PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF.merge(ngung_giao_nhan_final_df, on=['receiver_province', 'receiver_district', 'receiver_commune'], how='left')
+
+    # sort_values theo status, giá trị 'Quá Tải' xếp trên giá trị None
+    ngung_giao_nhan_final_df = ngung_giao_nhan_final_df.sort_values('status').drop_duplicates(['receiver_province', 'receiver_district', 'receiver_commune'], keep='first')
+
+    # Mapping thông tin
+    mapping_address = PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF[['province', 'district', 'commune']]
+    mapping_address.columns = ['receiver_province', 'receiver_district', 'receiver_commune']
+    ngung_giao_nhan_final_df = mapping_address.merge(ngung_giao_nhan_final_df, on=['receiver_province', 'receiver_district', 'receiver_commune'], how='left')
     ngung_giao_nhan_final_df['carrier'] = 'SPX Express'
     ngung_giao_nhan_final_df = ngung_giao_nhan_final_df[
         ['receiver_province', 'receiver_district', 'receiver_commune', 'carrier', 'status']]
