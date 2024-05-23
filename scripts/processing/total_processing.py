@@ -7,7 +7,7 @@ import optparse
 ROOT_PATH = str(Path(__file__).parent.parent.parent)
 sys.path.append(ROOT_PATH)
 
-from scripts.processing.get_latest_location import get_latest_province_mapping_district, get_latest_province_mapping_district_json
+from scripts.processing.get_latest_location import get_latest_province_mapping_district, get_latest_province_mapping_district_json, get_latest_province_mapping_district_mapping_ward, get_latest_province_mapping_district_mapping_ward_json
 from scripts.processing.bang_gia_cuoc import xu_ly_bang_gia_cuoc
 from scripts.processing.chat_luong_noi_bo import xu_ly_chat_luong_noi_bo
 from scripts.processing.kho_giao_nhan import xu_ly_kho_giao_nhan
@@ -20,9 +20,11 @@ from scripts.utilities.helper import telegram_bot_send_error_message
 
 def total_processing(run_date_str, from_api=True, n_days_back=30):
 
-    print('0. Lấy thông tin metadata tỉnh thành, quận huyện mới nhất từ API...')
+    print('0. Lấy thông tin metadata tỉnh thành, quận huyện, phường xã mới nhất từ API...')
     get_latest_province_mapping_district()
     get_latest_province_mapping_district_json()
+    get_latest_province_mapping_district_mapping_ward()
+    get_latest_province_mapping_district_mapping_ward_json()
     print('>>> Done\n')
 
     if not os.path.exists(ROOT_PATH + '/processed_data'):
