@@ -123,8 +123,9 @@ def get_norm_district(province, district):
         # province đưa vào hàm phải ở dạng chuẩn
         # 1. sử dụng get_norm_province => 2. sử dụng hàm get_norm_district
         short_district = unidecode(
-            preprocess_str(district).replace('quận ', '').replace('huyện ', '').replace('thị xã ', '').replace(
-                'thành phố ', '').replace('.', '').replace(',', ''))
+            preprocess_str(district).replace('quận ', '').replace('huyện ', '').replace('thị xã ', '')
+            .replace('thành phố ', '').replace('.', '').replace(',', '')
+        )
         if short_district == 'phan rang thap cham':
             return 'Thành phố Phan Rang-Tháp Chàm'
         if province == 'Tỉnh Bình Định' and short_district == 'qui nhon':
@@ -148,7 +149,8 @@ def get_norm_commune(province, district, commune):
         # province, district đưa vào hàm phải ở dạng chuẩn
         # 1. sử dụng get_norm_province => 2. sử dụng hàm get_norm_district => 3. sử dụng hàm get_norm_commune
         short_commune = unidecode(
-            preprocess_str(commune).replace('xã ', '').replace('phường ', '').replace('thị trấn ', '').replace('.', '').replace(',', ''))
+            preprocess_str(commune).replace('xã ', '').replace('phường ', '').replace('thị trấn ', '').replace('.', '').replace(',', '')
+        )
         # if short_commune == 'phan rang thap cham':
         #     return 'Thành phố Phan Rang-Tháp Chàm'
         # if province == 'Tỉnh Bình Định' and district == 'Thành phố Quy Nhơn' and short_commune == 'abc':
@@ -189,7 +191,11 @@ def normalize_province_district(target_df, tinh_thanh='tinh_thanh', quan_huyen='
 
 
 def normalize_province_district_ward(focus_df, tinh_thanh='tinh_thanh', quan_huyen='quan_huyen', phuong_xa='phuong_xa'):
+
     target_df = focus_df.copy()
+    # Có thể comment toàn bộ dòng filter notna()
+    # # để tìm ra tên tỉnh/thành, quận/huyện, phường/xã bị sai
+
     # 1. province
     print('Normalizing province...')
     target_df = target_df[target_df[tinh_thanh].notna()]

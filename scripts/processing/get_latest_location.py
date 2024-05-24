@@ -41,8 +41,7 @@ def get_latest_province_mapping_district_json():
         [c['code'] for c in province_api_res['results']],
         [c['name'] for c in province_api_res['results']]
     ):
-        district_api_res = \
-        requests.get('https://api.mysupership.vn/v1/partner/areas/district?province={}'.format(province_code), verify=False).json()['results']
+        district_api_res = requests.get('https://api.mysupership.vn/v1/partner/areas/district?province={}'.format(province_code), verify=False).json()['results']
         district_list = [item['name'] for item in district_api_res]
         province_mapping_district_dict[province] = district_list
 
@@ -71,23 +70,28 @@ def get_latest_province_mapping_district_mapping_ward():
     district_df = pd.concat(list_district_df, ignore_index=True)
 
     list_commune_df = []
-    for district_code in district_df['district_code'].tolist():
+    for district, district_code in zip(district_df['district'].tolist(), district_df['district_code'].tolist()):
         commune_api_res = requests.get('https://api.mysupership.vn/v1/partner/areas/commune?district={}'.format(district_code), verify=False).json()['results']
-        for item in commune_api_res:
-            tmp_df = pd.DataFrame(data={
-                'commune_code': [item['code']],
-                'commune': [item['name']],
-                'district_code': [district_code]
-            })
-            list_commune_df.append(tmp_df)
+        if len(commune_api_res) == 0:
+            print(f'District {district} with code {district_code} has no commune')
+        else:
+            for item in commune_api_res:
+                tmp_df = pd.DataFrame(data={
+                    'commune_code': [item['code']],
+                    'commune': [item['name']],
+                    'district_code': [district_code]
+                })
+                list_commune_df.append(tmp_df)
     commune_df = pd.concat(list_commune_df, ignore_index=True)
 
     province_district_ward_df = (
-        province_df.merge(
+        province_df
+        .merge(
             district_df, on='province_code', how='inner'
         ).merge(
             commune_df, on='district_code', how='inner'
-        ).sort_values(['province', 'district', 'commune', 'commune_code'], ascending=[True, True, True, False])
+        )
+        .sort_values(['province', 'district', 'commune', 'commune_code'], ascending=[True, True, True, False])
         .drop_duplicates(['province', 'district', 'commune'])
         .reset_index(drop=True)
     )
@@ -103,18 +107,14 @@ def get_latest_province_mapping_district_mapping_ward_json():
             [c['code'] for c in province_api_res['results']],
             [c['name'] for c in province_api_res['results']]
     ):
-        district_api_res = \
-        requests.get('https://api.mysupership.vn/v1/partner/areas/district?province={}'.format(province_code),
-                     verify=False).json()['results']
+        district_api_res = requests.get('https://api.mysupership.vn/v1/partner/areas/district?province={}'.format(province_code), verify=False).json()['results']
 
         district_list = [item['name'] for item in district_api_res]
         district_code_list = [item['code'] for item in district_api_res]
 
         district_mapping_commune_dict = {}
         for district_code, district in zip(district_code_list, district_list):
-            commune_api_res = \
-            requests.get('https://api.mysupership.vn/v1/partner/areas/commune?district={}'.format(district_code),
-                         verify=False).json()['results']
+            commune_api_res = requests.get('https://api.mysupership.vn/v1/partner/areas/commune?district={}'.format(district_code), verify=False).json()['results']
             commune_list = list(set([item['name'] for item in commune_api_res]))
             district_mapping_commune_dict[district] = commune_list
 
