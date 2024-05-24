@@ -66,7 +66,15 @@ TABLE_SCHEMA = {
         'receiver_province_code': VARCHAR(length=2),
         'receiver_district_code': VARCHAR(length=3),
         'carrier_id': SMALLINT,
-        'status': VARCHAR(length=500),
+        'status': VARCHAR(length=30),
+        "import_time": TIMESTAMP,
+    },
+    'tbl_ngung_giao_nhan_level3': {
+        'receiver_province_code': VARCHAR(length=2),
+        'receiver_district_code': VARCHAR(length=3),
+        'receiver_commune_code': VARCHAR(length=3),
+        'carrier_id': SMALLINT,
+        'status': VARCHAR(length=30),
         "import_time": TIMESTAMP,
     },
     'tbl_phan_vung_nvc': {
