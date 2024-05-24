@@ -21,10 +21,18 @@ from scripts.utilities.helper import telegram_bot_send_error_message
 def total_processing(run_date_str, from_api=True, n_days_back=30):
 
     print('0. Lấy thông tin metadata tỉnh thành, quận huyện, phường xã mới nhất từ API...')
+
+    print('0.1 Lấy thông tin mapping tỉnh thành, quận huyện mới nhất ...')
     get_latest_province_mapping_district()
+
+    print('0.2 Lấy thông tin mapping tỉnh thành, quận huyện mới nhất (dạng json) ...')
     get_latest_province_mapping_district_json()
-    get_latest_province_mapping_district_mapping_ward()
-    get_latest_province_mapping_district_mapping_ward_json()
+
+    # print('0.3 Lấy thông tin mapping tỉnh thành, quận huyện, phường xã mới nhất ...')
+    # get_latest_province_mapping_district_mapping_ward()
+    #
+    # print('0.4 Lấy thông tin mapping tỉnh thành, quận huyện, phường xã mới nhất (dạng json)...')
+    # get_latest_province_mapping_district_mapping_ward_json()
     print('>>> Done\n')
 
     if not os.path.exists(ROOT_PATH + '/processed_data'):
