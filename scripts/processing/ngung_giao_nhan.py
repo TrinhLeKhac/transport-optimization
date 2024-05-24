@@ -35,13 +35,13 @@ def xu_ly_ngung_giao_nhan():
     set_carrier = set(ngung_giao_nhan_final_df['carrier'].unique().tolist())
     set_norm_full_carrier = set(MAPPING_CARRIER_ID.keys())
     assert set_carrier - set_norm_full_carrier == set(), 'Ops, Tên nhà vận chuyển chưa được chuẩn hóa'
+    ngung_giao_nhan_final_df.loc[ngung_giao_nhan_final_df['status'].notna(), 'status'] = 'Quá tải'
 
     # Lưu thông tin
     ngung_giao_nhan_final_df.to_parquet(ROOT_PATH + '/processed_data/ngung_giao_nhan.parquet', index=False)
 
 
-def xu_ly_ngung_giao_nhan_2():
-
+def xu_ly_ngung_giao_nhan_shopee():
     # Đọc data shopee ngưng giao nhận
     ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/input/shopee_ngung_giao_nhan.xlsx', header=None)
 
@@ -54,15 +54,39 @@ def xu_ly_ngung_giao_nhan_2():
                                                                 phuong_xa='receiver_commune')
 
     # sort_values theo status, giá trị 'Quá Tải' xếp trên giá trị None
-    ngung_giao_nhan_final_df = ngung_giao_nhan_final_df.sort_values('status').drop_duplicates(['receiver_province', 'receiver_district', 'receiver_commune'], keep='first')
+    ngung_giao_nhan_final_df = ngung_giao_nhan_final_df.sort_values('status').drop_duplicates(
+        ['receiver_province', 'receiver_district', 'receiver_commune'], keep='first')
 
     # Mapping thông tin
     mapping_address = PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF[['province', 'district', 'commune']]
     mapping_address.columns = ['receiver_province', 'receiver_district', 'receiver_commune']
-    ngung_giao_nhan_final_df = mapping_address.merge(ngung_giao_nhan_final_df, on=['receiver_province', 'receiver_district', 'receiver_commune'], how='left')
+    ngung_giao_nhan_final_df = mapping_address.merge(ngung_giao_nhan_final_df,
+                                                     on=['receiver_province', 'receiver_district', 'receiver_commune'],
+                                                     how='left')
     ngung_giao_nhan_final_df['carrier'] = 'SPX Express'
     ngung_giao_nhan_final_df = ngung_giao_nhan_final_df[
         ['receiver_province', 'receiver_district', 'receiver_commune', 'carrier', 'status']]
 
     # Lưu thông tin
     ngung_giao_nhan_final_df.to_parquet(ROOT_PATH + '/processed_data/shopee_ngung_giao_nhan.parquet', index=False)
+
+
+def xu_ly_ngung_giao_nhan_level_3():
+    ngung_giao_nhan = pd.read_parquet(ROOT_PATH + '/processed_data/ngung_giao_nhan.parquet')
+
+    mapping_address = PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF[['province', 'district', 'commune']]
+    mapping_address.columns = ['receiver_province', 'receiver_district', 'receiver_commune']
+
+    ngung_giao_nhan = ngung_giao_nhan.merge(mapping_address, on=['receiver_province', 'receiver_district'], how='left')
+    ngung_giao_nhan = ngung_giao_nhan[
+        ['receiver_province', 'receiver_district', 'receiver_commune', 'carrier', 'status']]
+
+    shoppe_ngung_giao_nhan = pd.read_parquet(ROOT_PATH + '/processed_data/shopee_ngung_giao_nhan.parquet')
+
+    ngung_giao_nhan_level_3 = pd.concat([
+        shoppe_ngung_giao_nhan,
+        ngung_giao_nhan
+    ]).sort_values(['status', 'receiver_province', 'receiver_district', 'receiver_commune', 'carrier']).drop_duplicates(
+        subset=['receiver_province', 'receiver_district', 'receiver_commune', 'carrier'])
+
+    ngung_giao_nhan_level_3.to_parquet(ROOT_PATH + '/processed_data/ngung_giao_nhan_level_3.parquet', index=False)

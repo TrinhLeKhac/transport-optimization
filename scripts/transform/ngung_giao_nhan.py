@@ -8,7 +8,7 @@ def transform_data_ngung_giao_nhan():
     ngung_giao_nhan_df = pd.read_parquet(ROOT_PATH + '/processed_data/ngung_giao_nhan.parquet')
 
     ngung_giao_nhan_df.loc[ngung_giao_nhan_df['status'].isna(), 'status'] = 'Bình thường'
-    ngung_giao_nhan_df.loc[ngung_giao_nhan_df['status'] != 'Bình thường', 'status'] = 'Quá tải'
+    # ngung_giao_nhan_df.loc[ngung_giao_nhan_df['status'] != 'Bình thường', 'status'] = 'Quá tải'
 
     ngung_giao_nhan_df = (
         PROVINCE_MAPPING_DISTRICT_CROSS_CARRIER_DF.merge(
