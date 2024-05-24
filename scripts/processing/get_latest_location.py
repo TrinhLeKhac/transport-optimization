@@ -122,3 +122,10 @@ def get_latest_province_mapping_district_mapping_ward_json():
 
     with open(ROOT_PATH + '/input/province_mapping_district_mapping_ward_from_api.json', 'w') as file:
         json.dump(province_mapping_district_mapping_ward_dict, file)
+
+
+if __name__ == '__main__':
+    get_latest_province_mapping_district()
+    get_latest_province_mapping_district_json()
+    get_latest_province_mapping_district_mapping_ward()
+    get_latest_province_mapping_district_mapping_ward_json()
