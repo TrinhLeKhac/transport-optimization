@@ -81,6 +81,13 @@ PROVINCE_MAPPING_DISTRICT_CROSS_CARRIER_DF = (
         'district': 'receiver_district'
     }).merge(active_carrier_df, how='cross')
 )
+PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_CROSS_CARRIER_DF = (
+    PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF[['province', 'district', 'commune']].rename(columns={
+        'province': 'receiver_province',
+        'district': 'receiver_district',
+        'commune': 'receiver_commune',
+    }).merge(active_carrier_df, how='cross')
+)
 
 with open(ROOT_PATH + '/input/province_mapping_district_from_api.json') as file:
     PROVINCE_MAPPING_DISTRICT = json.load(file)
