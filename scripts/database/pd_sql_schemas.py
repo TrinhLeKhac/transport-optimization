@@ -69,7 +69,7 @@ TABLE_SCHEMA = {
         'status': VARCHAR(length=30),
         "import_time": TIMESTAMP,
     },
-    'tbl_ngung_giao_nhan_level3': {
+    'tbl_ngung_giao_nhan_level_3': {
         'receiver_province_code': VARCHAR(length=2),
         'receiver_district_code': VARCHAR(length=3),
         'receiver_commune_code': VARCHAR(length=3),

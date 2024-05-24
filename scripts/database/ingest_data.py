@@ -41,7 +41,7 @@ config_daily = [
         'carrier_id, sender_province_code, sender_district_code'
     ),
     (
-        ROOT_PATH + '/transform/ngung_giao_nhan_level_3.parquet', 'tbl_ngung_giao_nhan_level3', False, False,  # observe, trigger rum.sh mode daily khi file shopee_ngung_giao_nhan.xlsx thay đổi.
+        ROOT_PATH + '/transform/ngung_giao_nhan_level_3.parquet', 'tbl_ngung_giao_nhan_level_3', False, False,  # observe, trigger rum.sh mode daily khi file shopee_ngung_giao_nhan.xlsx thay đổi.
         'carrier_id, receiver_province_code, receiver_district_code, receiver_commune_code'
     ),
     (
