@@ -39,7 +39,7 @@ class NGN(Base):
     carrier_id: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(String(30))
 
-    # __table_args__ = (PrimaryKeyConstraint("id", name="tbl_ngung_giao_nhan_rev_pkey"), {"schema": "db_schema"})
+    __table_args__ = (PrimaryKeyConstraint("id", name="tbl_ngung_giao_nhan_rev_pkey"), {"schema": "db_schema"})
 
 
 class NGNLV3(Base):
@@ -52,7 +52,7 @@ class NGNLV3(Base):
     carrier_id: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(String(30))
 
-    # __table_args__ = (PrimaryKeyConstraint("id", name="tbl_ngung_giao_nhan_level_3_rev_pkey"), {"schema": "db_schema"})
+    __table_args__ = (PrimaryKeyConstraint("id", name="tbl_ngung_giao_nhan_level_3_rev_pkey"), {"schema": "db_schema"})
 
 
 class Order(Base):
