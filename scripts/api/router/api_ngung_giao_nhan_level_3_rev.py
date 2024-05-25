@@ -35,6 +35,6 @@ async def get_data_ngung_giao_nhan_level_3_rev(
             "message": "",
             "data": {
                 "count": 1,
-                "order": ngung_giao_nhan_level_3_inf,
+                "ngn_status": ngung_giao_nhan_level_3_inf,
             },
         }
