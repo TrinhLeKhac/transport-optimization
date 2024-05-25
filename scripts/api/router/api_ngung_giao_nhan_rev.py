@@ -11,29 +11,22 @@ router = APIRouter()
 
 
 @router.post("")
-async def get_data_order(
-    request_data: Annotated[schemas.OrderModel, Body(description="Data order")],
+async def get_data_ngung_giao_nhan_rev(
+    request_data: Annotated[schemas.NGNModel, Body(description="Data ngung giao nhan")],
     db_session: AsyncSession = Depends(get_db)
 ):
     try:
         data_dict = request_data.model_dump()
-        order_inf = models.Order(**data_dict)
+        ngung_giao_nhan_inf = models.NGN(**data_dict)
 
-        db_session.add(order_inf)
+        db_session.add(ngung_giao_nhan_inf)
         await db_session.commit()
     except ProgrammingError as e:
-        if 'relation "db_schema.order" does not exist' in str(e):
-            create_tbl_if_not_exists('db_schema', 'order')
+        if 'relation "db_schema.tbl_ngung_giao_nhan_rev" does not exist' in str(e):
+            create_tbl_if_not_exists('db_schema', 'tbl_ngung_giao_nhan_rev')
             return {
                 "error": True,
-                "message": "Table order does not exist. Already created. Please insert data",
-                "data": {}
-            }
-    except IntegrityError as e:
-        if "constraint_dup_" in str(e):
-            return {
-                "error": True,
-                "message": "Duplicate row already exists",
+                "message": "Table tbl_ngung_giao_nhan_rev does not exist. Already created. Please insert data",
                 "data": {}
             }
     else:
@@ -42,6 +35,6 @@ async def get_data_order(
             "message": "",
             "data": {
                 "count": 1,
-                "order": order_inf,
+                "order": ngung_giao_nhan_inf,
             },
         }

@@ -74,7 +74,7 @@ class NGNModel(BaseModel):
     carrier_id: conint(strict=True)
     province: constr(max_length=2, strict=True)
     district: constr(max_length=3, strict=True)
-    status: constr(max_length=1, strict=True)
+    status: constr(max_length=30, strict=True)
 
     class Config:
         from_attributes = True
@@ -85,7 +85,7 @@ class NGNLV3Model(BaseModel):
     province: constr(max_length=2, strict=True)
     district: constr(max_length=3, strict=True)
     commune: constr(max_length=5, strict=True)
-    status: constr(max_length=1, strict=True)
+    status: constr(max_length=30, strict=True)
 
     class Config:
         from_attributes = True

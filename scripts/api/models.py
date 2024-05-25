@@ -30,6 +30,31 @@ class MessageZNS(Base):
     __table_args__ = (PrimaryKeyConstraint("id", name="message_zns_pkey"), {"schema": "db_schema"})
 
 
+class NGN(Base):
+    __tablename__ = "tbl_ngung_giao_nhan_rev"
+
+    id: Mapped[int] = mapped_column(Integer, autoincrement=True)
+    province: Mapped[str] = mapped_column(String(2))
+    district: Mapped[str] = mapped_column(String(3))
+    carrier_id: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(30))
+
+    # __table_args__ = (PrimaryKeyConstraint("id", name="tbl_ngung_giao_nhan_rev_pkey"), {"schema": "db_schema"})
+
+
+class NGNLV3(Base):
+    __tablename__ = "tbl_ngung_giao_nhan_level_3_rev"
+
+    id: Mapped[int] = mapped_column(Integer, autoincrement=True)
+    province: Mapped[str] = mapped_column(String(2))
+    district: Mapped[str] = mapped_column(String(3))
+    commune: Mapped[str] = mapped_column(String(5))
+    carrier_id: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(30))
+
+    # __table_args__ = (PrimaryKeyConstraint("id", name="tbl_ngung_giao_nhan_level_3_rev_pkey"), {"schema": "db_schema"})
+
+
 class Order(Base):
     __tablename__ = "order"
 

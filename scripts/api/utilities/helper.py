@@ -87,6 +87,27 @@ def create_tbl_if_not_exists(schema_name, table_name):
                 date
             );
         """
+    elif table_name == 'tbl_ngung_giao_nhan_rev':
+        table_query = f"""
+            CREATE TABLE {schema_name}.{table_name} (
+                id SERIAL PRIMARY KEY,
+                province VARCHAR(2),
+                district VARCHAR(3),
+                carrier_id SMALLINT,
+                status VARCHAR(30),
+            );
+        """
+    elif table_name == 'tbl_ngung_giao_nhan_level_3_rev':
+        table_query = f"""
+            CREATE TABLE {schema_name}.{table_name} (
+                id SERIAL PRIMARY KEY,
+                province VARCHAR(2),
+                district VARCHAR(3),
+                commune VARCHAR(5),
+                carrier_id SMALLINT,
+                status VARCHAR(30),
+            );
+        """
 
     create_table_query = sql.SQL(table_query)
     cursor.execute(create_table_query)
