@@ -10,7 +10,7 @@ sys.path.append(ROOT_PATH)
 from scripts.transform.chat_luong_noi_bo import transform_data_chat_luong_noi_bo
 from scripts.transform.danh_gia_zns import transform_data_danh_gia_zns
 from scripts.transform.kho_giao_nhan import transform_data_kho_giao_nhan
-from scripts.transform.ngung_giao_nhan import transform_data_ngung_giao_nhan
+from scripts.transform.ngung_giao_nhan import transform_data_ngung_giao_nhan, transform_data_ngung_giao_nhan_level_3
 from scripts.transform.thoi_gian_giao_hang_toan_trinh import transform_data_thoi_gian_giao_hang_toan_trinh
 from scripts.transform.ti_le_giao_hang import transform_data_ti_le_giao_hang
 from scripts.transform.don_ton_dong import get_khu_vuc_ton_dong
@@ -42,6 +42,7 @@ def total_transform(run_date_str, show_logs=True):
     if show_logs:
         print('4. Transform data chất lượng nội bộ...')
     chat_luong_noi_bo = transform_data_chat_luong_noi_bo()
+    transform_data_ngung_giao_nhan_level_3()
     if show_logs:
         print('>>> Done\n')
 
