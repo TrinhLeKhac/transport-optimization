@@ -94,7 +94,7 @@ def create_tbl_if_not_exists(schema_name, table_name):
                 province VARCHAR(2),
                 district VARCHAR(3),
                 carrier_id SMALLINT,
-                status VARCHAR(30),
+                status VARCHAR(30)
             );
         """
     elif table_name == 'tbl_ngung_giao_nhan_level_3_rev':
@@ -105,7 +105,7 @@ def create_tbl_if_not_exists(schema_name, table_name):
                 district VARCHAR(3),
                 commune VARCHAR(5),
                 carrier_id SMALLINT,
-                status VARCHAR(30),
+                status VARCHAR(30)
             );
         """
 
