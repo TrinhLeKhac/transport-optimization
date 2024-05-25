@@ -53,13 +53,6 @@ TABLE_SCHEMA = {
         'criteria_weight': SMALLINT,
         "import_time": TIMESTAMP,
     },
-    # 'tbl_ngung_giao_nhan': {
-    #     "receiver_province": VARCHAR(length=30),
-    #     "receiver_district": VARCHAR(length=30),
-    #     "carrier": VARCHAR(length=20),
-    #     "status": VARCHAR(length=30),
-    #     "import_time": TIMESTAMP,
-    # },
     'tbl_ngung_giao_nhan': {
         'sender_province_code': VARCHAR(length=2),
         'sender_district_code': VARCHAR(length=3),
@@ -72,7 +65,7 @@ TABLE_SCHEMA = {
     'tbl_ngung_giao_nhan_level_3': {
         'receiver_province_code': VARCHAR(length=2),
         'receiver_district_code': VARCHAR(length=3),
-        'receiver_commune_code': VARCHAR(length=3),
+        'receiver_commune_code': VARCHAR(length=5),
         'carrier_id': SMALLINT,
         'status': VARCHAR(length=30),
         "import_time": TIMESTAMP,
