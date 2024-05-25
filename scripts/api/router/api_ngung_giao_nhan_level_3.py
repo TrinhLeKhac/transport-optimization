@@ -71,8 +71,12 @@ def calculate(carrier_id: Optional[int] = None, commune: Optional[str] = None):
     rows = cursor.fetchall()
 
     # Get the field names from the Pydantic model
-    field_names = schemas.NGNLV3Model.__annotations__.keys()
-    result = [schemas.NGNLV3Model(**dict(zip(field_names, row))) for row in rows]
+    if commune is None:
+        field_names = schemas.NGNModel.__annotations__.keys()
+        result = [schemas.NGNModel(**dict(zip(field_names, row))) for row in rows]
+    else:
+        field_names = schemas.NGNLV3Model.__annotations__.keys()
+        result = [schemas.NGNLV3Model(**dict(zip(field_names, row))) for row in rows]
 
     # Commit the transaction
     connection.commit()
