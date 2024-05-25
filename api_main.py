@@ -1,4 +1,4 @@
-from scripts.api.router import api_output, api_ngung_giao_nhan, order, zns, optimal_score, result, result_final, result_super
+from scripts.api.router import api_output, api_ngung_giao_nhan, api_ngung_giao_nhan_rev, api_ngung_giao_nhan_level_3, api_ngung_giao_nhan_level_3_rev, order, zns, optimal_score, result, result_final, result_super
 from scripts.api.auth import authen
 from fastapi.exceptions import RequestValidationError
 from fastapi import FastAPI, Request, status, Depends
@@ -44,4 +44,7 @@ app.include_router(result_final.router, tags=[""], prefix="/superai/final", depe
 app.include_router(result_super.router, tags=[""], prefix="/superai/super", dependencies=[Depends(validate_token)])
 app.include_router(api_output.router, tags=[""], prefix="/superai/district", dependencies=[Depends(validate_token)])
 app.include_router(api_ngung_giao_nhan.router, tags=[""], prefix="/superai/status", dependencies=[Depends(validate_token)])
+app.include_router(api_ngung_giao_nhan_rev.router, tags=[""], prefix="/superai/status_rev", dependencies=[Depends(validate_token)])
+app.include_router(api_ngung_giao_nhan_level_3.router, tags=[""], prefix="/superai/status_lv3", dependencies=[Depends(validate_token)])
+app.include_router(api_ngung_giao_nhan_level_3_rev.router, tags=[""], prefix="/superai/status_lv3_rev", dependencies=[Depends(validate_token)])
 app.include_router(optimal_score.router, tags=[""], prefix="/superai/score", dependencies=[Depends(validate_token)])
