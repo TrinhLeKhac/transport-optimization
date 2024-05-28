@@ -11,7 +11,11 @@ def split_buu_cuc_ninja_van(s):
 def xu_ly_kho_giao_nhan():
 
     print('Ninja Van')
-    buu_cuc_njv_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_njv.xlsx')
+    try:
+        buu_cuc_njv_df = pd.read_excel(ROOT_PATH + '/user_input/buu_cuc_njv.xlsx')
+    except FileNotFoundError:
+        print(f"Error: The file {ROOT_PATH}/user_input/buu_cuc_njv.xlsx was not found. Use file {ROOT_PATH}/input/buu_cuc_njv.xlsx instead.")
+        buu_cuc_njv_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_njv.xlsx')
     buu_cuc_njv_df = buu_cuc_njv_df[1:]
 
     buu_cuc_njv_df.columns = [
@@ -46,7 +50,11 @@ def xu_ly_kho_giao_nhan():
     #############################################################################################
 
     print('GHN')
-    buu_cuc_ghn_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_ghn.xlsx')
+    try:
+        buu_cuc_ghn_df = pd.read_excel(ROOT_PATH + '/user_input/buu_cuc_ghn.xlsx')
+    except FileNotFoundError:
+        print(f"Error: The file {ROOT_PATH}/user_input/buu_cuc_ghn.xlsx was not found. Use file {ROOT_PATH}/input/buu_cuc_ghn.xlsx instead.")
+        buu_cuc_ghn_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_ghn.xlsx')
 
     buu_cuc_ghn_df.columns = ['address', 'receiver_province', 'receiver_district']
     buu_cuc_ghn_df['receiver_province'] = buu_cuc_ghn_df['receiver_province'].astype(str)
@@ -71,7 +79,11 @@ def xu_ly_kho_giao_nhan():
     #############################################################################################
 
     print('BEST Express')
-    buu_cuc_best_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_best.xlsx')
+    try:
+        buu_cuc_best_df = pd.read_excel(ROOT_PATH + '/user_input/buu_cuc_best.xlsx')
+    except FileNotFoundError:
+        print(f"Error: The file {ROOT_PATH}/user_input/buu_cuc_best.xlsx was not found. Use file {ROOT_PATH}/input/buu_cuc_best.xlsx instead.")
+        buu_cuc_best_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_best.xlsx')
 
     buu_cuc_best_df.columns = ['id', 'area', 'receiver_province', 'receiver_district', 'receiver_ward', 'best_post_office']
     buu_cuc_best_df['receiver_province'] = buu_cuc_best_df['receiver_province'].astype(str)
@@ -103,7 +115,11 @@ def xu_ly_kho_giao_nhan():
     #############################################################################################
 
     print('GHTK')
-    buu_cuc_ghtk_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_ghtk.xlsx')
+    try:
+        buu_cuc_ghtk_df = pd.read_excel(ROOT_PATH + '/user_input/buu_cuc_ghtk.xlsx')
+    except FileNotFoundError:
+        print(f"Error: The file {ROOT_PATH}/user_input/buu_cuc_ghtk.xlsx was not found. Use file {ROOT_PATH}/input/buu_cuc_ghtk.xlsx instead.")
+        buu_cuc_ghtk_df = pd.read_excel(ROOT_PATH + '/input/buu_cuc_ghtk.xlsx')
 
     buu_cuc_ghtk_df = buu_cuc_ghtk_df[['Tên bưu cục', 'Địa chỉ']]
     buu_cuc_ghtk_df.columns = ['ghtk_post_office', 'address']

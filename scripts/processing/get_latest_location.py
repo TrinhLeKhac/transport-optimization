@@ -29,7 +29,7 @@ def get_latest_province_mapping_district():
         ).sort_values(['province_code', 'district_code'])
         .reset_index(drop=True)
     )
-    province_district_df.to_parquet(ROOT_PATH + '/input/province_mapping_district.parquet', index=False)
+    province_district_df.to_parquet(ROOT_PATH + '/user_input/province_mapping_district.parquet', index=False)
 
 
 def get_latest_province_mapping_district_json():
@@ -45,7 +45,7 @@ def get_latest_province_mapping_district_json():
         district_list = [item['name'] for item in district_api_res]
         province_mapping_district_dict[province] = district_list
 
-    with open(ROOT_PATH + '/input/province_mapping_district_from_api.json', 'w') as file:
+    with open(ROOT_PATH + '/user_input/province_mapping_district_from_api.json', 'w') as file:
         json.dump(province_mapping_district_dict, file)
 
 
@@ -96,7 +96,7 @@ def get_latest_province_mapping_district_mapping_ward():
         .reset_index(drop=True)
     )
 
-    province_district_ward_df.to_parquet(ROOT_PATH + '/input/province_mapping_district_mapping_ward.parquet', index=False)
+    province_district_ward_df.to_parquet(ROOT_PATH + '/user_input/province_mapping_district_mapping_ward.parquet', index=False)
 
 
 def get_latest_province_mapping_district_mapping_ward_json():
@@ -120,7 +120,7 @@ def get_latest_province_mapping_district_mapping_ward_json():
 
         province_mapping_district_mapping_ward_dict[province] = district_mapping_commune_dict
 
-    with open(ROOT_PATH + '/input/province_mapping_district_mapping_ward_from_api.json', 'w') as file:
+    with open(ROOT_PATH + '/user_input/province_mapping_district_mapping_ward_from_api.json', 'w') as file:
         json.dump(province_mapping_district_mapping_ward_dict, file)
 
 

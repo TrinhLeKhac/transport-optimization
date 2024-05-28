@@ -3,7 +3,11 @@ from scripts.utilities.helper import *
 
 def xu_ly_phan_vung_nha_van_chuyen():
     # 1. Đọc thông tin raw
-    phan_vung_nvc = pd.read_excel(ROOT_PATH + '/input/phan_vung_ghep_supership.xlsx')
+    try:
+        phan_vung_nvc = pd.read_excel(ROOT_PATH + '/user_input/phan_vung_ghep_supership.xlsx')
+    except FileNotFoundError:
+        print(f"Error: The file {ROOT_PATH}/user_input/phan_vung_ghep_supership.xlsx was not found. Use file {ROOT_PATH}/input/phan_vung_ghep_supership.xlsx instead.")
+        phan_vung_nvc = pd.read_excel(ROOT_PATH + '/input/phan_vung_ghep_supership.xlsx')
 
     phan_vung_nvc = phan_vung_nvc.iloc[3:, 2:19]
     phan_vung_nvc.columns = [

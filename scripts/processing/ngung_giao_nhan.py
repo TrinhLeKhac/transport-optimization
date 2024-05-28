@@ -3,7 +3,11 @@ from scripts.utilities.helper import *
 
 def xu_ly_ngung_giao_nhan():
     # Đọc data ngưng giao nhận
-    ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/input/ngung_giao_nhan.xlsx')
+    try:
+        ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/user_input/ngung_giao_nhan.xlsx')
+    except FileNotFoundError:
+        print(f"Error: The file {ROOT_PATH}/user_input/ngung_giao_nhan.xlsx was not found. Use file {ROOT_PATH}/input/ngung_giao_nhan.xlsx instead.")
+        ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/input/ngung_giao_nhan.xlsx')
 
     # Chọn lấy cột cần thiết và đổi tên cột
     ngung_giao_nhan_df.columns = [
@@ -43,7 +47,11 @@ def xu_ly_ngung_giao_nhan():
 
 def xu_ly_ngung_giao_nhan_shopee():
     # Đọc data shopee ngưng giao nhận
-    ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/input/shopee_ngung_giao_nhan.xlsx', header=None)
+    try:
+        ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/user_input/shopee_ngung_giao_nhan.xlsx', header=None)
+    except FileNotFoundError:
+        print(f"Error: The file {ROOT_PATH}/user_input/shopee_ngung_giao_nhan.xlsx was not found. Use file {ROOT_PATH}/input/shopee_ngung_giao_nhan.xlsx instead.")
+        ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/input/shopee_ngung_giao_nhan.xlsx', header=None)
 
     ngung_giao_nhan_df.columns = ['country', 'receiver_province', 'receiver_district', 'receiver_commune']
     ngung_giao_nhan_df['status'] = 'Quá tải'

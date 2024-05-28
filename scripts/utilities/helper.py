@@ -71,8 +71,19 @@ def vietnamese_sort_key(s):
     return [char_order.get(char, len(vietnamese_order)) for char in s.lower()]
 
 
-PROVINCE_MAPPING_DISTRICT_DF = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
-PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district_mapping_ward.parquet')
+try:
+    PROVINCE_MAPPING_DISTRICT_DF = pd.read_parquet(ROOT_PATH + '/user_input/province_mapping_district.parquet')
+except FileNotFoundError:
+    print(
+        f"Error: The file {ROOT_PATH}/user_input/province_mapping_district.parquet was not found. Use file {ROOT_PATH}/input/province_mapping_district.parquet instead.")
+    PROVINCE_MAPPING_DISTRICT_DF = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
+
+try:
+    PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF = pd.read_parquet(ROOT_PATH + '/user_input/province_mapping_district_mapping_ward.parquet')
+except FileNotFoundError:
+    print(
+        f"Error: The file {ROOT_PATH}/user_input/province_mapping_district_mapping_ward.parquet was not found. Use file {ROOT_PATH}/input/province_mapping_district_mapping_ward.parquet instead.")
+    PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district_mapping_ward.parquet')
 
 active_carrier_df = pd.DataFrame(data={'carrier': ACTIVE_CARRIER})
 PROVINCE_MAPPING_DISTRICT_CROSS_CARRIER_DF = (
@@ -89,10 +100,19 @@ PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_CROSS_CARRIER_DF = (
     }).merge(active_carrier_df, how='cross')
 )
 
-with open(ROOT_PATH + '/input/province_mapping_district_from_api.json') as file:
-    PROVINCE_MAPPING_DISTRICT = json.load(file)
-with open(ROOT_PATH + '/input/province_mapping_district_mapping_ward_from_api.json') as file:
-    PROVINCE_MAPPING_DISTRICT_MAPPING_WARD = json.load(file)
+try:
+    with open(ROOT_PATH + '/user_input/province_mapping_district_from_api.json') as file:
+        PROVINCE_MAPPING_DISTRICT = json.load(file)
+except FileNotFoundError:
+    with open(ROOT_PATH + '/input/province_mapping_district_from_api.json') as file:
+        PROVINCE_MAPPING_DISTRICT = json.load(file)
+
+try:
+    with open(ROOT_PATH + '/user_input/province_mapping_district_mapping_ward_from_api.json') as file:
+        PROVINCE_MAPPING_DISTRICT_MAPPING_WARD = json.load(file)
+except FileNotFoundError:
+    with open(ROOT_PATH + '/input/province_mapping_district_mapping_ward_from_api.json') as file:
+        PROVINCE_MAPPING_DISTRICT_MAPPING_WARD = json.load(file)
 
 
 # để norm được case dấu đặt khác vị trí => dùng unidecode

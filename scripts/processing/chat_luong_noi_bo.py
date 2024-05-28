@@ -14,7 +14,11 @@ def get_pct_ninja_van(s):
 
 def xu_ly_chat_luong_noi_bo_old():
     # 1. Đọc data raw
-    clnb_njv_df = pd.read_excel(ROOT_PATH + '/input/chat_luong_noi_bo_njv.xlsx')
+    try:
+        clnb_njv_df = pd.read_excel(ROOT_PATH + '/user_input/chat_luong_noi_bo_njv.xlsx')
+    except FileNotFoundError:
+        print(f"Error: The file {ROOT_PATH}/user_input/chat_luong_noi_bo_njv.xlsx was not found. Use file {ROOT_PATH}/input/chat_luong_noi_bo_njv.xlsx instead.")
+        clnb_njv_df = pd.read_excel(ROOT_PATH + '/input/chat_luong_noi_bo_njv.xlsx')
     clnb_njv_df = clnb_njv_df[1:]
     clnb_njv_df.columns = [
         'region', 'receiver_province', 'id_receiver_district', 'receiver_district',
@@ -50,7 +54,12 @@ def xu_ly_chat_luong_noi_bo():
     old_njv = xu_ly_chat_luong_noi_bo_old()
 
     # 2. Dữ liệu chất lượng nội bộ mới
-    raw_njv = pd.read_excel(ROOT_PATH + '/input/rst_cao_njv.xlsx')
+    try:
+        raw_njv = pd.read_excel(ROOT_PATH + '/user_input/rst_cao_njv.xlsx')
+    except FileNotFoundError:
+        print(f"Error: The file {ROOT_PATH}/user_input/rst_cao_njv.xlsx was not found. Use file {ROOT_PATH}/input/rst_cao_njv.xlsx instead.")
+        raw_njv = pd.read_excel(ROOT_PATH + '/input/rst_cao_njv.xlsx')
+
     raw_njv.columns = ['receiver_province', 'njv_post_office', 'delivery_failed_rate']
     raw_njv['njv_post_office'] = raw_njv['njv_post_office'].astype(str).apply(lambda x: x.replace('\xa0', ' '))
 

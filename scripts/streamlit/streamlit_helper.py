@@ -18,7 +18,12 @@ def st_get_optimal_score():
 
 @st.cache_data
 def st_get_province_mapping_district():
-    return pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
+    try:
+        province_mapping_district = pd.read_parquet(ROOT_PATH + '/user_input/province_mapping_district.parquet')
+    except FileNotFoundError:
+        print(f"Error: The file {ROOT_PATH}/user_input/province_mapping_district.parquet was not found. Use file {ROOT_PATH}/input/province_mapping_district.parquet instead.")
+        province_mapping_district = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
+    return province_mapping_district
 
 
 @st.cache_data
