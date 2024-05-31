@@ -514,7 +514,7 @@ QUERY_SQL_COMMAND_API = """
     -- CREATE UNIQUE INDEX tbl_ngung_giao_nhan_idx 
     -- ON db_schema.tbl_ngung_giao_nhan(carrier_id, sender_province_code, sender_district_code);
 
-    WITH carrier_information AS ( 
+    WITH carrier_information_tmp AS ( 
         SELECT 
         tbl_ord.carrier_id, tbl_ord.route_type, 
         tbl_fee.price, 
@@ -547,6 +547,24 @@ QUERY_SQL_COMMAND_API = """
         AND tbl_ord.receiver_district_code = '{}' 
         AND tbl_fee.weight = CEIL({}/500.0)*500 
         AND tbl_fee.pickup = '{}' 
+    ),
+    
+    carrier_information AS ( 
+        SELECT carrier_id, route_type, price, ngn_status, status, 
+        CASE
+            WHEN ngn_status = 'Quá tải'
+                THEN 
+                    CASE 
+                        WHEN description = 'Bình thường' THEN 'Quá tải (quận/huyện gửi)'
+                        WHEN description = 'Quá tải' THEN 'Quá tải'
+                        ELSE 'Quá tải (quận/huyện gửi) + ' || description
+                    END
+            ELSE description
+        END AS description, 
+        time_data, 
+        time_display, rate, score, star, for_shop, 
+        speed_ranking, score_ranking, rate_ranking, optimal_score
+        FROM carrier_information_tmp 
     ),
     
     -- Create carrier_information_above CTE by 
@@ -663,7 +681,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
     -- Create carrier_information CTE
     -- by JOIN tbl_order_type, tbl_data_api, tbl_service_fee, tbl_optimal_score
 
-    WITH carrier_information AS ( 
+    WITH carrier_information_tmp AS ( 
         SELECT 
         tbl_ord.carrier_id, tbl_ord.route_type, 
         tbl_price.price, 
@@ -694,6 +712,24 @@ QUERY_SQL_COMMAND_API_SUPER = """
         AND tbl_ord.sender_district_code = '{}' 
         AND tbl_ord.receiver_province_code = '{}' 
         AND tbl_ord.receiver_district_code = '{}' 
+    ),
+    
+    carrier_information AS ( 
+        SELECT carrier_id, route_type, price, ngn_status, status, 
+        CASE
+            WHEN ngn_status = 'Quá tải'
+                THEN 
+                    CASE 
+                        WHEN description = 'Bình thường' THEN 'Quá tải (quận/huyện gửi)'
+                        WHEN description = 'Quá tải' THEN 'Quá tải'
+                        ELSE 'Quá tải (quận/huyện gửi) + ' || description
+                    END
+            ELSE description
+        END AS description, 
+        time_data, 
+        time_display, rate, score, star, for_shop, 
+        speed_ranking, score_ranking, rate_ranking, optimal_score
+        FROM carrier_information_tmp 
     ),
 
     -- Create carrier_information_above CTE by 
@@ -978,8 +1014,18 @@ QUERY_SQL_COMMAND_API_FINAL = """
                         ELSE 0
                     END
         END AS redeem_fee, 
-        status, ngn_status, description, time_data, 
-        time_display, rate, score, optimal_score, star, for_shop, 
+        status, ngn_status, 
+        CASE
+            WHEN ngn_status = 'Quá tải'
+                THEN 
+                    CASE 
+                        WHEN description = 'Bình thường' THEN 'Quá tải (quận/huyện gửi)'
+                        WHEN description = 'Quá tải' THEN 'Quá tải'
+                        ELSE 'Quá tải (quận/huyện gửi) + ' || description
+                    END
+            ELSE description
+        END AS description,
+        time_data, time_display, rate, score, optimal_score, star, for_shop, 
         speed_ranking, score_ranking 
         FROM carrier_information_tmp1 
     ), 
@@ -1331,8 +1377,18 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                         ELSE 0
                     END
         END AS redeem_fee, 
-        status, ngn_status, description, time_data, 
-        time_display, rate, score, optimal_score, star, for_shop, 
+        status, ngn_status, 
+        CASE
+            WHEN ngn_status = 'Quá tải'
+                THEN 
+                    CASE 
+                        WHEN description = 'Bình thường' THEN 'Quá tải (quận/huyện gửi)'
+                        WHEN description = 'Quá tải' THEN 'Quá tải'
+                        ELSE 'Quá tải (quận/huyện gửi) + ' || description
+                    END
+            ELSE description
+        END AS description, 
+        time_data, time_display, rate, score, optimal_score, star, for_shop, 
         speed_ranking, score_ranking 
         FROM carrier_information_tmp1 
     ), 
