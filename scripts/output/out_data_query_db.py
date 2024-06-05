@@ -110,4 +110,4 @@ if __name__ == '__main__':
             error = type(e).__name__ + " – " + str(e)
             telegram_bot_send_error_message(error)
     elif options.mode == 'daily':
-        pass
+        out_data_service_fee()
