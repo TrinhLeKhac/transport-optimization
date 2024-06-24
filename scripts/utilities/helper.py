@@ -518,7 +518,12 @@ QUERY_SQL_COMMAND_API = """
         SELECT 
         tbl_ord.carrier_id, tbl_ord.route_type, 
         tbl_fee.price, 
-        tbl_ngn.status AS ngn_status, 
+        -- tbl_ngn.status AS ngn_status, 
+        CASE 
+            WHEN tbl_ngn.status = 'Quá tải' AND tbl_fee.pickup = '0' 
+                THEN 'Bình thường' 
+            ELSE tbl_ngn.status
+        END AS ngn_status,
         tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
         ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score 
@@ -685,7 +690,12 @@ QUERY_SQL_COMMAND_API_SUPER = """
         SELECT 
         tbl_ord.carrier_id, tbl_ord.route_type, 
         tbl_price.price, 
-        tbl_ngn.status AS ngn_status, 
+        -- tbl_ngn.status AS ngn_status, 
+        CASE 
+            WHEN tbl_ngn.status = 'Quá tải' AND tbl_fee.pickup = '0' 
+                THEN 'Bình thường' 
+            ELSE tbl_ngn.status
+        END AS ngn_status,
         tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
         ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score 
@@ -847,7 +857,12 @@ QUERY_SQL_COMMAND_API_FINAL = """
         SELECT 
         tbl_ord.carrier_id, tbl_ord.route_type, 
         tbl_fee.price, 
-        tbl_ngn.status AS ngn_status, 
+        -- tbl_ngn.status AS ngn_status, 
+        CASE 
+            WHEN tbl_ngn.status = 'Quá tải' AND tbl_fee.pickup = '0' 
+                THEN 'Bình thường' 
+            ELSE tbl_ngn.status
+        END AS ngn_status,
         tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
         ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score 
@@ -1210,7 +1225,12 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         SELECT 
         tbl_ord.carrier_id, tbl_ord.new_type, 
         tbl_fee.price, 
-        tbl_ngn.status AS ngn_status, 
+        -- tbl_ngn.status AS ngn_status, 
+        CASE 
+            WHEN tbl_ngn.status = 'Quá tải' AND tbl_fee.pickup = '0' 
+                THEN 'Bình thường' 
+            ELSE tbl_ngn.status
+        END AS ngn_status,
         tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
         ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score 
