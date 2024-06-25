@@ -11,7 +11,7 @@ def execute_query_super(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
         price,
-        # weight, pickup
+        weight, pickup
 ):
     # Create connection
     connection = psycopg2.connect(
@@ -25,7 +25,7 @@ def execute_query_super(
         price_stm,
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
-        # weight, pickup
+        weight, pickup
     )
 
     cursor.execute(table_query)
@@ -52,14 +52,14 @@ def calculate_super(data: schemas.SuggestCarrierInputSuper):
     receiver_province_code = data.receiver_province
     receiver_district_code = data.receiver_district
     price = [(item.id, item.value) for item in data.price]
-    # weight = data['weight']
-    # pickup = data['pickup']
+    weight = data.weight
+    pickup = data.pickup
 
     result = execute_query_super(
         sender_province_code, sender_district_code,
         receiver_province_code, receiver_district_code,
         price,
-        # weight, pickup
+        weight, pickup
     )
 
     return {

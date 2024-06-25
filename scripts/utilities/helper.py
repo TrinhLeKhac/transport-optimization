@@ -707,6 +707,9 @@ QUERY_SQL_COMMAND_API_SUPER = """
         AND tbl_ord.receiver_province_code = tbl_api.receiver_province_code 
         AND tbl_ord.receiver_district_code = tbl_api.receiver_district_code 
         AND tbl_ord.new_type = tbl_api.new_type 
+        INNER JOIN db_schema.tbl_service_fee tbl_fee 
+        ON tbl_ord.carrier_id = tbl_fee.carrier_id 
+        AND tbl_ord.order_type = tbl_fee.order_type
         INNER JOIN db_schema.tbl_ngung_giao_nhan AS tbl_ngn 
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
@@ -722,6 +725,8 @@ QUERY_SQL_COMMAND_API_SUPER = """
         AND tbl_ord.sender_district_code = '{}' 
         AND tbl_ord.receiver_province_code = '{}' 
         AND tbl_ord.receiver_district_code = '{}' 
+        AND tbl_fee.weight = CEIL({}/500.0)*500 
+        AND tbl_fee.pickup = '{}' 
     ),
     
     carrier_information AS ( 
