@@ -345,7 +345,7 @@ ACTIVE_CARRIER = [
     'Viettel Post',
     'BEST Express',
     'Ninja Van',
-    'SPX Express'
+    'SPX Express',
 ]
 
 MAPPING_CARRIER_ID = {
