@@ -87,13 +87,17 @@ if __name__ == '__main__':
     parser = optparse.OptionParser(description="Running mode")
     parser.add_option(
         '-m', '--mode',
-        action="store", dest="mode",
-        help="mode string", default="excel"
+        type=str,
+        # action="store", dest="mode",
+        # help="mode string",
+        default="excel"
     )
     parser.add_option(
         '-r', '--run_date',
-        action="store", dest="run_date",
-        help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
+        type=str,
+        # action="store", dest="run_date",
+        # help="run_date string",
+        default=f"{datetime.now().strftime('%Y-%m-%d')}"
     )
     options, args = parser.parse_args()
     # print(options.mode)

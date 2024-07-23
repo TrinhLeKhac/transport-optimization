@@ -75,10 +75,10 @@ if __name__ == '__main__':
     parser = optparse.OptionParser(description="Running mode")
     parser.add_option(
         '-r', '--run_date',
-        action="store", dest="run_date",
-        help="run_date string", default=f"{datetime.now().strftime('%Y-%m-%d')}"
+        type=str,
+        # action="store", dest="run_date",
+        # help="run_date string",
+        default=f"{datetime.now().strftime('%Y-%m-%d')}"
     )
     options, args = parser.parse_args()
-    print(options.run_date)
-    print(type(options.run_date))
     total_transform(options.run_date, show_logs=True)
