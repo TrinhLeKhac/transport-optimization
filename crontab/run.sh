@@ -4,8 +4,7 @@
 # There are 3 arguments
 # $1 run mode (init | daily) --mode|-m
 # $2 type of get data (excel | api) --get-data|-g
-# $3 regulation value from optimal point --delta|-d
-# $4 run date (2024-01-15 | None) --run-date|-r
+# $3 run date (2024-01-15 | None) --run-date|-r
 
 for argument in "$@"
 do
@@ -15,13 +14,12 @@ do
   case "$key" in
     --mode|-m)        mode="$value" ;;
     --get-data|-g)    get_data="$value" ;;
-    --delta|-d)       delta="$value" ;;
     --run-date|-r)    run_date="$value" ;;
     *)
   esac
 done
 
-if [ -z "$4" ]
+if [ -z "$3" ]
   then
     run_date=$(date +%F)
 fi
@@ -42,7 +40,7 @@ python ./scripts/processing/total_processing.py --mode $get_data --run_date $run
 python ./scripts/output/out_data_api.py --run_date $run_date &&
 
 # Run script out data for visualization
-python ./scripts/output/out_data_final.py --run_date $run_date --delta $delta &&
+python ./scripts/output/out_data_final.py --run_date $run_date &&
 
 # Run script out data query database
 python ./scripts/output/out_data_query_db.py --mode $mode &&

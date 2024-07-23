@@ -476,3 +476,5 @@ DF_STATUS_MAPPING = pd.DataFrame(data={
               ['Hoàn hàng'] * len(HOAN_HANG_STATUS) + ['Thành công'] * len(THANH_CONG_STATUS) +
               ['Thất lạc'] * len(THAT_LAC_STATUS) + ['Không xét'] * len(KHONG_XET_STATUS)
 })
+
+DELTA = 0.9

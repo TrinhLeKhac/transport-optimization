@@ -388,17 +388,17 @@ if __name__ == '__main__':
         # help="run_date string",
         default=f"{datetime.now().strftime('%Y-%m-%d')}"
     )
-    parser.add_option(
-        '-d', '--delta',
-        type=float,
-        # action="store", dest="delta",
-        # help="delta float",
-        default=0.9
-    )
+    # parser.add_option(
+    #     '-d', '--delta',
+    #     type=float,
+    #     # action="store", dest="delta",
+    #     # help="delta float",
+    #     default=0.9
+    # )
     options, args = parser.parse_args()
 
-    print(options.delta)
-    print(type(options.delta))
+    # print(options.delta)
+    # print(type(options.delta))
 
     include_supership = False
     if include_supership:
@@ -408,7 +408,7 @@ if __name__ == '__main__':
     try:
         out_data_final(run_date_str=options.run_date, carriers=ACTIVE_CARRIER, show_logs=False, include_supership=include_supership)
         get_data_viz()
-        get_optimal_point(run_date_str=options.run_date, delta=options.delta, step=2)
+        get_optimal_point(run_date_str=options.run_date, delta=DELTA, step=2)
     except Exception as e:
         error = type(e).__name__ + " – " + str(e)
         telegram_bot_send_error_message(error)
