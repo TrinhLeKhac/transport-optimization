@@ -256,10 +256,10 @@ def out_data_api(
     api_data_final = api_data_final.merge(qua_tai, on=['receiver_province', 'receiver_district', 'carrier'], how='left')
     api_data_final.loc[api_data_final['total_order'] == 0, 'carrier_status_comment'] = 'Không có đơn hàng'
     api_data_final['carrier_status_comment'] = api_data_final['carrier_status_comment'].fillna('Bình thường')
-    api_data_final['carrier_status'] = 0
-    api_data_final.loc[api_data_final['carrier_status_comment'] == 'Quá tải', 'carrier_status'] = 1
-    api_data_final.loc[~api_data_final['carrier_status_comment'].isin(
-        ['Bình thường', 'Quá tải', 'Không có đơn hàng']), 'carrier_status'] = 2
+
+    api_data_final['carrier_status'] = 2
+    api_data_final.loc[api_data_final['carrier_status_comment'].isin(['Bình thường', 'Không có đơn hàng']), 'carrier_status'] = 0
+    api_data_final.loc[api_data_final['carrier_status_comment'].str.contains('Quá tải'), 'carrier_status'] = 1
 
     api_data_final['carrier_id'] = api_data_final['carrier'].map(MAPPING_CARRIER_ID)
     api_data_final = (
