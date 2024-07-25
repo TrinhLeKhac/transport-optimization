@@ -560,8 +560,8 @@ QUERY_SQL_COMMAND_API = """
             WHEN ngn_status = 'Quá tải'
                 THEN 
                     CASE 
-                        WHEN description = 'Bình thường' THEN 'Quá tải (quận/huyện gửi)'
-                        WHEN description = 'Quá tải' THEN 'Quá tải'
+                        WHEN status = '0' THEN 'Quá tải (quận/huyện gửi)'
+                        WHEN status = '1' THEN description
                         ELSE 'Quá tải (quận/huyện gửi) + ' || description
                     END
             ELSE description
@@ -585,7 +585,7 @@ QUERY_SQL_COMMAND_API = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score >= optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải') 
+        WHERE (score >= optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') 
     ), 
     
     -- Create carrier_information_below_tmp CTE by 
@@ -601,7 +601,7 @@ QUERY_SQL_COMMAND_API = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score < optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải') 
+        WHERE (score < optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') 
     ),
     
     -- Create carrier_information_below CTE by 
@@ -642,7 +642,7 @@ QUERY_SQL_COMMAND_API = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải') 
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') 
     ),
     
     carrier_information_overload_tmp2 AS (
@@ -735,8 +735,8 @@ QUERY_SQL_COMMAND_API_SUPER = """
             WHEN ngn_status = 'Quá tải'
                 THEN 
                     CASE 
-                        WHEN description = 'Bình thường' THEN 'Quá tải (quận/huyện gửi)'
-                        WHEN description = 'Quá tải' THEN 'Quá tải'
+                        WHEN status = '0' THEN 'Quá tải (quận/huyện gửi)'
+                        WHEN status = '1' THEN description
                         ELSE 'Quá tải (quận/huyện gửi) + ' || description
                     END
             ELSE description
@@ -760,7 +760,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score >= optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải') 
+        WHERE (score >= optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') 
     ), 
 
     -- Create carrier_information_below_tmp CTE by 
@@ -776,7 +776,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score < optimal_score) AND (description != 'Quá tải') AND (ngn_status != 'Quá tải') 
+        WHERE (score < optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') 
     ),
 
     -- Create carrier_information_below CTE by 
@@ -817,7 +817,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải') 
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') 
     ),
 
     carrier_information_overload_tmp2 AS ( 
@@ -1039,8 +1039,8 @@ QUERY_SQL_COMMAND_API_FINAL = """
             WHEN ngn_status = 'Quá tải'
                 THEN 
                     CASE 
-                        WHEN description = 'Bình thường' THEN 'Quá tải (quận/huyện gửi)'
-                        WHEN description = 'Quá tải' THEN 'Quá tải'
+                        WHEN status = '0' THEN 'Quá tải (quận/huyện gửi)'
+                        WHEN status = '1' THEN description
                         ELSE 'Quá tải (quận/huyện gửi) + ' || description
                     END
             ELSE description
@@ -1082,7 +1082,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
             (score >= optimal_score) 
             AND (insurance_fee != -1) 
             AND (collection_fee != -1) 
-            AND (description != 'Quá tải') 
+            AND (status != '1') 
             AND (ngn_status != 'Quá tải') 
     ), 
     
@@ -1103,7 +1103,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
             (score < optimal_score) 
             AND (insurance_fee != -1) 
             AND (collection_fee != -1) 
-            AND (description != 'Quá tải')
+            AND (status != '1')
             AND (ngn_status != 'Quá tải')
     ),
     
@@ -1145,7 +1145,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải') 
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') 
     ),
     
     carrier_information_overload_tmp2 AS ( 
@@ -1180,7 +1180,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         FROM carrier_information 
         WHERE 
             ((insurance_fee = -1) OR (collection_fee = -1))
-            AND (description != 'Quá tải') 
+            AND (status != '1') 
             AND (ngn_status != 'Quá tải')
     ),
     
@@ -1407,8 +1407,8 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             WHEN ngn_status = 'Quá tải'
                 THEN 
                     CASE 
-                        WHEN description = 'Bình thường' THEN 'Quá tải (quận/huyện gửi)'
-                        WHEN description = 'Quá tải' THEN 'Quá tải'
+                        WHEN status = '0' THEN 'Quá tải (quận/huyện gửi)'
+                        WHEN status = '1' THEN description
                         ELSE 'Quá tải (quận/huyện gửi) + ' || description
                     END
             ELSE description
@@ -1450,7 +1450,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             (score >= optimal_score) 
             AND (insurance_fee != -1) 
             AND (collection_fee != -1) 
-            AND (description != 'Quá tải') 
+            AND (status != '1') 
             AND (ngn_status != 'Quá tải')
     ), 
 
@@ -1471,7 +1471,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             (score < optimal_score) 
             AND (insurance_fee != -1) 
             AND (collection_fee != -1) 
-            AND (description != 'Quá tải')
+            AND (status != '1')
             AND (ngn_status != 'Quá tải')
     ),
 
@@ -1513,7 +1513,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (description = 'Quá tải') OR (ngn_status = 'Quá tải') 
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') 
     ),
     
     carrier_information_overload_tmp2 AS ( 
@@ -1548,7 +1548,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         FROM carrier_information 
         WHERE 
             ((insurance_fee = -1) OR (collection_fee = -1)) 
-            AND (description != 'Quá tải') 
+            AND (status != '1') 
             AND (ngn_status != 'Quá tải')
     ),
     
