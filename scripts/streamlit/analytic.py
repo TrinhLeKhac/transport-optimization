@@ -217,8 +217,8 @@ def create_analytic_tab(run_date_str):
         ]
         opt_weight_range.slider(
             label=":blue[**Chọn Khoảng Khối Lượng Đơn**]",
-            min_value=filter_order_df5['weight'].min(),
-            max_value=filter_order_df5['weight'].max() + 100,
+            min_value=int(filter_order_df5['weight'].min() // 100) * 100,
+            max_value=int(filter_order_df5['weight'].max() // 100) * 100 + 100,
             step=100,
             key='order_weight_range',
             value=(filter_order_df5['weight'].min(), filter_order_df5['weight'].max())
