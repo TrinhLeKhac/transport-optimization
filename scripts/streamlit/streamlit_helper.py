@@ -51,6 +51,11 @@ def st_get_data_order():
             'carrier_delivered_at'
         ]
     )
+    df_order = df_order.loc[
+        df_order['weight'].notna()
+        & df_order['reviewed_at'].notna()
+        & df_order['created_at'].notna()
+    ]
     return df_order
 
 
