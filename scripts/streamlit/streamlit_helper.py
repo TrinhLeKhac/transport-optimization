@@ -28,7 +28,9 @@ def st_get_province_mapping_district():
 
 @st.cache_data
 def st_get_data_zns():
-    return pd.read_parquet(ROOT_PATH + '/processed_data/danh_gia_zns.parquet')
+    df_zns = pd.read_parquet(ROOT_PATH + '/processed_data/danh_gia_zns.parquet')
+    df_zns = df_zns.loc[df_zns['reviewed_at'].notna()]
+    return df_zns
 
 
 @st.cache_data
@@ -53,7 +55,6 @@ def st_get_data_order():
     )
     df_order = df_order.loc[
         df_order['weight'].notna()
-        & df_order['reviewed_at'].notna()
         & df_order['created_at'].notna()
     ]
     return df_order
