@@ -62,7 +62,7 @@ def transform_data_chat_luong_noi_bo_ninja_van():
             }), on=['receiver_province', 'receiver_district'], how='right')
     )
     chat_luong_noi_bo_df['status'] = chat_luong_noi_bo_df['status'].fillna('Không có thông tin')
-    chat_luong_noi_bo_df['score'] = chat_luong_noi_bo_df['score'].fillna(5)
+    chat_luong_noi_bo_df['score'] = chat_luong_noi_bo_df['status'].map(TRONG_SO['Chất lượng nội bộ']['Phân loại']['Ninja Van'])
 
     chat_luong_noi_bo_df['carrier'] = 'Ninja Van'
     chat_luong_noi_bo_df['criteria'] = 'Chất lượng nội bộ'
@@ -89,7 +89,7 @@ def transform_data_chat_luong_noi_bo_lazada():
             }), on=['receiver_province', 'receiver_district'], how='right')
     )
     chat_luong_noi_bo_df['status'] = chat_luong_noi_bo_df['status'].fillna('Không có thông tin')
-    chat_luong_noi_bo_df['score'] = chat_luong_noi_bo_df['score'].fillna(5)
+    chat_luong_noi_bo_df['score'] = chat_luong_noi_bo_df['status'].map(TRONG_SO['Chất lượng nội bộ']['Phân loại']['Lazada Logistics'])
 
     chat_luong_noi_bo_df['carrier'] = 'Lazada Logistics'
     chat_luong_noi_bo_df['criteria'] = 'Chất lượng nội bộ'
