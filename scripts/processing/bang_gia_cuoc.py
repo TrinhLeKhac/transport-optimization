@@ -16,11 +16,6 @@ def xu_ly_bang_gia_cuoc():
                              axis=1).reset_index(
         drop=True)
     ninja_van_df.columns = COLUMNS_CUOC_PHI
-    # for i in range(80):
-    #     ninja_van_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 70 + 9 * int(i / 2), 70 + 9 * int(i / 2),
-    #                                    70 + 9 * int(i / 2), 70 + 9 * int(i / 2), 82 + 11 * int(i / 2),
-    #                                    124 + 16 * int(i / 2), 124 + 16 * int(i / 2), 82 + 11 * int(i / 2),
-    #                                    124 + 16 * int(i / 2), 124 + 16 * int(i / 2)]
     ninja_van_df['carrier'] = 'Ninja Van'
     ninja_van_df['carrier_id'] = 7
 
@@ -28,9 +23,6 @@ def xu_ly_bang_gia_cuoc():
     best_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 13:24]], axis=1).reset_index(
         drop=True)
     best_df.columns = COLUMNS_CUOC_PHI
-    # for i in range(80):
-    #     best_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i,
-    #                               38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i, 38 + 2 * i]
     best_df['carrier'] = 'BEST Express'
     best_df['carrier_id'] = 6
 
@@ -38,11 +30,6 @@ def xu_ly_bang_gia_cuoc():
     shopee_express_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 24:35]],
                                   axis=1).reset_index(drop=True)
     shopee_express_df.columns = COLUMNS_CUOC_PHI
-    # for i in range(80):
-    #     shopee_express_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 58.5 + 2.5 * i, 58.5 + 2.5 * i,
-    #                                         58.5 + 2.5 * i,
-    #                                         58.5 + 2.5 * i, 58.5 + 2.5 * i, 103 + 5 * i, 103 + 5 * i,
-    #                                         58.5 + 2.5 * i, 103 + 5 * i, 103 + 5 * i]
     shopee_express_df['carrier'] = 'SPX Express'
     shopee_express_df['carrier_id'] = 10
 
@@ -50,11 +37,6 @@ def xu_ly_bang_gia_cuoc():
     ghn_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 35:46]], axis=1).reset_index(
         drop=True)
     ghn_df.columns = COLUMNS_CUOC_PHI
-    # for i in range(80):
-    #     ghn_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-    #                              54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-    #                              54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-    #                              54 + 5 * int(i / 2)]
     ghn_df['carrier'] = 'GHN'
     ghn_df['carrier_id'] = 2
 
@@ -62,16 +44,6 @@ def xu_ly_bang_gia_cuoc():
     viettel_post_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 46:57]],
                                 axis=1).reset_index(drop=True)
     viettel_post_df.columns = COLUMNS_CUOC_PHI
-    # for i in range(40):
-    #     viettel_post_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 50 + 4 * int(i / 2), 50 + 4 * int(i / 2),
-    #                                       50 + 4 * int(i / 2), 50 + 4 * int(i / 2), 63 + 5 * int(i / 2),
-    #                                       63 + 5 * int(i / 2), 63 + 5 * int(i / 2),
-    #                                       63 + 5 * int(i / 2), 63 + 5 * int(i / 2), 63 + 5 * int(i / 2)]
-    # for i in range(40):
-    #     viettel_post_df.loc[60 + i, :] = [30000 + 500 * i, 30500 + 500 * i, 120 + 4 * int(i / 2), 120 + 4 * int(i / 2),
-    #                                       120 + 4 * int(i / 2), 120 + 4 * int(i / 2), 150 + 5.5 * int(i / 2),
-    #                                       150 + 5.5 * int(i / 2), 150 + 5.5 * int(i / 2),
-    #                                       150 + 5.5 * int(i / 2), 150 + 5.5 * int(i / 2), 150 + 5.5 * int(i / 2)]
     viettel_post_df['carrier'] = 'Viettel Post'
     viettel_post_df['carrier_id'] = 4
 
@@ -79,29 +51,27 @@ def xu_ly_bang_gia_cuoc():
     ghtk_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 57:68]], axis=1).reset_index(
         drop=True)
     ghtk_df.columns = COLUMNS_CUOC_PHI
-    # for i in range(80):
-    #     ghtk_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 85 + 2.5 * i, 85 + 2.5 * i, 59.5 + 2.5 * i,
-    #                               67.5 + 2.5 * i, 85 + 2.5 * i, 127.5 + 2.5 * i, 127.5 + 2.5 * i,
-    #                               85 + 2.5 * i, 127.5 + 2.5 * i, 127.5 + 2.5 * i]
     ghtk_df['carrier'] = 'GHTK'
     ghtk_df['carrier_id'] = 1
 
-    # 2.7 Tách lấy thông tin bảng giá cước SuperShip và xử lý
-    supership_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 68:79]],
+    # 2.7 Tách lấy thông tin bảng giá cước VNPost và xử lý
+    vnpost_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 79:90]],
                              axis=1).reset_index(
         drop=True)
-    supership_df.columns = COLUMNS_CUOC_PHI
-    # for i in range(80):
-    #     supership_df.loc[20 + i, :] = [10000 + 500 * i, 10500 + 500 * i, 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-    #                                    54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-    #                                    54 + 5 * int(i / 2),
-    #                                    54 + 5 * int(i / 2), 54 + 5 * int(i / 2), 54 + 5 * int(i / 2),
-    #                                    54 + 5 * int(i / 2)]
-    supership_df['carrier'] = 'SuperShip'
-    supership_df['carrier_id'] = 13
+    vnpost_df.columns = COLUMNS_CUOC_PHI
+    vnpost_df['carrier'] = 'VNPost'
+    vnpost_df['carrier_id'] = 13
+
+    # 2.8 Tách lấy thông tin bảng giá cước Lazada Logistics và xử lý
+    lazada_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 90:101]],
+                          axis=1).reset_index(
+        drop=True)
+    lazada_df.columns = COLUMNS_CUOC_PHI
+    lazada_df['carrier'] = 'Lazada Logistics'
+    lazada_df['carrier_id'] = 14
 
     # 3. Tổng hợp thông tin
-    cuoc_phi_df = pd.concat([ninja_van_df, best_df, shopee_express_df, ghn_df, viettel_post_df, ghtk_df, supership_df],
+    cuoc_phi_df = pd.concat([ninja_van_df, best_df, shopee_express_df, ghn_df, viettel_post_df, ghtk_df, vnpost_df, lazada_df],
                             ignore_index=True)
     cuoc_phi_df = cuoc_phi_df[['carrier_id', 'carrier'] + COLUMNS_CUOC_PHI]
     cuoc_phi_df = cuoc_phi_df.set_index(['carrier_id', 'carrier', 'gt', 'lt_or_eq'])
@@ -113,7 +83,7 @@ def xu_ly_bang_gia_cuoc():
         var_name='order_type', value_name='service_fee'
     )
 
-    # 3. Check tên nhà vận chuyển đã được chuẩn hóa chưa
+    # 3. Check tên nhà vận chuyển đã chuẩn hóa chưa
     set_carrier = set(cuoc_phi_df['carrier'].unique().tolist())
     set_norm_full_carrier = set(MAPPING_CARRIER_ID.keys())
     assert set_carrier - set_norm_full_carrier == set(), 'Ops, Tên nhà vận chuyển chưa được chuẩn hóa'
