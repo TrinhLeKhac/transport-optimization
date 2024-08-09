@@ -12,12 +12,13 @@ def get_pct_ninja_van(s):
         return 0
 
 
-def xu_ly_chat_luong_noi_bo_old():
+def xu_ly_chat_luong_noi_bo_ninja_van_old():
     # 1. Đọc data raw
     try:
         clnb_njv_df = pd.read_excel(ROOT_PATH + '/user_input/chat_luong_noi_bo_njv.xlsx')
     except FileNotFoundError:
-        print(f"Error: The file {ROOT_PATH}/user_input/chat_luong_noi_bo_njv.xlsx was not found. Use file {ROOT_PATH}/input/chat_luong_noi_bo_njv.xlsx instead.")
+        print(
+            f"Error: The file {ROOT_PATH}/user_input/chat_luong_noi_bo_njv.xlsx was not found. Use file {ROOT_PATH}/input/chat_luong_noi_bo_njv.xlsx instead.")
         clnb_njv_df = pd.read_excel(ROOT_PATH + '/input/chat_luong_noi_bo_njv.xlsx')
     clnb_njv_df = clnb_njv_df[1:]
     clnb_njv_df.columns = [
@@ -48,16 +49,16 @@ def xu_ly_chat_luong_noi_bo_old():
     return clnb_njv_df
 
 
-def xu_ly_chat_luong_noi_bo():
-
+def xu_ly_chat_luong_noi_bo_ninja_van():
     # 1. Dữ liệu chất lượng nội bộ cũ
-    old_njv = xu_ly_chat_luong_noi_bo_old()
+    old_njv = xu_ly_chat_luong_noi_bo_ninja_van_old()
 
     # 2. Dữ liệu chất lượng nội bộ mới
     try:
         raw_njv = pd.read_excel(ROOT_PATH + '/user_input/rst_cao_njv.xlsx')
     except FileNotFoundError:
-        print(f"Error: The file {ROOT_PATH}/user_input/rst_cao_njv.xlsx was not found. Use file {ROOT_PATH}/input/rst_cao_njv.xlsx instead.")
+        print(
+            f"Error: The file {ROOT_PATH}/user_input/rst_cao_njv.xlsx was not found. Use file {ROOT_PATH}/input/rst_cao_njv.xlsx instead.")
         raw_njv = pd.read_excel(ROOT_PATH + '/input/rst_cao_njv.xlsx')
 
     raw_njv.columns = ['receiver_province', 'njv_post_office', 'delivery_failed_rate']
@@ -96,7 +97,8 @@ def xu_ly_chat_luong_noi_bo():
     new_njv1['delivery_success_rate'] = 1 - new_njv1['delivery_failed_rate']
 
     # 3.5. Chọn thông tin cần thiết
-    new_njv1 = new_njv1[['receiver_province', 'receiver_district', 'njv_post_office', 'delivery_success_rate', 'is_more_than_100']]
+    new_njv1 = new_njv1[
+        ['receiver_province', 'receiver_district', 'njv_post_office', 'delivery_success_rate', 'is_more_than_100']]
 
     # 4. Xử lý phần riêng
     new_njv2 = new_njv.loc[~new_njv['njv_post_office'].isin(new_njv1['njv_post_office'])]
@@ -132,3 +134,30 @@ def xu_ly_chat_luong_noi_bo():
     clnb_njv_df = pd.concat([new_njv1, new_njv2, old_njv], ignore_index=True)
     clnb_njv_df = clnb_njv_df.drop_duplicates(subset=['receiver_province', 'receiver_district'], keep='first')
     clnb_njv_df.to_parquet(ROOT_PATH + '/processed_data/chat_luong_noi_bo_njv.parquet', index=False)
+
+
+def xu_ly_chat_luong_noi_bo_lazada():
+    clnb_lex_df = pd.read_excel(ROOT_PATH + '/input/chat_luong_noi_bo_lex.xlsx', sheet_name='Province')
+    clnb_lex_df = clnb_lex_df.loc[1:, :]
+    clnb_lex_df.columns = ['receiver_province', 'receiver_district', 'receiver_commune', 'w1', 'w2', 'w3', 'w4', 'w5',
+                           'w6', 'w7', 'w8']
+    clnb_lex_df['mean_w'] = clnb_lex_df[['w1', 'w2', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8']].mean(axis=1)
+    clnb_lex_df = clnb_lex_df.groupby(['receiver_province', 'receiver_district']).agg(
+        delivery_success_rate=('mean_w', 'mean')).reset_index()
+
+    clnb_lex_df = normalize_province_district(
+        clnb_lex_df,
+        tinh_thanh='receiver_province',
+        quan_huyen='receiver_district'
+    )
+    clnb_lex_df = clnb_lex_df.loc[clnb_lex_df['receiver_province'].notna() & clnb_lex_df['receiver_district'].notna()]
+    clnb_lex_df = clnb_lex_df.drop_duplicates(['receiver_province', 'receiver_district'], keep='first')
+
+    mean_value = clnb_lex_df['delivery_success_rate'].mean()
+    clnb_lex_df = PROVINCE_MAPPING_DISTRICT_DF[['province', 'district']].rename(
+        columns={'province': 'receiver_province', 'district': 'receiver_district'}).merge(clnb_lex_df,
+                                                                                          on=['receiver_province',
+                                                                                              'receiver_district'],
+                                                                                          how='left')
+    clnb_lex_df['delivery_success_rate'] = clnb_lex_df['delivery_success_rate'].fillna(mean_value)
+    clnb_lex_df.to_parquet(ROOT_PATH + '/processed_data/chat_luong_noi_bo_lazada.parquet', index=False)
