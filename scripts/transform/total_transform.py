@@ -4,10 +4,12 @@ from datetime import datetime
 from pathlib import Path
 import os
 
+import pandas as pd
+
 ROOT_PATH = str(Path(__file__).parent.parent.parent)
 sys.path.append(ROOT_PATH)
 
-from scripts.transform.chat_luong_noi_bo import transform_data_chat_luong_noi_bo
+from scripts.transform.chat_luong_noi_bo import transform_data_chat_luong_noi_bo_ninja_van, transform_data_chat_luong_noi_bo_lazada
 from scripts.transform.danh_gia_zns import transform_data_danh_gia_zns
 from scripts.transform.kho_giao_nhan import transform_data_kho_giao_nhan
 from scripts.transform.ngung_giao_nhan import transform_data_ngung_giao_nhan, transform_data_ngung_giao_nhan_level_3
@@ -41,7 +43,10 @@ def total_transform(run_date_str, show_logs=True):
 
     if show_logs:
         print('4. Transform data chất lượng nội bộ...')
-    chat_luong_noi_bo = transform_data_chat_luong_noi_bo()
+    chat_luong_noi_bo_ninja_van = transform_data_chat_luong_noi_bo_ninja_van()
+    chat_luong_noi_bo_lazada = transform_data_chat_luong_noi_bo_lazada()
+    chat_luong_noi_bo = pd.concat([chat_luong_noi_bo_ninja_van, chat_luong_noi_bo_lazada], ignore_index=True)
+
     transform_data_ngung_giao_nhan_level_3()
     if show_logs:
         print('>>> Done\n')
