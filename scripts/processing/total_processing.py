@@ -9,10 +9,10 @@ sys.path.append(ROOT_PATH)
 
 from scripts.processing.get_latest_location import get_latest_province_mapping_district, get_latest_province_mapping_district_json, get_latest_province_mapping_district_mapping_ward, get_latest_province_mapping_district_mapping_ward_json
 from scripts.processing.bang_gia_cuoc import xu_ly_bang_gia_cuoc
-from scripts.processing.chat_luong_noi_bo import xu_ly_chat_luong_noi_bo
+from scripts.processing.chat_luong_noi_bo import xu_ly_chat_luong_noi_bo_ninja_van, xu_ly_chat_luong_noi_bo_lazada
 from scripts.processing.kho_giao_nhan import xu_ly_kho_giao_nhan
 from scripts.processing.danh_gia_zns import xu_ly_danh_gia_zns
-from scripts.processing.ngung_giao_nhan import xu_ly_ngung_giao_nhan, xu_ly_ngung_giao_nhan_shopee, xu_ly_ngung_giao_nhan_level_3
+from scripts.processing.ngung_giao_nhan import xu_ly_ngung_giao_nhan, xu_ly_ngung_giao_nhan_shopee, xu_ly_ngung_giao_nhan_lazada, xu_ly_ngung_giao_nhan_level_3
 from scripts.processing.phan_vung_nha_van_chuyen import xu_ly_phan_vung_nha_van_chuyen
 from scripts.processing.giao_dich import xu_ly_giao_dich, xu_ly_giao_dich_co_khoi_luong, tong_hop_thong_tin_giao_dich
 from scripts.utilities.helper import telegram_bot_send_error_message
@@ -42,8 +42,9 @@ def total_processing(run_date_str, from_api=True, n_days_back=30):
     xu_ly_bang_gia_cuoc()
     print('>>> Done\n')
 
-    print('2. Xử lý data chất lượng nội bộ Ninja Van...')
-    xu_ly_chat_luong_noi_bo()
+    print('2. Xử lý data chất lượng nội bộ Ninja Van, Lazada...')
+    xu_ly_chat_luong_noi_bo_ninja_van()
+    xu_ly_chat_luong_noi_bo_lazada()
     print('>>> Done\n')
 
     print('3. Xử lý data kho giao nhận...')
@@ -57,6 +58,7 @@ def total_processing(run_date_str, from_api=True, n_days_back=30):
     print('5. Xử lý data ngưng giao nhận...')
     xu_ly_ngung_giao_nhan()
     xu_ly_ngung_giao_nhan_shopee()
+    xu_ly_ngung_giao_nhan_lazada()
     xu_ly_ngung_giao_nhan_level_3()
     print('>>> Done\n')
 
