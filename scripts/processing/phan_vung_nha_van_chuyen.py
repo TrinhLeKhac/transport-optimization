@@ -9,13 +9,19 @@ def xu_ly_phan_vung_nha_van_chuyen():
         print(f"Error: The file {ROOT_PATH}/user_input/phan_vung_ghep_supership.xlsx was not found. Use file {ROOT_PATH}/input/phan_vung_ghep_supership.xlsx instead.")
         phan_vung_nvc = pd.read_excel(ROOT_PATH + '/input/phan_vung_ghep_supership.xlsx')
 
-    phan_vung_nvc = phan_vung_nvc.iloc[3:, 2:19]
+    phan_vung_nvc = phan_vung_nvc.iloc[3:, 2:25]
     phan_vung_nvc.columns = [
         'receiver_province', 'receiver_district', 'short_receiver_district',
-        'ghn_outer_region', 'ghn_inner_region', 'njv_outer_region', 'njv_inner_region',
-        'vtp_outer_region', 'vtp_inner_region', 'spx_outer_region', 'spx_inner_region',
-        'best_outer_region', 'best_inner_region', 'ghtk_outer_region', 'ghtk_inner_region',
+        'ghn_outer_region', 'ghn_inner_region',
+        'njv_outer_region', 'njv_inner_region',
+        'vtp_outer_region', 'vtp_inner_region',
+        'spx_outer_region', 'spx_inner_region',
+        'best_outer_region', 'best_inner_region',
+        'ghtk_outer_region', 'ghtk_inner_region',
         'supership_outer_region', 'supership_inner_region',
+        'tikinow_outer_region', 'tikinow_inner_region',
+        'vnpost_outer_region', 'vnpost_inner_region',
+        'lazada_outer_region', 'lazada_inner_region',
     ]
     phan_vung_nvc = phan_vung_nvc.drop('short_receiver_district', axis=1)
 
@@ -68,15 +74,23 @@ def xu_ly_phan_vung_nha_van_chuyen():
     })
     ghtk['carrier'] = 'GHTK'
 
-    supership = phan_vung_nvc[[
+    vnpost = phan_vung_nvc[[
         'receiver_province', 'receiver_district',
-        'supership_outer_region', 'supership_inner_region']].rename(columns={
-        'supership_outer_region': 'outer_region',
-        'supership_inner_region': 'inner_region'
+        'vnpost_outer_region', 'vnpost_inner_region']].rename(columns={
+        'vnpost_outer_region': 'outer_region',
+        'vnpost_inner_region': 'inner_region'
     })
-    supership['carrier'] = 'SuperShip'
+    vnpost['carrier'] = 'VNPost'
 
-    phan_vung_nvc_final = pd.concat([ghn, njv, vtp, spx, best, ghtk, supership], ignore_index=True)
+    lazada = phan_vung_nvc[[
+        'receiver_province', 'receiver_district',
+        'lazada_outer_region', 'lazada_inner_region']].rename(columns={
+        'lazada_outer_region': 'outer_region',
+        'lazada_inner_region': 'inner_region'
+    })
+    lazada['carrier'] = 'Lazada Logistics'
+
+    phan_vung_nvc_final = pd.concat([ghn, njv, vtp, spx, best, ghtk, vnpost, lazada], ignore_index=True)
     phan_vung_nvc_final = phan_vung_nvc_final[
         ['carrier', 'receiver_province', 'receiver_district', 'outer_region', 'inner_region']]
     phan_vung_nvc_final['inner_region'] = phan_vung_nvc_final['inner_region'].map({
