@@ -60,6 +60,18 @@ TRONG_SO = {
                 'Ti lệ dưới 91% và tổng số đơn giao hàng trên 100 đơn': -6,
                 'Không có thông tin': 0,
             },
+            'Lazada Logistics': {
+                'Ti lệ trên 99%': 10,
+                'Ti lệ trên 98%': 9,
+                'Ti lệ trên 97%': 8,
+                'Ti lệ trên 96.5%': 7,
+                'Ti lệ trên 96%': 5,
+                'Ti lệ trên 95.5%': 3,
+                'Ti lệ trên 95%': 1,
+                'Ti lệ trên 94%': -3,
+                'Ti lệ dưới 94%': -6,
+                'Không có thông tin': 0,
+            },
         }
     },
     'Thời gian giao hàng': {
@@ -346,6 +358,8 @@ ACTIVE_CARRIER = [
     'BEST Express',
     'Ninja Van',
     'SPX Express',
+    'VNPost',
+    'Lazada Logistics'
 ]
 
 MAPPING_CARRIER_ID = {
@@ -353,7 +367,6 @@ MAPPING_CARRIER_ID = {
     'GHN': 2,
     'J&T Express': 3,
     'Viettel Post': 4,
-    'VNPost': 5,
     'BEST Express': 6,
     'Ninja Van': 7,
     'Snappy Express': 8,
@@ -361,7 +374,8 @@ MAPPING_CARRIER_ID = {
     'SPX Express': 10,
     'NETCO Post': 11,
     'TikiNOW Smart Logistics': 12,
-    'SuperShip': 13,
+    'VNPost': 13,
+    'Lazada Logistics': 14
 }
 
 MAPPING_ID_CARRIER = {}
