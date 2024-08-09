@@ -11,3 +11,4 @@
 **/*.xml
 **/.DS_Store
 **/__pycache__/
+./test_tich_hop_nvc.py
