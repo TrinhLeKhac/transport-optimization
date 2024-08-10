@@ -714,7 +714,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
         AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
-        -- (6, 18000), (7, 17000), (2, 19000), (4, 20000), (10, 15000) 
+        -- (6, 18000), (7, 17000), (2, 19000), (4, 20000), (10, 15000), (13, 15000), (14, 15000) 
         INNER JOIN (VALUES {}) AS tbl_price(carrier_id, price) 
         ON tbl_ord.carrier_id = tbl_price.carrier_id 
         CROSS JOIN ( 
@@ -950,7 +950,15 @@ QUERY_SQL_COMMAND_API_FINAL = """
                         WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
                         WHEN item_price > 5000000 THEN -1
                     END
-            WHEN carrier_id = 13 -- SuperShip
+            WHEN carrier_id = 13 -- VnPost
+                THEN
+                    CASE
+                        WHEN item_price < 1000000 THEN 0
+                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0.005*item_price
+                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
+                        WHEN item_price > 5000000 THEN -1
+                    END
+            WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
                         WHEN item_price < 1000000 THEN 0
@@ -994,7 +1002,13 @@ QUERY_SQL_COMMAND_API_FINAL = """
                         WHEN (money_get_first >= 10000000) AND (money_get_first <= 100000000) THEN 0.005*(money_get_first - 3000000)
                         WHEN money_get_first > 100000000 THEN -1
                     END
-            WHEN carrier_id = 13 -- SuperShip
+            WHEN carrier_id = 13 -- VNPost
+                THEN
+                    CASE
+                        WHEN money_get_first > 5000000 THEN -1
+                        ELSE 0
+                    END
+            WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
                         WHEN money_get_first > 5000000 THEN -1
@@ -1027,7 +1041,13 @@ QUERY_SQL_COMMAND_API_FINAL = """
                         WHEN is_returned = 'Có' THEN price
                         ELSE 0
                     END
-            WHEN carrier_id = 13 -- SuperShip
+            WHEN carrier_id = 13 -- VnPost
+                THEN
+                    CASE
+                        WHEN is_returned = 'Có' THEN 10000
+                        ELSE 0
+                    END
+            WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
                         WHEN is_returned = 'Có' THEN 10000
@@ -1318,7 +1338,15 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                         WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
                         WHEN item_price > 5000000 THEN -1
                     END
-            WHEN carrier_id = 13 -- SuperShip
+            WHEN carrier_id = 13 -- VnPost
+                THEN
+                    CASE
+                        WHEN item_price < 1000000 THEN 0
+                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0.005*item_price
+                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
+                        WHEN item_price > 5000000 THEN -1
+                    END
+            WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
                         WHEN item_price < 1000000 THEN 0
@@ -1362,7 +1390,13 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                         WHEN (money_get_first >= 10000000) AND (money_get_first <= 100000000) THEN 0.005*(money_get_first - 3000000)
                         WHEN money_get_first > 100000000 THEN -1
                     END
-            WHEN carrier_id = 13 -- SuperShip
+            WHEN carrier_id = 13 -- VnPost
+                THEN
+                    CASE
+                        WHEN money_get_first > 5000000 THEN -1
+                        ELSE 0
+                    END
+            WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
                         WHEN money_get_first > 5000000 THEN -1
@@ -1395,7 +1429,13 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                         WHEN is_returned = 'Có' THEN price
                         ELSE 0
                     END
-            WHEN carrier_id = 13 -- SuperShip
+            WHEN carrier_id = 13 -- VnPost
+                THEN
+                    CASE
+                        WHEN is_returned = 'Có' THEN 10000
+                        ELSE 0
+                    END
+            WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
                         WHEN is_returned = 'Có' THEN 10000
