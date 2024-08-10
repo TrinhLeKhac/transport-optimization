@@ -237,12 +237,24 @@ def out_data_api(
     api_data_final['delivery_success_rate'] = np.round(api_data_final['delivery_success_rate'] * 100, 2)
 
     # Change delivery_success_rate random from 80% - 85% toward region have total_order = 0
-    success_rate_modified = api_data_final.loc[api_data_final['total_order'] == 0][
+    success_rate_modified_1 = api_data_final.loc[api_data_final['total_order'] == 0][
         ['receiver_province', 'receiver_district', 'carrier']].drop_duplicates()
 
-    success_rate_modified['delivery_success_rate_modified'] = np.round(np.random.uniform(80, 85, len(success_rate_modified)), 2)
-    api_data_final = api_data_final.merge(success_rate_modified, on=['receiver_province', 'receiver_district', 'carrier'], how='left')
+    success_rate_modified_1['delivery_success_rate_modified'] = np.round(np.random.uniform(80, 85, len(success_rate_modified_1)), 2)
+    api_data_final = api_data_final.merge(success_rate_modified_1, on=['receiver_province', 'receiver_district', 'carrier'], how='left')
     api_data_final.loc[api_data_final['total_order'] == 0, 'delivery_success_rate'] = api_data_final['delivery_success_rate_modified']
+    api_data_final.drop('delivery_success_rate_modified', axis=1, inplace=True)
+
+    # Change delivery_success_rate random from 96% - 98% toward region have delivery_success_rate = 100
+    success_rate_modified_2 = api_data_final.loc[api_data_final['delivery_success_rate'] == 100][
+        ['receiver_province', 'receiver_district', 'carrier']].drop_duplicates()
+
+    success_rate_modified_2['delivery_success_rate_modified'] = np.round(
+        np.random.uniform(96, 98, len(success_rate_modified_2)), 2)
+    api_data_final = api_data_final.merge(success_rate_modified_2,
+                                          on=['receiver_province', 'receiver_district', 'carrier'], how='left')
+    api_data_final.loc[api_data_final['delivery_success_rate'] == 100, 'delivery_success_rate'] = api_data_final[
+        'delivery_success_rate_modified']
     api_data_final.drop('delivery_success_rate_modified', axis=1, inplace=True)
 
     api_data_final['combine_col'] = api_data_final[["delivery_success_rate", "total_order"]].apply(tuple, axis=1)
