@@ -240,6 +240,7 @@ def create_customer_tab():
                 :four: :blue[**{', '.join(result_df[result_df['for_shop'] == 4]['carrier'].tolist())}**]  
                 :five: :blue[**{', '.join(result_df[result_df['for_shop'] == 5]['carrier'].tolist())}**]  
                 :six: :blue[**{', '.join(result_df[result_df['for_shop'] == 6]['carrier'].tolist())}**]  
+                :seven: :blue[**{', '.join(result_df[result_df['for_shop'] == 7]['carrier'].tolist())}**] 
                 """
             )
 
@@ -252,6 +253,7 @@ def create_customer_tab():
                 :four: :blue[**{', '.join(result_df[result_df['for_partner'] == 4]['carrier'].tolist())}**]  
                 :five: :blue[**{', '.join(result_df[result_df['for_partner'] == 5]['carrier'].tolist())}**]  
                 :six: :blue[**{', '.join(result_df[result_df['for_partner'] == 6]['carrier'].tolist())}**]  
+                :seven: :blue[**{', '.join(result_df[result_df['for_partner'] == 7]['carrier'].tolist())}**]
                 """
             )
 
