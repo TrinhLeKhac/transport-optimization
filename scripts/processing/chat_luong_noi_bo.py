@@ -137,7 +137,12 @@ def xu_ly_chat_luong_noi_bo_ninja_van():
 
 
 def xu_ly_chat_luong_noi_bo_lazada():
-    clnb_lex_df = pd.read_excel(ROOT_PATH + '/input/chat_luong_noi_bo_lex.xlsx', sheet_name='Province')
+    try:
+        clnb_lex_df = pd.read_excel(ROOT_PATH + '/user_input/chat_luong_noi_bo_lex.xlsx', sheet_name='Province')
+    except FileNotFoundError:
+        print(
+            f"Error: The file {ROOT_PATH}/user_input/chat_luong_noi_bo_lex.xlsx was not found. Use file {ROOT_PATH}/input/chat_luong_noi_bo_lex.xlsx instead.")
+        clnb_lex_df = pd.read_excel(ROOT_PATH + '/input/chat_luong_noi_bo_lex.xlsx', sheet_name='Province')
     clnb_lex_df = clnb_lex_df.loc[1:, :]
     clnb_lex_df.columns = ['receiver_province', 'receiver_district', 'receiver_commune', 'w1', 'w2', 'w3', 'w4', 'w5',
                            'w6', 'w7', 'w8']
