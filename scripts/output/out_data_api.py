@@ -93,6 +93,82 @@ def customer_best_carrier(data_api_df):
     return data_api_df.drop(['combine_col', 'wscore'], axis=1)
 
 
+def calculate_vpn(group):
+    # Kiểm tra xem group là Series hay DataFrame
+    if isinstance(group, pd.Series):
+        group = group.to_frame().T  # Chuyển Series thành DataFrame
+
+    if 'carrier_id' not in group.columns:
+        raise KeyError("The 'carrier_id' column is missing in the group DataFrame")
+
+    # Thoi gian van chuyen trung binh (vtp + ghn + spx)
+    time_data = group.loc[group['carrier_id'].isin([4, 2, 10])]['time_data'].mean()
+
+    # Chat luong giao hang trung binh (spx + best + nin)
+    score = group.loc[group['carrier_id'].isin([10, 6, 7])]['score'].mean()
+
+    # ty le thanh cong trung binh (vtp + best + ghn)
+    rate = group.loc[group['carrier_id'].isin([4, 6, 2])]['rate'].mean()
+
+    # Trả về Series với tên các cột mong muốn
+    return pd.Series({'time_data_modified': time_data, 'score_modified': score, 'rate_modified': rate})
+
+
+def calculate_lex(group):
+    # Kiểm tra xem group là Series hay DataFrame
+    if isinstance(group, pd.Series):
+        group = group.to_frame().T  # Chuyển Series thành DataFrame
+
+    if 'carrier_id' not in group.columns:
+        raise KeyError("The 'carrier_id' column is missing in the group DataFrame")
+
+    # Thời gian vận chuyển trung bình (best + nin + spx)
+    time_data = group.loc[group['carrier_id'].isin([6, 7, 10]), 'time_data'].mean()
+
+    # Chất lượng giao hàng trung bình (vtp + best + nin)
+    score = group.loc[group['carrier_id'].isin([4, 6, 7]), 'score'].mean()
+
+    # Tỷ lệ thành công trung bình (spx + ghn)
+    rate = group.loc[group['carrier_id'].isin([10, 2]), 'rate'].mean()
+
+    # Trả về Series với tên các cột mong muốn
+    return pd.Series({'time_data_modified': time_data, 'score_modified': score, 'rate_modified': rate})
+
+
+def modified_output_api(df_api_full):
+    main_data_api = df_api_full.loc[~df_api_full['carrier_id'].isin([13, 14])]
+
+    # Calculate VNPost modified data api
+    vnp_data_api = main_data_api.groupby(['receiver_province_code', 'receiver_district_code', 'new_type']).apply(
+        calculate_vpn).reset_index()
+    vnp_data_api['carrier_id'] = 13
+
+    # Calculate Lazada Logistics modified data api
+    lex_data_api = main_data_api.groupby(['receiver_province_code', 'receiver_district_code', 'new_type']).apply(
+        calculate_lex).reset_index()
+    lex_data_api['carrier_id'] = 14
+
+    # Replace old value VNPost by new value
+    df_api_full_final = df_api_full.merge(vnp_data_api,
+                                          on=['carrier_id', 'receiver_province_code', 'receiver_district_code',
+                                              'new_type'], how='left')
+    df_api_full_final.loc[df_api_full_final['carrier_id'] == 13, 'time_data'] = df_api_full_final['time_data_modified']
+    df_api_full_final.loc[df_api_full_final['carrier_id'] == 13, 'score'] = df_api_full_final['score_modified']
+    df_api_full_final.loc[df_api_full_final['carrier_id'] == 13, 'rate'] = df_api_full_final['rate_modified']
+    df_api_full_final = df_api_full_final.drop(['time_data_modified', 'score_modified', 'rate_modified'], axis=1)
+
+    # Replace old value Lazada Logistics by new value
+    df_api_full_final = df_api_full_final.merge(lex_data_api,
+                                                on=['carrier_id', 'receiver_province_code', 'receiver_district_code',
+                                                    'new_type'], how='left')
+    df_api_full_final.loc[df_api_full_final['carrier_id'] == 14, 'time_data'] = df_api_full_final['time_data_modified']
+    df_api_full_final.loc[df_api_full_final['carrier_id'] == 14, 'score'] = df_api_full_final['score_modified']
+    df_api_full_final.loc[df_api_full_final['carrier_id'] == 14, 'rate'] = df_api_full_final['rate_modified']
+    df_api_full_final = df_api_full_final.drop(['time_data_modified', 'score_modified', 'rate_modified'], axis=1)
+
+    return df_api_full_final
+
+
 def out_data_api(
     run_date_str,
     carriers=ACTIVE_CARRIER,
@@ -331,6 +407,8 @@ def out_data_api(
         api_data_final = api_data_final[API_COLS]
         api_data_final.columns = API_COLS_RENAMED
     print('Shape: ', api_data_final.shape)
+    print('Modifying 2 new carrier...')
+    api_data_final = modified_output_api(api_data_final)
     if save_output:
         if show_logs:
             print('9. Lưu dữ liệu API')
