@@ -921,16 +921,16 @@ QUERY_SQL_COMMAND_API_FINAL = """
                 THEN
                     CASE
                         WHEN item_price < 1000000 THEN 0
-                        WHEN (item_price >= 1000000) AND (item_price <= 3000000) THEN 0
-                        WHEN (item_price > 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
+                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0
+                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
                         WHEN item_price > 5000000 THEN -1
                     END
             WHEN carrier_id = 10 --- SPX Express
                 THEN
                     CASE
                         WHEN item_price < 1000000 THEN 0
-                        WHEN (item_price >= 1000000) AND (item_price <= 3000000) THEN 0
-                        WHEN (item_price > 3000000) AND (item_price < 10000000) THEN 0.005*item_price
+                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0
+                        WHEN (item_price >= 3000000) AND (item_price < 10000000) THEN 0.005*item_price
                         WHEN (item_price >= 10000000) AND (item_price <= 20000000) THEN 0.005*item_price
                         WHEN item_price > 20000000 THEN -1
                     END
@@ -954,16 +954,18 @@ QUERY_SQL_COMMAND_API_FINAL = """
                 THEN
                     CASE
                         WHEN item_price < 1000000 THEN 0
-                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0.005*item_price
-                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
-                        WHEN item_price > 5000000 THEN -1
+                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0
+                        WHEN (item_price >= 3000000) AND (item_price < 10000000) THEN 0.005*item_price
+                        WHEN (item_price >= 10000000) AND (item_price <= 20000000) THEN 0.005*item_price
+                        WHEN item_price > 20000000 THEN -1
                     END
             WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
                         WHEN item_price < 1000000 THEN 0
-                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0.005*item_price
-                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
+                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0
+                        WHEN (item_price >= 3000000) AND (item_price < 10000000) THEN 0.005*item_price
+                        WHEN (item_price >= 10000000) AND (item_price <= 20000000) THEN 0.005*item_price
                         WHEN item_price > 5000000 THEN -1
                     END
         END AS insurance_fee,
@@ -978,7 +980,6 @@ QUERY_SQL_COMMAND_API_FINAL = """
                 THEN
                     CASE
                         WHEN money_get_first > 5000000 THEN -1
-                        WHEN (money_get_first > 3000000) AND (money_get_first <= 5000000) THEN 0.005*money_get_first
                         ELSE 0
                     END
             WHEN carrier_id = 10 --- SPX Express
@@ -998,20 +999,20 @@ QUERY_SQL_COMMAND_API_FINAL = """
                     CASE
                         WHEN money_get_first < 1000000 THEN 0
                         WHEN (money_get_first >= 1000000) AND (money_get_first < 3000000) THEN 0
-                        WHEN (money_get_first >= 3000000) AND (money_get_first <= 10000000) THEN 0.005*(money_get_first - 3000000)
+                        WHEN (money_get_first >= 3000000) AND (money_get_first < 10000000) THEN 0.005*(money_get_first - 3000000)
                         WHEN (money_get_first >= 10000000) AND (money_get_first <= 100000000) THEN 0.005*(money_get_first - 3000000)
                         WHEN money_get_first > 100000000 THEN -1
                     END
             WHEN carrier_id = 13 -- VNPost
                 THEN
                     CASE
-                        WHEN money_get_first > 5000000 THEN -1
+                        WHEN money_get_first > 20000000 THEN -1
                         ELSE 0
                     END
             WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
-                        WHEN money_get_first > 5000000 THEN -1
+                        WHEN money_get_first > 20000000 THEN -1
                         ELSE 0
                     END
         END AS collection_fee,
@@ -1044,13 +1045,13 @@ QUERY_SQL_COMMAND_API_FINAL = """
             WHEN carrier_id = 13 -- VnPost
                 THEN
                     CASE
-                        WHEN is_returned = 'Có' THEN 10000
+                        WHEN is_returned = 'Có' THEN price
                         ELSE 0
                     END
             WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
-                        WHEN is_returned = 'Có' THEN 10000
+                        WHEN is_returned = 'Có' THEN price
                         ELSE 0
                     END
         END AS redeem_fee, 
@@ -1309,16 +1310,16 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                 THEN
                     CASE
                         WHEN item_price < 1000000 THEN 0
-                        WHEN (item_price >= 1000000) AND (item_price <= 3000000) THEN 0
-                        WHEN (item_price > 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
+                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0
+                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
                         WHEN item_price > 5000000 THEN -1
                     END
             WHEN carrier_id = 10 --- SPX Express
                 THEN
                     CASE
                         WHEN item_price < 1000000 THEN 0
-                        WHEN (item_price >= 1000000) AND (item_price <= 3000000) THEN 0
-                        WHEN (item_price > 3000000) AND (item_price < 10000000) THEN 0.005*item_price
+                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0
+                        WHEN (item_price >= 3000000) AND (item_price < 10000000) THEN 0.005*item_price
                         WHEN (item_price >= 10000000) AND (item_price <= 20000000) THEN 0.005*item_price
                         WHEN item_price > 20000000 THEN -1
                     END
@@ -1342,16 +1343,18 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                 THEN
                     CASE
                         WHEN item_price < 1000000 THEN 0
-                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0.005*item_price
-                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
-                        WHEN item_price > 5000000 THEN -1
+                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0
+                        WHEN (item_price >= 3000000) AND (item_price < 10000000) THEN 0.005*item_price
+                        WHEN (item_price >= 10000000) AND (item_price <= 20000000) THEN 0.005*item_price
+                        WHEN item_price > 20000000 THEN -1
                     END
             WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
                         WHEN item_price < 1000000 THEN 0
-                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0.005*item_price
-                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
+                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0
+                        WHEN (item_price >= 3000000) AND (item_price < 10000000) THEN 0.005*item_price
+                        WHEN (item_price >= 10000000) AND (item_price <= 20000000) THEN 0.005*item_price
                         WHEN item_price > 5000000 THEN -1
                     END
         END AS insurance_fee,
@@ -1366,7 +1369,6 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                 THEN
                     CASE
                         WHEN money_get_first > 5000000 THEN -1
-                        WHEN (money_get_first > 3000000) AND (money_get_first <= 5000000) THEN 0.005*money_get_first
                         ELSE 0
                     END
             WHEN carrier_id = 10 --- SPX Express
@@ -1386,20 +1388,20 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                     CASE
                         WHEN money_get_first < 1000000 THEN 0
                         WHEN (money_get_first >= 1000000) AND (money_get_first < 3000000) THEN 0
-                        WHEN (money_get_first >= 3000000) AND (money_get_first <= 10000000) THEN 0.005*(money_get_first - 3000000)
+                        WHEN (money_get_first >= 3000000) AND (money_get_first < 10000000) THEN 0.005*(money_get_first - 3000000)
                         WHEN (money_get_first >= 10000000) AND (money_get_first <= 100000000) THEN 0.005*(money_get_first - 3000000)
                         WHEN money_get_first > 100000000 THEN -1
                     END
-            WHEN carrier_id = 13 -- VnPost
+            WHEN carrier_id = 13 -- VNPost
                 THEN
                     CASE
-                        WHEN money_get_first > 5000000 THEN -1
+                        WHEN money_get_first > 20000000 THEN -1
                         ELSE 0
                     END
             WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
-                        WHEN money_get_first > 5000000 THEN -1
+                        WHEN money_get_first > 20000000 THEN -1
                         ELSE 0
                     END
         END AS collection_fee,
@@ -1432,13 +1434,13 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             WHEN carrier_id = 13 -- VnPost
                 THEN
                     CASE
-                        WHEN is_returned = 'Có' THEN 10000
+                        WHEN is_returned = 'Có' THEN price
                         ELSE 0
                     END
             WHEN carrier_id = 14 -- Lazada Logistics
                 THEN
                     CASE
-                        WHEN is_returned = 'Có' THEN 10000
+                        WHEN is_returned = 'Có' THEN price
                         ELSE 0
                     END
         END AS redeem_fee, 
