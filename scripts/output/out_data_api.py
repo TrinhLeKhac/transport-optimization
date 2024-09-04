@@ -432,6 +432,7 @@ def out_data_api(
     print('Shape: ', api_data_final.shape)
     print('Modifying 2 new carrier...')
     api_data_final = modified_output_api(api_data_final)
+    api_data_final['time_display'] = api_data_final['time_data'].apply(round_value)
     if save_output:
         if show_logs:
             print('9. Lưu dữ liệu API')
