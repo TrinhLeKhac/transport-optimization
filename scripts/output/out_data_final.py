@@ -166,7 +166,7 @@ def out_data_final(
         tmp_df1 = focus_df.merge(pd.DataFrame(data={'carrier': carriers}), how='cross')
 
     tmp_df1['carrier_id'] = tmp_df1['carrier'].map(MAPPING_CARRIER_ID)
-    assert len(tmp_df1) == len(focus_df) * tmp_df1['carrier'].nunique(), 'Transform data sai'
+    assert len(tmp_df1) == len(focus_df) * tmp_df1['carrier'].nunique(), 'Gán thông tin nhà vận chuyển sai'
 
     del focus_df
     gc.collect()
@@ -190,7 +190,7 @@ def out_data_final(
         show_logs=show_logs,
         include_supership=include_supership
     )
-    # assert len(tmp_df2) == len(tmp_df1), 'Transform data sai'
+    # assert len(tmp_df2) == len(tmp_df1), 'Gán thông tin tính toán từ API sai'
 
     del tmp_df1
     gc.collect()
@@ -210,21 +210,21 @@ def out_data_final(
     ] = 'Liên Thành'
 
     tmp_df3 = calculate_service_fee(tmp_df2)
-    assert len(tmp_df3) == len(tmp_df2), 'Transform data sai'
+    assert len(tmp_df3) == len(tmp_df2), 'Tính toán fee vận chuyển sai'
 
     del tmp_df2
     gc.collect()
 
     print('iii. Tính ranking nhà vận chuyển theo tiêu chí rẻ nhất')
     tmp_df4 = calculate_notification(tmp_df3)
-    assert len(tmp_df4) == len(tmp_df3), 'Transform data sai'
+    assert len(tmp_df4) == len(tmp_df3), 'Tính toán ranking nhà vận chuyển theo tiêu chí rẻ nhất sai'
 
     del tmp_df3
     gc.collect()
 
     print('iv. Tính nhà vận chuyển tốt nhất cho đối tác')
     final_df = partner_best_carrier(tmp_df4)
-    assert len(final_df) == len(tmp_df4), 'Transform data sai'
+    assert len(final_df) == len(tmp_df4), 'Tính toán ranking nhà vận chuyển tốt nhất cho đối tác sai'
 
     del tmp_df4
     gc.collect()
