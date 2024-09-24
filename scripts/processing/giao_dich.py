@@ -303,6 +303,7 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
 
         # valid_order_df = valid_order_df.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
         valid_order_df['carrier_status'] = valid_order_df['carrier_status'].str.strip()
+        valid_order_df = valid_order_df.sort_values(['order_code', 'created_at'], ascending=[True, False]).drop_duplicates('order_code', keep='first')
 
         print('Min (created_at): ', valid_order_df['created_at'].min())
         print('Max (created_at): ', valid_order_df['created_at'].max())
