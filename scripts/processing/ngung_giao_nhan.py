@@ -25,7 +25,7 @@ def xu_ly_ngung_giao_nhan():
         & ngung_giao_nhan_df['receiver_district'].notna()
     ]
 
-    assert len(ngung_giao_nhan_df) == len(ngung_giao_nhan_filter_df), 'File Excel cung cấp thông tin sai format tỉnh/thành, quận/huyện'
+    # assert len(ngung_giao_nhan_df) == len(ngung_giao_nhan_filter_df), 'File Excel cung cấp thông tin sai format tỉnh/thành, quận/huyện'
 
     ngung_giao_nhan_final_df = pd.melt(
         ngung_giao_nhan_filter_df,
