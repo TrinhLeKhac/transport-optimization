@@ -18,7 +18,6 @@ def get_don_ton_dong(run_date_str, n_days_back=30):
     loai_van_chuyen_df['default_delivery_time_details'] = [48 + 12, 48 + 12, 48 + 12, 48 + 12, 24 + 12, 48 + 12, 72 + 12, 72 + 12, 72 + 12, 108 + 12]
 
     df_order = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
-    df_order = df_order.sort_values('date', ascending=False).drop_duplicates('order_code', keep='first')
     df_order = df_order.loc[df_order['created_at'] >= (run_date - timedelta(days=n_days_back))]
     df_order = df_order[[
         'order_code', 'carrier', 'receiver_province', 'receiver_district',
