@@ -48,10 +48,6 @@ config_daily = [
         ROOT_PATH + '/output/data_api.parquet', 'tbl_data_api', True, False,
         'carrier_id, receiver_province_code, receiver_district_code, new_type'
     ),
-    (
-        ROOT_PATH + '/output/service_fee.parquet', 'tbl_service_fee', False, False,  # observe, trigger run.sh mode append khi file bang_cuoc_phi.xlsx thay đổi.
-        'carrier_id, order_type, weight, pickup'
-    ),
     (ROOT_PATH + '/output/total_optimal_score.parquet', 'tbl_optimal_score', False, False, None),
 ]
 
