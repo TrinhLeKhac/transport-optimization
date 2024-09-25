@@ -15,8 +15,21 @@ def xu_ly_ngung_giao_nhan():
         'id', 'id_receiver_district', 'receiver_province', 'receiver_district', 'short_receiver_district',
         'Ninja Van', 'GHN', 'BEST Express', 'SPX Express', 'GHTK', 'Viettel Post', 'VNPost', 'Lazada Logistics'
     ]
+    ngung_giao_nhan_df = ngung_giao_nhan_df[['receiver_province', 'id_receiver_district',
+                                             'Ninja Van', 'GHN', 'BEST Express', 'SPX Express', 'GHTK', 'Viettel Post',
+                                             'VNPost', 'Lazada Logistics']]
+
+    ngung_giao_nhan_df['id_receiver_district'] = ngung_giao_nhan_df['id_receiver_district'].astype(str)
+    ngung_giao_nhan_df['id_receiver_district'] = ngung_giao_nhan_df['id_receiver_district'].str.zfill(3)
+
+    ngung_giao_nhan_df = ngung_giao_nhan_df.merge(
+        PROVINCE_MAPPING_DISTRICT_DF[['district_code', 'district']].rename(columns={
+            'district_code': 'id_receiver_district',
+            'district': 'receiver_district'
+        }), on='id_receiver_district', how='inner')
     ngung_giao_nhan_df = ngung_giao_nhan_df[['receiver_province', 'receiver_district',
-                                             'Ninja Van', 'GHN', 'BEST Express', 'SPX Express', 'GHTK', 'Viettel Post', 'VNPost', 'Lazada Logistics']]
+                                             'Ninja Van', 'GHN', 'BEST Express', 'SPX Express', 'GHTK', 'Viettel Post',
+                                             'VNPost', 'Lazada Logistics']]
 
     # Chuẩn hóa thông tin quận/huyện, tỉnh/thành
     ngung_giao_nhan_df = normalize_province_district(ngung_giao_nhan_df, tinh_thanh='receiver_province',
