@@ -10,21 +10,33 @@ from datetime import datetime, timedelta
 from time import time
 import re
 import os
+import traceback
 import warnings
 
 warnings.filterwarnings("ignore")
-import requests
 from config import Settings
 
 
-def telegram_bot_send_message(
-        bot_message,
-        bot_token=Settings.TELEGRAM_BOT_TOKEN,
-        bot_chat_id=Settings.TELEGRAM_CHAT_ID,
-):
-    send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chat_id + '&parse_mode=Markdown&text=' + bot_message
-    res = requests.get(send_text)
-    return res.json()
+def exception_wrapper(func):
+    def wrapper(*args, **kwargs):
+        result = None  # Initialize result
+        try:
+            result = func(*args, **kwargs)
+        except Exception as e:
+            # Extract the line number where the exception occurred
+            error_line = traceback.extract_tb(e.__traceback__)[-1].lineno
+            error = f"Error in function '{func.__name__}' at line {error_line}: {type(e).__name__} – {str(e)}"
+            print(error)
+            telegram_bot_send_error_message(error)
+        return result
+
+    return wrapper
+
+
+def telegram_bot_send_success_message():
+    telegram_bot_send_message(f"""
+        ✅✅✅ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Task run daily *SUCCESSED*!!!
+    """)
 
 
 def telegram_bot_send_error_message(message):
@@ -37,10 +49,14 @@ def telegram_bot_send_error_message(message):
     """)
 
 
-def telegram_bot_send_success_message():
-    telegram_bot_send_message(f"""
-        ✅✅✅ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Task run daily *SUCCESSED*!!!
-    """)
+def telegram_bot_send_message(
+        bot_message,
+        bot_token=Settings.TELEGRAM_BOT_TOKEN,
+        bot_chat_id=Settings.TELEGRAM_CHAT_ID,
+):
+    send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chat_id + '&parse_mode=Markdown&text=' + bot_message
+    res = requests.get(send_text)
+    return res.json()
 
 
 def convert_time_m_s(stop, start):
@@ -79,11 +95,13 @@ except FileNotFoundError:
     PROVINCE_MAPPING_DISTRICT_DF = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
 
 try:
-    PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF = pd.read_parquet(ROOT_PATH + '/user_input/province_mapping_district_mapping_ward.parquet')
+    PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF = pd.read_parquet(
+        ROOT_PATH + '/user_input/province_mapping_district_mapping_ward.parquet')
 except FileNotFoundError:
     print(
         f"Error: The file {ROOT_PATH}/user_input/province_mapping_district_mapping_ward.parquet was not found. Use file {ROOT_PATH}/input/province_mapping_district_mapping_ward.parquet instead.")
-    PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district_mapping_ward.parquet')
+    PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF = pd.read_parquet(
+        ROOT_PATH + '/input/province_mapping_district_mapping_ward.parquet')
 
 active_carrier_df = pd.DataFrame(data={'carrier': ACTIVE_CARRIER})
 PROVINCE_MAPPING_DISTRICT_CROSS_CARRIER_DF = (
@@ -176,7 +194,9 @@ def get_norm_commune(province, district, commune):
         # province, district đưa vào hàm phải ở dạng chuẩn
         # 1. sử dụng get_norm_province => 2. sử dụng hàm get_norm_district => 3. sử dụng hàm get_norm_commune
         short_commune = unidecode(
-            preprocess_str(commune).replace('xã ', '').replace('phường ', '').replace('thị trấn ', '').replace('.', '').replace(',', '')
+            preprocess_str(commune).replace('xã ', '').replace('phường ', '').replace('thị trấn ', '').replace('.',
+                                                                                                               '').replace(
+                ',', '')
         )
         # if short_commune == 'phan rang thap cham':
         #     return 'Thành phố Phan Rang-Tháp Chàm'
@@ -218,7 +238,6 @@ def normalize_province_district(target_df, tinh_thanh='tinh_thanh', quan_huyen='
 
 
 def normalize_province_district_ward(focus_df, tinh_thanh='tinh_thanh', quan_huyen='quan_huyen', phuong_xa='phuong_xa'):
-
     target_df = focus_df.copy()
     # Có thể comment toàn bộ dòng filter notna()
     # # để tìm ra tên tỉnh/thành, quận/huyện, phường/xã bị sai
@@ -1241,7 +1260,6 @@ QUERY_SQL_COMMAND_API_FINAL = """
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id; 
 """
-
 
 QUERY_SQL_COMMAND_STREAMLIT = """
     -- Create carrier_information CTE
