@@ -23,6 +23,14 @@ def xu_ly_kho_giao_nhan():
         'region', 'receiver_province', 'id_receiver_district', 'receiver_district',
         'short_name', 'njv_post_office', 'delivery_success_rate', 'don_den_tram'
     ]
+    buu_cuc_njv_df = buu_cuc_njv_df[['receiver_province', 'id_receiver_district', 'njv_post_office']]
+    buu_cuc_njv_df['id_receiver_district'] = buu_cuc_njv_df['id_receiver_district'].astype(str)
+    buu_cuc_njv_df['id_receiver_district'] = buu_cuc_njv_df['id_receiver_district'].str.zfill(3)
+
+    buu_cuc_njv_df = buu_cuc_njv_df.merge(PROVINCE_MAPPING_DISTRICT_DF[['district_code', 'district']].rename(columns={
+        'district_code': 'id_receiver_district',
+        'district': 'receiver_district'
+    }), on='id_receiver_district', how='inner')
     buu_cuc_njv_df = buu_cuc_njv_df[['receiver_province', 'receiver_district', 'njv_post_office']]
     buu_cuc_njv_df['receiver_province'] = buu_cuc_njv_df['receiver_province'].astype(str)
     buu_cuc_njv_df['receiver_district'] = buu_cuc_njv_df['receiver_district'].astype(str)
