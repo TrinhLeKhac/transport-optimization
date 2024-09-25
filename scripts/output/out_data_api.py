@@ -192,6 +192,7 @@ def modified_output_api(df_api_full):
     return df_api_full_final
 
 
+@exception_wrapper
 def out_data_api(
     run_date_str,
     carriers=ACTIVE_CARRIER,
@@ -445,6 +446,7 @@ def out_data_api(
     return api_data_final
 
 
+@exception_wrapper
 def assign_supership_carrier(df_api, save_output=True):
 
     # 1. Get analytics of top 3 carrier
@@ -527,18 +529,10 @@ if __name__ == '__main__':
     # print(options.run_date)
     # print(type(options.run_date))
 
-    try:
-        print('Transforming output API from processed_data...')
-        df_api = out_data_api(options.run_date)
-    except Exception as e:
-        error = type(e).__name__ + " – " + str(e)
-        telegram_bot_send_error_message(error)
+    print('Transforming output API from processed_data...')
+    df_api = out_data_api(options.run_date)
 
     include_supership = False
     if include_supership:
-        try:
-            print('Assigning SuperShip carrier...')
-            _ = assign_supership_carrier(df_api)
-        except Exception as e:
-            error = type(e).__name__ + " – " + str(e)
-            telegram_bot_send_error_message(error)
+        print('Assigning SuperShip carrier...')
+        _ = assign_supership_carrier(df_api)

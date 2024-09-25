@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from config import settings
 
 
+@exception_wrapper
 def xu_ly_danh_gia_zns(run_date_str, from_api=True, n_days_back=30):
     run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
     if not from_api:

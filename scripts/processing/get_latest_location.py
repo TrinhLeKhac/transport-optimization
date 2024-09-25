@@ -3,6 +3,7 @@ import pandas as pd
 from scripts.utilities.helper import *
 
 
+@exception_wrapper
 def get_latest_province_mapping_district():
     province_api_res = requests.get('https://api.mysupership.vn/v1/partner/areas/province', verify=False).json()
 
@@ -32,6 +33,7 @@ def get_latest_province_mapping_district():
     province_district_df.to_parquet(ROOT_PATH + '/user_input/province_mapping_district.parquet', index=False)
 
 
+@exception_wrapper
 def get_latest_province_mapping_district_json():
     province_api_res = requests.get('https://api.mysupership.vn/v1/partner/areas/province', verify=False).json()
 
@@ -49,6 +51,7 @@ def get_latest_province_mapping_district_json():
         json.dump(province_mapping_district_dict, file)
 
 
+@exception_wrapper
 def get_latest_province_mapping_district_mapping_ward():
     province_api_res = requests.get('https://api.mysupership.vn/v1/partner/areas/province', verify=False).json()
 
@@ -99,6 +102,7 @@ def get_latest_province_mapping_district_mapping_ward():
     province_district_ward_df.to_parquet(ROOT_PATH + '/user_input/province_mapping_district_mapping_ward.parquet', index=False)
 
 
+@exception_wrapper
 def get_latest_province_mapping_district_mapping_ward_json():
     province_api_res = requests.get('https://api.mysupership.vn/v1/partner/areas/province', verify=False).json()
     province_mapping_district_mapping_ward_dict = {}
@@ -122,10 +126,3 @@ def get_latest_province_mapping_district_mapping_ward_json():
 
     with open(ROOT_PATH + '/user_input/province_mapping_district_mapping_ward_from_api.json', 'w') as file:
         json.dump(province_mapping_district_mapping_ward_dict, file)
-
-
-# if __name__ == '__main__':
-#     get_latest_province_mapping_district()
-#     get_latest_province_mapping_district_json()
-#     get_latest_province_mapping_district_mapping_ward()
-#     get_latest_province_mapping_district_mapping_ward_json()

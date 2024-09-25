@@ -3,12 +3,14 @@ from scripts.utilities.helper import *
 COLUMNS_CUOC_PHI = ['gt', 'lt_or_eq'] + list(MAPPING_ORDER_TYPE_ID.keys()) + ['Liên Thành']
 
 
+@exception_wrapper
 def xu_ly_bang_gia_cuoc():
     # 1. Lấy thông tin bảng giá cước
     try:
         bang_gia_cuoc_df = pd.read_excel(ROOT_PATH + '/user_input/bang_cuoc_phi.xlsx')
     except FileNotFoundError:
-        print(f"Error: The file {ROOT_PATH}/user_input/bang_gia_cuoc.xlsx was not found. Use file {ROOT_PATH}/input/bang_gia_cuoc.xlsx instead.")
+        print(
+            f"Warning: The file {ROOT_PATH}/user_input/bang_gia_cuoc.xlsx was not found. Use file {ROOT_PATH}/input/bang_gia_cuoc.xlsx instead.")
         bang_gia_cuoc_df = pd.read_excel(ROOT_PATH + '/input/bang_cuoc_phi.xlsx')
 
     # 2.1 Tách lấy thông tin bảng giá cước Ninja Van và xử lý
@@ -56,7 +58,7 @@ def xu_ly_bang_gia_cuoc():
 
     # 2.7 Tách lấy thông tin bảng giá cước VNPost và xử lý
     vnpost_df = pd.concat([bang_gia_cuoc_df.iloc[1:101, :2], bang_gia_cuoc_df.iloc[1:101, 79:90]],
-                             axis=1).reset_index(
+                          axis=1).reset_index(
         drop=True)
     vnpost_df.columns = COLUMNS_CUOC_PHI
     vnpost_df['carrier'] = 'VNPost'
@@ -71,8 +73,9 @@ def xu_ly_bang_gia_cuoc():
     lazada_df['carrier_id'] = 14
 
     # 3. Tổng hợp thông tin
-    cuoc_phi_df = pd.concat([ninja_van_df, best_df, shopee_express_df, ghn_df, viettel_post_df, ghtk_df, vnpost_df, lazada_df],
-                            ignore_index=True)
+    cuoc_phi_df = pd.concat(
+        [ninja_van_df, best_df, shopee_express_df, ghn_df, viettel_post_df, ghtk_df, vnpost_df, lazada_df],
+        ignore_index=True)
     cuoc_phi_df = cuoc_phi_df[['carrier_id', 'carrier'] + COLUMNS_CUOC_PHI]
     cuoc_phi_df = cuoc_phi_df.set_index(['carrier_id', 'carrier', 'gt', 'lt_or_eq'])
     cuoc_phi_df = (cuoc_phi_df * 1000).astype(int).reset_index()

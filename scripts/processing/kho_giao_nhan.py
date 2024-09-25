@@ -8,6 +8,7 @@ def split_buu_cuc_ninja_van(s):
         return s
 
 
+@exception_wrapper
 def xu_ly_kho_giao_nhan():
 
     print('Ninja Van')

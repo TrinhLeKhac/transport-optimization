@@ -10,6 +10,7 @@ BAD_COMMENTS = [
 ]
 
 
+@exception_wrapper
 def transform_data_danh_gia_zns():
 
     # Đọc thông tin data ZNS

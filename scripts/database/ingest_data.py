@@ -98,6 +98,7 @@ def create_index_of_table(
     connection.close()
 
 
+@exception_wrapper
 def ingest_tbl_to_db(
         schema_name,
         path,
@@ -145,6 +146,7 @@ def ingest_tbl_to_db(
     print('-' * 100)
 
 
+@exception_wrapper
 def ingest_data_to_db(date_str, schema_name="db_schema", init=True):
     if init:
         for path, tbl_name, is_id_col, is_churn_size, idx_cols in config_init:
@@ -207,14 +209,6 @@ if __name__ == '__main__':
 
     print(f'Ingesting data on date = {options.run_date}...')
     if options.mode == 'init':
-        try:
-            ingest_data_to_db(options.run_date, schema_name="db_schema", init=True)
-        except Exception as e:
-            error = type(e).__name__ + " – " + str(e)
-            telegram_bot_send_error_message(error)
+        ingest_data_to_db(options.run_date, schema_name="db_schema", init=True)
     elif options.mode == 'daily':
-        try:
-            ingest_data_to_db(options.run_date, schema_name="db_schema", init=False)
-        except Exception as e:
-            error = type(e).__name__ + " – " + str(e)
-            telegram_bot_send_error_message(error)
+        ingest_data_to_db(options.run_date, schema_name="db_schema", init=False)

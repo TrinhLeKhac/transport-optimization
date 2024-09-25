@@ -11,6 +11,7 @@ def score_ton_dong(n_order_type, threshold=10):
         return 'Không có thông tin'
 
 
+@exception_wrapper
 def get_don_ton_dong(run_date_str, n_days_back=30):
     run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
     loai_van_chuyen_df = pd.DataFrame(THOI_GIAN_GIAO_HANG_DEFAULT.items(),
@@ -36,6 +37,7 @@ def get_don_ton_dong(run_date_str, n_days_back=30):
     return df_order
 
 
+@exception_wrapper
 def get_khu_vuc_ton_dong(run_date_str, threshold=10):
     df_order = get_don_ton_dong(run_date_str)
 

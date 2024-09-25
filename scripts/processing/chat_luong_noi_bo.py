@@ -12,6 +12,7 @@ def get_pct_ninja_van(s):
         return 0
 
 
+@exception_wrapper
 def xu_ly_chat_luong_noi_bo_ninja_van_old():
     # 1. Đọc data raw
     try:
@@ -49,6 +50,7 @@ def xu_ly_chat_luong_noi_bo_ninja_van_old():
     return clnb_njv_df
 
 
+@exception_wrapper
 def xu_ly_chat_luong_noi_bo_ninja_van():
     # 1. Dữ liệu chất lượng nội bộ cũ
     old_njv = xu_ly_chat_luong_noi_bo_ninja_van_old()
@@ -136,6 +138,7 @@ def xu_ly_chat_luong_noi_bo_ninja_van():
     clnb_njv_df.to_parquet(ROOT_PATH + '/processed_data/chat_luong_noi_bo_njv.parquet', index=False)
 
 
+@exception_wrapper
 def xu_ly_chat_luong_noi_bo_lazada():
     try:
         clnb_lex_df = pd.read_excel(ROOT_PATH + '/user_input/chat_luong_noi_bo_lex.xlsx', sheet_name='Province')

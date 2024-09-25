@@ -29,6 +29,7 @@ def _get_delivery_success_rate(df_order):
     return ti_le_giao_hang[['receiver_province', 'receiver_district', 'carrier', 'delivery_success_rate']]
 
 
+@exception_wrapper
 def get_delivery_success_rate(df_order, run_date, n_days_back=30):
 
     nstep = n_days_back // 3
@@ -113,6 +114,7 @@ def score_ti_le_giao_hang(tong_don, ti_le_thanh_cong):
         return 'Trường hợp khác'
 
 
+@exception_wrapper
 def transform_data_ti_le_giao_hang(run_date_str, n_days_back=30):
     run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
     print(run_date)

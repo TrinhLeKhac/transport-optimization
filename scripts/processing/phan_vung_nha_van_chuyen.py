@@ -1,6 +1,7 @@
 from scripts.utilities.helper import *
 
 
+@exception_wrapper
 def xu_ly_phan_vung_nha_van_chuyen():
     # 1. Đọc thông tin raw
     try:
@@ -134,7 +135,3 @@ def xu_ly_phan_vung_nha_van_chuyen():
 
     # 5. Lưu thông tin
     phan_vung_nvc_final.to_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet', index=False)
-
-
-if __name__ == "__main__":
-    xu_ly_phan_vung_nha_van_chuyen()

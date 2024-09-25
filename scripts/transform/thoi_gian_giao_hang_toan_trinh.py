@@ -172,6 +172,7 @@ def score_thoi_gian_giao_hang(tong_don, thoi_gian_giao_tb, loai_van_chuyen):
             return 'Trung bình thời gian giao hàng lớn hơn hoặc bằng 72h'
 
 
+@exception_wrapper
 def transform_data_thoi_gian_giao_hang_toan_trinh():
     # Đọc thông tin giao dịch valid
     giao_dich_valid = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')

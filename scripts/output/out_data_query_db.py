@@ -9,6 +9,7 @@ from scripts.utilities.helper import *
 from scripts.utilities.config import *
 
 
+@exception_wrapper
 def out_data_order_type(carriers=ACTIVE_CARRIER, include_supership=True, show_logs=True):
 
     if show_logs:
@@ -57,6 +58,7 @@ def out_data_order_type(carriers=ACTIVE_CARRIER, include_supership=True, show_lo
     order_type_df.to_parquet(ROOT_PATH + "/output/data_order_type.parquet", index=False)
 
 
+@exception_wrapper
 def out_data_service_fee():
     print('Xử lý data service_fee...')
     cuoc_phi_df = pd.read_parquet(ROOT_PATH + '/processed_data/cuoc_phi.parquet')
@@ -105,11 +107,7 @@ if __name__ == '__main__':
             print('Out data query_db and assigning SuperShip carrier...')
         else:
             print('Out data query_db...')
-        try:
-            out_data_order_type(include_supership=include_supership)
-            out_data_service_fee()
-        except Exception as e:
-            error = type(e).__name__ + " – " + str(e)
-            telegram_bot_send_error_message(error)
+        out_data_order_type(include_supership=include_supership)
+        out_data_service_fee()
     elif options.mode == 'daily':
         out_data_service_fee()

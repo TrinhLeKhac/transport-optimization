@@ -46,6 +46,7 @@ def status_chat_luong_noi_bo_lazada(series, col='delivery_success_rate'):
         return 'Ti lệ dưới 94%'
 
 
+@exception_wrapper
 def transform_data_chat_luong_noi_bo_ninja_van():
     chat_luong_noi_bo_df = pd.read_parquet(ROOT_PATH + '/processed_data/chat_luong_noi_bo_njv.parquet')
 
@@ -75,6 +76,7 @@ def transform_data_chat_luong_noi_bo_ninja_van():
     return chat_luong_noi_bo_df
 
 
+@exception_wrapper
 def transform_data_chat_luong_noi_bo_lazada():
     chat_luong_noi_bo_df = pd.read_parquet(ROOT_PATH + '/processed_data/chat_luong_noi_bo_lazada.parquet')
     chat_luong_noi_bo_df['status'] = chat_luong_noi_bo_df.apply(status_chat_luong_noi_bo_lazada, axis=1)

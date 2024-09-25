@@ -2,6 +2,7 @@ from scripts.utilities.helper import *
 from scripts.utilities.config import *
 
 
+@exception_wrapper
 def transform_data_ngung_giao_nhan():
 
     # Đọc data ngưng giao nhận
@@ -60,6 +61,7 @@ def transform_data_ngung_giao_nhan():
     return return_df
 
 
+@exception_wrapper
 def transform_data_ngung_giao_nhan_level_3():
 
     # Đọc data ngưng giao nhận

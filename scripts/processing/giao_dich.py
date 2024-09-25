@@ -40,6 +40,7 @@ def convert_datetime_type2(s):
     return result
 
 
+@exception_wrapper
 def xu_ly_giao_dich():
     print('Xử lý giao dịch BEST Express...')
     best_df = pd.read_excel(ROOT_PATH + '/input/giao_dich_nha_van_chuyen.xlsx', sheet_name='BEST')
@@ -139,6 +140,7 @@ def xu_ly_giao_dich():
     raw_order_df.to_parquet(ROOT_PATH + '/processed_data/raw_order.parquet', index=False)
 
 
+@exception_wrapper
 def xu_ly_giao_dich_co_khoi_luong():
     order_with_weight_df = pd.read_excel(ROOT_PATH + '/input/don_co_khoi_luong.xlsx', sheet_name='Combined')
 
@@ -149,6 +151,7 @@ def xu_ly_giao_dich_co_khoi_luong():
     order_with_weight_df.to_parquet(ROOT_PATH + '/processed_data/order_with_weight.parquet', index=False)
 
 
+@exception_wrapper
 def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
     run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
     if not from_api:

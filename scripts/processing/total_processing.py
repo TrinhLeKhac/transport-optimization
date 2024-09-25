@@ -15,9 +15,10 @@ from scripts.processing.danh_gia_zns import xu_ly_danh_gia_zns
 from scripts.processing.ngung_giao_nhan import xu_ly_ngung_giao_nhan, xu_ly_ngung_giao_nhan_shopee, xu_ly_ngung_giao_nhan_lazada, xu_ly_ngung_giao_nhan_level_3
 from scripts.processing.phan_vung_nha_van_chuyen import xu_ly_phan_vung_nha_van_chuyen
 from scripts.processing.giao_dich import xu_ly_giao_dich, xu_ly_giao_dich_co_khoi_luong, tong_hop_thong_tin_giao_dich
-from scripts.utilities.helper import telegram_bot_send_error_message
+from scripts.utilities.helper import *
 
 
+@exception_wrapper
 def total_processing(run_date_str, from_api=True, n_days_back=30):
 
     print('0. Lấy thông tin metadata tỉnh thành, quận huyện, phường xã mới nhất từ API...')
@@ -28,11 +29,11 @@ def total_processing(run_date_str, from_api=True, n_days_back=30):
     print('0.2 Lấy thông tin mapping tỉnh thành, quận huyện mới nhất (dạng json) ...')
     get_latest_province_mapping_district_json()
 
-    print('0.3 Lấy thông tin mapping tỉnh thành, quận huyện, phường xã mới nhất ...')
-    get_latest_province_mapping_district_mapping_ward()
-
-    print('0.4 Lấy thông tin mapping tỉnh thành, quận huyện, phường xã mới nhất (dạng json)...')
-    get_latest_province_mapping_district_mapping_ward_json()
+    # print('0.3 Lấy thông tin mapping tỉnh thành, quận huyện, phường xã mới nhất ...')
+    # get_latest_province_mapping_district_mapping_ward()
+    #
+    # print('0.4 Lấy thông tin mapping tỉnh thành, quận huyện, phường xã mới nhất (dạng json)...')
+    # get_latest_province_mapping_district_mapping_ward_json()
     print('>>> Done\n')
 
     if not os.path.exists(ROOT_PATH + '/processed_data'):
@@ -108,16 +109,8 @@ if __name__ == '__main__':
     n_days_back = 30
 
     if options.mode == 'api':
-        try:
-            print(f'Processing data on date = {options.run_date} with interval = {n_days_back} from API get data order, zns...')
-            total_processing(options.run_date, from_api=True, n_days_back=n_days_back)
-        except Exception as e:
-            error = type(e).__name__ + " – " + str(e)
-            telegram_bot_send_error_message(error)
+        print(f'Processing data on date = {options.run_date} with interval = {n_days_back} from API get data order, zns...')
+        total_processing(options.run_date, from_api=True, n_days_back=n_days_back)
     elif options.mode == 'excel':
-        try:
-            print('Processing data from Excel File...')
-            total_processing(options.run_date, from_api=False, n_days_back=n_days_back)
-        except Exception as e:
-            error = type(e).__name__ + " – " + str(e)
-            telegram_bot_send_error_message(error)
+        print('Processing data from Excel File...')
+        total_processing(options.run_date, from_api=False, n_days_back=n_days_back)

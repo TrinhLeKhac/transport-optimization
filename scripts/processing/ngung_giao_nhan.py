@@ -1,6 +1,7 @@
 from scripts.utilities.helper import *
 
 
+@exception_wrapper
 def xu_ly_ngung_giao_nhan():
     # Đọc data ngưng giao nhận
     try:
@@ -45,6 +46,7 @@ def xu_ly_ngung_giao_nhan():
     ngung_giao_nhan_final_df.to_parquet(ROOT_PATH + '/processed_data/ngung_giao_nhan.parquet', index=False)
 
 
+@exception_wrapper
 def xu_ly_ngung_giao_nhan_shopee():
     # Đọc data shopee ngưng giao nhận
     try:
@@ -79,6 +81,7 @@ def xu_ly_ngung_giao_nhan_shopee():
     ngung_giao_nhan_final_df.to_parquet(ROOT_PATH + '/processed_data/shopee_ngung_giao_nhan.parquet', index=False)
 
 
+@exception_wrapper
 def xu_ly_ngung_giao_nhan_lazada():
     # Đọc data Lazada Logistics ngưng giao nhận
     try:
@@ -114,6 +117,7 @@ def xu_ly_ngung_giao_nhan_lazada():
     ngung_giao_nhan_final_df.to_parquet(ROOT_PATH + '/processed_data/lazada_ngung_giao_nhan.parquet', index=False)
 
 
+@exception_wrapper
 def xu_ly_ngung_giao_nhan_level_3():
     ngung_giao_nhan = pd.read_parquet(ROOT_PATH + '/processed_data/ngung_giao_nhan.parquet')
 

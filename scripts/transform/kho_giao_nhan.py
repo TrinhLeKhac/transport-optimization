@@ -22,6 +22,7 @@ def status_kho_giao_nhan(so_buu_cuc, so_buu_cuc_trong_tinh, so_quan_huyen):
         return 'Có bưu cục cùng cấp quận/huyện'
 
 
+@exception_wrapper
 def transform_buu_cuc(buu_cuc_df, carrier='BEST Express'):
 
     buu_cuc_df = buu_cuc_df.merge(PROVINCE_MAPPING_DISTRICT_DF[['province', 'district']].rename(columns={
@@ -47,6 +48,7 @@ def transform_buu_cuc(buu_cuc_df, carrier='BEST Express'):
     return buu_cuc_df[['receiver_province', 'receiver_district', 'carrier', 'status', 'score', 'criteria', 'criteria_weight']]
 
 
+@exception_wrapper
 def transform_data_kho_giao_nhan():
 
     # Đọc thông tin bưu cục

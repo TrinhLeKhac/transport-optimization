@@ -145,6 +145,7 @@ def partner_best_carrier(data_api_df):
     return data_api_df.drop(['wscore'], axis=1)
 
 
+@exception_wrapper
 def out_data_final(
         run_date_str,
         carriers=ACTIVE_CARRIER,
@@ -295,6 +296,7 @@ def _get_data_viz(target_df, threshold=0.6):
     return analyze_df1, analyze_df2
 
 
+@exception_wrapper
 def get_data_viz():
 
     target_df = pd.read_parquet(ROOT_PATH + '/output/data_visualization.parquet')
@@ -329,6 +331,7 @@ def find_intersection(x1, y1, x2, y2, x3, y3, x4, y4):
     return px, py
 
 
+@exception_wrapper
 def get_optimal_point(run_date_str, delta=0.9, step=2):
     input_df = pd.read_parquet(ROOT_PATH + '/output/st_data_visualization_p1.parquet',
                                columns=['score', 'monetary', 'total_error'])
@@ -405,10 +408,6 @@ if __name__ == '__main__':
         print('Out data visualization and assigning SuperShip carrier...')
     else:
         print('Out data visualization...')
-    try:
-        out_data_final(run_date_str=options.run_date, carriers=ACTIVE_CARRIER, show_logs=False, include_supership=include_supership)
-        get_data_viz()
-        get_optimal_point(run_date_str=options.run_date, delta=DELTA, step=2)
-    except Exception as e:
-        error = type(e).__name__ + " – " + str(e)
-        telegram_bot_send_error_message(error)
+    out_data_final(run_date_str=options.run_date, carriers=ACTIVE_CARRIER, show_logs=False, include_supership=include_supership)
+    get_data_viz()
+    get_optimal_point(run_date_str=options.run_date, delta=DELTA, step=2)
