@@ -27,6 +27,17 @@ def xu_ly_chat_luong_noi_bo_ninja_van_old():
         'short_receiver_district', 'njv_post_office', 'delivery_success_rate', 'is_more_than_100'
     ]
     clnb_njv_df = clnb_njv_df[[
+        'receiver_province', 'id_receiver_district',
+        'njv_post_office', 'delivery_success_rate', 'is_more_than_100'
+    ]]
+    clnb_njv_df['id_receiver_district'] = clnb_njv_df['id_receiver_district'].astype(str)
+    clnb_njv_df['id_receiver_district'] = clnb_njv_df['id_receiver_district'].str.zfill(3)
+
+    clnb_njv_df = clnb_njv_df.merge(PROVINCE_MAPPING_DISTRICT_DF[['district_code', 'district']].rename(columns={
+        'district_code': 'id_receiver_district',
+        'district': 'receiver_district'
+    }), on='id_receiver_district', how='inner')
+    clnb_njv_df = clnb_njv_df[[
         'receiver_province', 'receiver_district',
         'njv_post_office', 'delivery_success_rate', 'is_more_than_100'
     ]]
