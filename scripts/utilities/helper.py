@@ -965,8 +965,9 @@ QUERY_SQL_COMMAND_API_FINAL = """
                     CASE
                         WHEN item_price < 1000000 THEN 0
                         WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0.005*item_price
-                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
-                        WHEN item_price > 5000000 THEN -1
+                        WHEN (item_price >= 3000000) AND (item_price < 5000000) THEN 0.005*item_price
+                        WHEN (item_price >= 5000000) AND (item_price <= 30000000) THEN 0.005*item_price
+                        WHEN item_price > 30000000 THEN -1
                     END
             WHEN carrier_id = 13 -- VnPost
                 THEN
@@ -1352,8 +1353,9 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                     CASE
                         WHEN item_price < 1000000 THEN 0
                         WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0.005*item_price
-                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
-                        WHEN item_price > 5000000 THEN -1
+                        WHEN (item_price >= 3000000) AND (item_price < 5000000) THEN 0.005*item_price
+                        WHEN (item_price >= 5000000) AND (item_price <= 30000000) THEN 0.005*item_price
+                        WHEN item_price > 30000000 THEN -1
                     END
             WHEN carrier_id = 13 -- VnPost
                 THEN
