@@ -939,10 +939,9 @@ QUERY_SQL_COMMAND_API_FINAL = """
             WHEN carrier_id = 6 -- BEST Express
                 THEN
                     CASE
-                        WHEN item_price < 1000000 THEN 0
-                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0
-                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
-                        WHEN item_price > 5000000 THEN -1
+                        WHEN item_price <= 1000000 THEN 0
+                        WHEN (item_price > 1000000) AND (item_price <= 10000000) THEN 0.005*item_price
+                        WHEN item_price > 10000000 THEN 0.01*item_price
                     END
             WHEN carrier_id = 10 --- SPX Express
                 THEN
@@ -1327,10 +1326,9 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             WHEN carrier_id = 6 -- BEST Express
                 THEN
                     CASE
-                        WHEN item_price < 1000000 THEN 0
-                        WHEN (item_price >= 1000000) AND (item_price < 3000000) THEN 0
-                        WHEN (item_price >= 3000000) AND (item_price <= 5000000) THEN 0.005*item_price
-                        WHEN item_price > 5000000 THEN -1
+                        WHEN item_price <= 1000000 THEN 0
+                        WHEN (item_price > 1000000) AND (item_price <= 10000000) THEN 0.005*item_price
+                        WHEN item_price > 10000000 THEN 0.01*item_price
                     END
             WHEN carrier_id = 10 --- SPX Express
                 THEN
