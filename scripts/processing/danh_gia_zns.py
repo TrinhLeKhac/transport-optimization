@@ -85,7 +85,6 @@ def xu_ly_danh_gia_zns(run_date_str, from_api=True, n_days_back=30):
             danh_gia_zns_df['reviewed_at'] >=
             (run_date - timedelta(days=n_days_back))
             ]
-        danh_gia_zns_df['n_days'] = (run_date - danh_gia_zns_df['date']).dt.days
 
         # 4. Lưu thông tin
         danh_gia_zns_df.to_parquet(ROOT_PATH + '/processed_data/danh_gia_zns.parquet', index=False)
