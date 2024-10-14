@@ -84,8 +84,23 @@ def xu_ly_danh_gia_zns(run_date_str, from_api=True, n_days_back=30):
         danh_gia_zns_df = danh_gia_zns_df.loc[
             danh_gia_zns_df['reviewed_at'] >=
             (run_date - timedelta(days=n_days_back))
-        ]
+            ]
+        danh_gia_zns_df['n_days'] = (run_date - danh_gia_zns_df['date']).dt.days
 
         # 4. Lưu thông tin
         danh_gia_zns_df.to_parquet(ROOT_PATH + '/processed_data/danh_gia_zns.parquet', index=False)
 
+
+def xu_ly_danh_gia_zns_1_sao(run_date_str):
+    danh_gia_zns = pd.read_parquet(ROOT_PATH + "/processed_data/danh_gia_zns.parquet")
+    run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
+
+    danh_gia_zns['n_days'] = (run_date - danh_gia_zns['date']).dt.days
+    danh_gia_zns_1sao = danh_gia_zns.loc[danh_gia_zns['n_stars'] == 1]
+
+    danh_gia_zns_1sao = danh_gia_zns_1sao[['receiver_province', 'receiver_district', 'carrier', 'n_days']]
+    danh_gia_zns_1sao = danh_gia_zns_1sao.sort_values(['receiver_province', 'receiver_district', 'carrier', 'n_days'],
+                                                      ascending=[True, True, True, True])
+    danh_gia_zns_1sao = danh_gia_zns_1sao.drop_duplicates(['receiver_province', 'receiver_district', 'carrier'],
+                                                          keep='first')
+    danh_gia_zns_1sao.to_parquet(ROOT_PATH + '/processed_data/danh_gia_zns_1_sao.parquet', index=False)

@@ -11,7 +11,7 @@ from scripts.processing.get_latest_location import get_latest_province_mapping_d
 from scripts.processing.bang_gia_cuoc import xu_ly_bang_gia_cuoc
 from scripts.processing.chat_luong_noi_bo import xu_ly_chat_luong_noi_bo_ninja_van, xu_ly_chat_luong_noi_bo_lazada
 from scripts.processing.kho_giao_nhan import xu_ly_kho_giao_nhan
-from scripts.processing.danh_gia_zns import xu_ly_danh_gia_zns
+from scripts.processing.danh_gia_zns import xu_ly_danh_gia_zns, xu_ly_danh_gia_zns_1_sao
 from scripts.processing.ngung_giao_nhan import xu_ly_ngung_giao_nhan, xu_ly_ngung_giao_nhan_shopee, xu_ly_ngung_giao_nhan_lazada, xu_ly_ngung_giao_nhan_level_3
 from scripts.processing.phan_vung_nha_van_chuyen import xu_ly_phan_vung_nha_van_chuyen
 from scripts.processing.giao_dich import xu_ly_giao_dich, xu_ly_giao_dich_co_khoi_luong, tong_hop_thong_tin_giao_dich
@@ -54,6 +54,8 @@ def total_processing(run_date_str, from_api=True, n_days_back=30):
 
     print('4. Xử lý data đánh giá ZNS...')
     xu_ly_danh_gia_zns(run_date_str, from_api=from_api, n_days_back=n_days_back)
+    if from_api:
+        xu_ly_danh_gia_zns_1_sao(run_date_str)
     print('>>> Done\n')
 
     print('5. Xử lý data ngưng giao nhận...')
