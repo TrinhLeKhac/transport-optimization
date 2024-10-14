@@ -41,6 +41,10 @@ config_daily = [
         'carrier_id, receiver_province_code, receiver_district_code, receiver_commune_code'
     ),
     (
+        ROOT_PATH + '/processed_data/danh_gia_zns_1_sao.parquet', 'tbl_zns', False, False,
+        'receiver_province_code, receiver_district_code, carrier'
+    ),
+    (
         ROOT_PATH + '/output/service_fee.parquet', 'tbl_service_fee', False, False,  # observe, trigger run.sh mode init khi file bang_cuoc_phi.xlsx thay đổi.
         'carrier_id, order_type, weight, pickup'
     ),

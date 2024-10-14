@@ -43,6 +43,12 @@ TABLE_SCHEMA = {
     #     "is_more_than_100": Boolean,
     #     "import_time": TIMESTAMP,
     # },
+    'tbl_zns': {
+        'receiver_province': VARCHAR(length=30),
+        'receiver_district': VARCHAR(length=30),
+        'carrier': VARCHAR(length=30),
+        "n_days": INTEGER,
+    },
     'tbl_clnb_ninja_van': {
         'receiver_province': VARCHAR(length=30),
         'receiver_district': VARCHAR(length=30),
