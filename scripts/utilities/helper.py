@@ -543,6 +543,7 @@ QUERY_SQL_COMMAND_API = """
                 THEN 'Bình thường' 
             ELSE tbl_ngn.status
         END AS ngn_status,
+        tbl_zns.n_days,
         tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
         ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
@@ -560,7 +561,11 @@ QUERY_SQL_COMMAND_API = """
         INNER JOIN db_schema.tbl_ngung_giao_nhan AS tbl_ngn 
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
-        AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
+        AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code
+        INNER JOIN db_schema.tbl_zns AS tbl_zns 
+        ON tbl_ord.carrier_id = tbl_zns.carrier_id 
+        AND tbl_ord.receiver_province_code = tbl_zns.receiver_province_code 
+        AND tbl_ord.receiver_district_code = tbl_zns.receiver_district_code
         CROSS JOIN (
         SELECT score AS optimal_score FROM db_schema.tbl_optimal_score 
         WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)
@@ -574,7 +579,7 @@ QUERY_SQL_COMMAND_API = """
     ),
     
     carrier_information AS ( 
-        SELECT carrier_id, route_type, price, ngn_status, status, 
+        SELECT carrier_id, route_type, price, ngn_status, status, n_days, 
         CASE
             WHEN ngn_status = 'Quá tải'
                 THEN 
@@ -604,7 +609,7 @@ QUERY_SQL_COMMAND_API = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score >= optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') 
+        WHERE (score >= optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 10)
     ), 
     
     -- Create carrier_information_below_tmp CTE by 
@@ -620,7 +625,7 @@ QUERY_SQL_COMMAND_API = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score < optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') 
+        WHERE (score < optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 10)
     ),
     
     -- Create carrier_information_below CTE by 
@@ -661,7 +666,7 @@ QUERY_SQL_COMMAND_API = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') 
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 10)
     ),
     
     carrier_information_overload_tmp2 AS (
@@ -715,6 +720,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
                 THEN 'Bình thường' 
             ELSE tbl_ngn.status
         END AS ngn_status,
+        tbl_zns.n_days,
         tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
         ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
@@ -733,6 +739,10 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
         AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
+        INNER JOIN db_schema.tbl_zns AS tbl_zns 
+        ON tbl_ord.carrier_id = tbl_zns.carrier_id 
+        AND tbl_ord.receiver_province_code = tbl_zns.receiver_province_code 
+        AND tbl_ord.receiver_district_code = tbl_zns.receiver_district_code
         -- (6, 18000), (7, 17000), (2, 19000), (4, 20000), (10, 15000), (13, 15000), (14, 15000) 
         INNER JOIN (VALUES {}) AS tbl_price(carrier_id, price) 
         ON tbl_ord.carrier_id = tbl_price.carrier_id 
@@ -749,7 +759,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
     ),
     
     carrier_information AS ( 
-        SELECT carrier_id, route_type, price, ngn_status, status, 
+        SELECT carrier_id, route_type, price, ngn_status, status, n_days, 
         CASE
             WHEN ngn_status = 'Quá tải'
                 THEN 
@@ -779,7 +789,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score >= optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') 
+        WHERE (score >= optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 10)
     ), 
 
     -- Create carrier_information_below_tmp CTE by 
@@ -795,7 +805,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score < optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') 
+        WHERE (score < optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 10)
     ),
 
     -- Create carrier_information_below CTE by 
@@ -836,7 +846,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') 
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 10)
     ),
 
     carrier_information_overload_tmp2 AS ( 
@@ -887,6 +897,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
                 THEN 'Bình thường' 
             ELSE tbl_ngn.status
         END AS ngn_status,
+        n_days, 
         tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
         ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
@@ -908,6 +919,10 @@ QUERY_SQL_COMMAND_API_FINAL = """
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
         AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
+        INNER JOIN db_schema.tbl_zns AS tbl_zns 
+        ON tbl_ord.carrier_id = tbl_zns.carrier_id 
+        AND tbl_ord.receiver_province_code = tbl_zns.receiver_province_code 
+        AND tbl_ord.receiver_district_code = tbl_zns.receiver_district_code
         CROSS JOIN (
         SELECT score AS optimal_score FROM db_schema.tbl_optimal_score 
         WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)
@@ -1075,6 +1090,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
                     END
         END AS redeem_fee, 
         status, ngn_status, 
+        n_days, 
         CASE
             WHEN ngn_status = 'Quá tải'
                 THEN 
@@ -1094,7 +1110,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         SELECT carrier_id, route_type, price, insurance_fee, collection_fee, redeem_fee, 
         CASE WHEN insurance_fee != -1 THEN insurance_fee ELSE 0 END AS insurance_fee_modified, 
         CASE WHEN collection_fee != -1 THEN collection_fee ELSE 0 END AS collection_fee_modified, 
-        status, ngn_status, description, time_data, 
+        status, ngn_status, n_days, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         speed_ranking, score_ranking 
         FROM carrier_information_tmp2 
@@ -1103,7 +1119,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
     carrier_information AS ( 
         SELECT carrier_id, route_type, insurance_fee, collection_fee, 
         price + insurance_fee_modified + collection_fee_modified + redeem_fee AS total_price, 
-        status, ngn_status, description, time_data, 
+        status, ngn_status, n_days, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         speed_ranking, score_ranking 
         FROM carrier_information_tmp3 
@@ -1124,6 +1140,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
             AND (collection_fee != -1) 
             AND (status != '1') 
             AND (ngn_status != 'Quá tải') 
+            AND (n_days > 10)
     ), 
     
     -- Create carrier_information_below_tmp CTE by 
@@ -1145,6 +1162,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
             AND (collection_fee != -1) 
             AND (status != '1')
             AND (ngn_status != 'Quá tải')
+            AND (n_days > 10)
     ),
     
     -- Create carrier_information_below CTE by 
@@ -1185,7 +1203,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') 
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 10)
     ),
     
     carrier_information_overload_tmp2 AS ( 
@@ -1222,6 +1240,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
             ((insurance_fee = -1) OR (collection_fee = -1))
             AND (status != '1') 
             AND (ngn_status != 'Quá tải')
+            AND (n_days > 10)
     ),
     
     carrier_information_refuse_tmp2 AS ( 
@@ -1275,6 +1294,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                 THEN 'Bình thường' 
             ELSE tbl_ngn.status
         END AS ngn_status,
+        n_days, 
         tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
         ROUND(tbl_api.star, 1) AS star,
@@ -1296,6 +1316,10 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ON tbl_ord.carrier_id = tbl_ngn.carrier_id 
         AND tbl_ord.sender_province_code = tbl_ngn.sender_province_code 
         AND tbl_ord.sender_district_code = tbl_ngn.sender_district_code 
+        INNER JOIN db_schema.tbl_zns AS tbl_zns 
+        ON tbl_ord.carrier_id = tbl_zns.carrier_id 
+        AND tbl_ord.receiver_province_code = tbl_zns.receiver_province_code 
+        AND tbl_ord.receiver_district_code = tbl_zns.receiver_district_code
         CROSS JOIN (
         SELECT score AS optimal_score FROM db_schema.tbl_optimal_score 
         WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)
@@ -1473,6 +1497,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
                     END
             ELSE description
         END AS description, 
+        n_days, 
         time_data, time_display, rate, score, optimal_score, star, for_shop, 
         speed_ranking, score_ranking 
         FROM carrier_information_tmp1 
@@ -1482,7 +1507,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, 
         CASE WHEN insurance_fee != -1 THEN insurance_fee ELSE 0 END AS insurance_fee_modified, 
         CASE WHEN collection_fee != -1 THEN collection_fee ELSE 0 END AS collection_fee_modified, 
-        status, ngn_status, description, time_data, 
+        status, ngn_status, n_days, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         speed_ranking, score_ranking 
         FROM carrier_information_tmp2 
@@ -1491,7 +1516,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     carrier_information AS ( 
         SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, 
         price + insurance_fee_modified + collection_fee_modified + redeem_fee AS total_price, 
-        status, ngn_status, description, time_data, 
+        status, ngn_status, n_days, description, time_data, 
         time_display, rate, score, optimal_score, star, for_shop, 
         speed_ranking, score_ranking 
         FROM carrier_information_tmp3 
@@ -1512,6 +1537,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             AND (collection_fee != -1) 
             AND (status != '1') 
             AND (ngn_status != 'Quá tải')
+            AND (n_days > 10)
     ), 
 
     -- Create carrier_information_below_tmp CTE by 
@@ -1533,6 +1559,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             AND (collection_fee != -1) 
             AND (status != '1')
             AND (ngn_status != 'Quá tải')
+            AND (n_days > 10)
     ),
 
     -- Create carrier_information_below CTE by 
@@ -1573,7 +1600,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') 
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 10)
     ),
     
     carrier_information_overload_tmp2 AS ( 
@@ -1610,6 +1637,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             ((insurance_fee = -1) OR (collection_fee = -1)) 
             AND (status != '1') 
             AND (ngn_status != 'Quá tải')
+            AND (n_days > 10)
     ),
     
     carrier_information_refuse_tmp2 AS ( 
