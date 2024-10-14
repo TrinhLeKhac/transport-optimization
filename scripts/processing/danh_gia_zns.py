@@ -102,6 +102,13 @@ def xu_ly_danh_gia_zns_1_sao(run_date_str):
                                                       ascending=[True, True, True, True])
     danh_gia_zns_1sao = danh_gia_zns_1sao.drop_duplicates(['receiver_province', 'receiver_district', 'carrier'],
                                                           keep='first')
+    danh_gia_zns_1sao = (
+        PROVINCE_MAPPING_DISTRICT_CROSS_CARRIER_DF.merge(
+            danh_gia_zns_1sao, on=['receiver_province', 'receiver_district', 'carrier'], how='left'
+        )
+    )
+    danh_gia_zns_1sao['n_days'] = danh_gia_zns_1sao['n_days'].fillna(100).astype('int')
+
     danh_gia_zns_1sao = danh_gia_zns_1sao.merge(
         PROVINCE_MAPPING_DISTRICT_DF.rename(columns={
             'province': 'receiver_province',
@@ -109,7 +116,6 @@ def xu_ly_danh_gia_zns_1_sao(run_date_str):
             'province_code': 'receiver_province_code',
             'district_code': 'receiver_district_code'
         }), on=['receiver_province', 'receiver_district'], how='inner')
-
     danh_gia_zns_1sao['carrier_id'] = danh_gia_zns_1sao['carrier'].map(MAPPING_CARRIER_ID)
     danh_gia_zns_1sao = danh_gia_zns_1sao[['carrier_id', 'receiver_province_code', 'receiver_district_code', 'n_days']]
 
