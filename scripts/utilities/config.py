@@ -26,7 +26,7 @@ TRONG_SO = {
         },
     },
     'Tỉ lệ giao hàng': {
-        'Tiêu chí': 15,
+        'Tiêu chí': 18,
         'Phân loại': {
             'Tổng đơn hàng từ 30 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 10,
             'Tổng đơn hàng từ 20 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 8,
