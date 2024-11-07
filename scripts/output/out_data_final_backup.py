@@ -54,6 +54,13 @@ FINAL_COLS_RENAMED = [
 ]
 
 
+def approx(x):
+    if x % 500 == 0:
+        return x
+    else:
+        return 500 * (x // 500 + 1)
+
+
 def combine_info_from_api(
         input_df,
         run_date_str,
@@ -88,25 +95,19 @@ def combine_info_from_api(
             on=['receiver_province_code', 'receiver_district_code', 'carrier_id', 'order_type_id'], how='left'
         )
     )
-    del input_df, api_data_api
-    gc.collect()
-
     return result_df
 
 
-def calculate_service_fee(target_df):
-
+def calculate_service_fee(input_df):
+    target_df = input_df.copy()
     target_df.loc[target_df['weight'] > 50000, 'weight'] = 50000
-    target_df['weight'] = target_df['weight'].where(target_df['weight'] % 500 == 0, 500 * (target_df['weight'] // 500 + 1))
+    target_df['weight'] = target_df['weight'].apply(approx)
 
     cuoc_phi_df = pd.read_parquet(ROOT_PATH + '/processed_data/cuoc_phi.parquet')
     cuoc_phi_df = cuoc_phi_df[['carrier', 'order_type', 'lt_or_eq', 'service_fee']].rename(
         columns={'lt_or_eq': 'weight'})
 
     result_df = target_df.merge(cuoc_phi_df, on=['carrier', 'order_type', 'weight'], how='inner')
-
-    del cuoc_phi_df, target_df
-    gc.collect()
 
     # Ninja Van lấy tận nơi cộng cước phí 1,500
     result_df.loc[
@@ -125,8 +126,8 @@ def calculate_service_fee(target_df):
     return result_df
 
 
-def calculate_notification(result_df):
-
+def calculate_notification(input_df):
+    result_df = input_df.copy()
     result_df["cheapest_carrier_id"] = result_df.groupby("order_code")["service_fee"].rank(method="dense",
                                                                                            ascending=True)
     result_df["cheapest_carrier_id"] = result_df["cheapest_carrier_id"].astype(int)
@@ -151,65 +152,83 @@ def out_data_final(
         show_logs=False,
         include_supership=True
 ):
-    final_df = pd.read_parquet(
-        ROOT_PATH + '/processed_data/order.parquet',
-        columns=[
-            'order_code', 'weight', 'delivery_type',
-            'sender_province', 'sender_district', 'sender_province_code', 'sender_district_code',
-            'receiver_province', 'receiver_district', 'receiver_province_code', 'receiver_district_code',
-            'order_type', 'order_type_id', 'sys_order_type_id'
-        ])
-
-    print('Số dòng input dữ liệu: ', len(final_df))
+    order_df = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
+    focus_df = order_df[[
+        'order_code', 'weight', 'delivery_type',
+        'sender_province', 'sender_district', 'sender_province_code', 'sender_district_code',
+        'receiver_province', 'receiver_district', 'receiver_province_code', 'receiver_district_code',
+        'order_type', 'order_type_id', 'sys_order_type_id'
+    ]]
+    print('Số dòng input dữ liệu: ', len(focus_df))
 
     if include_supership:
-        final_df = final_df.merge(pd.DataFrame(data={'carrier': carriers + ['SuperShip']}), how='cross')
+        tmp_df1 = focus_df.merge(pd.DataFrame(data={'carrier': carriers + ['SuperShip']}), how='cross')
     else:
-        final_df = final_df.merge(pd.DataFrame(data={'carrier': carriers}), how='cross')
+        tmp_df1 = focus_df.merge(pd.DataFrame(data={'carrier': carriers}), how='cross')
 
-    final_df['carrier_id'] = final_df['carrier'].map(MAPPING_CARRIER_ID)
+    tmp_df1['carrier_id'] = tmp_df1['carrier'].map(MAPPING_CARRIER_ID)
+    assert len(tmp_df1) == len(focus_df) * tmp_df1['carrier'].nunique(), 'Gán thông tin nhà vận chuyển sai'
 
-    final_df = final_df[[
+    del focus_df
+    gc.collect()
+
+    tmp_df1 = tmp_df1[[
         'order_code', 'weight', 'delivery_type',
         'sender_province', 'sender_district', 'sender_province_code', 'sender_district_code',
         'receiver_province', 'receiver_district', 'receiver_province_code', 'receiver_district_code',
         'carrier', 'carrier_id',
         'order_type', 'order_type_id', 'sys_order_type_id'
     ]]
-    final_df['delivery_type'] = final_df['delivery_type'].fillna('Gửi Bưu Cục')
-    final_df['order_type_id'] = final_df['order_type_id'].astype(str)
-    final_df['sys_order_type_id'] = final_df['sys_order_type_id'].astype(str)
+    tmp_df1['delivery_type'] = tmp_df1['delivery_type'].fillna('Gửi Bưu Cục')
+    tmp_df1['order_type_id'] = tmp_df1['order_type_id'].astype(str)
+    tmp_df1['sys_order_type_id'] = tmp_df1['sys_order_type_id'].astype(str)
 
     print('i. Gắn thông tin tính toán từ API')
-    final_df = combine_info_from_api(
-        final_df,
+    tmp_df2 = combine_info_from_api(
+        tmp_df1,
         run_date_str,
         carriers=carriers,
         show_logs=show_logs,
         include_supership=include_supership
     )
+    # assert len(tmp_df2) == len(tmp_df1), 'Gán thông tin tính toán từ API sai'
+
+    del tmp_df1
+    gc.collect()
 
     print('ii. Tính phí dịch vụ')
     # Thêm phân vùng mới 'Liên Thành' cho đúng Ninja Van
     # Bảng cước phí cập nhật giá đủ 11 phân vùng => effect chỉ mỗi Ninja Van
-    final_df.loc[
-        (final_df['carrier_id'] == 7) &
+    tmp_df2.loc[
+        (tmp_df2['carrier_id'] == 7) &
         (
-                ((final_df['sender_province_code'] == '01') & (
-                        final_df['receiver_province_code'] == '79')) |
-                ((final_df['sender_province_code'] == '79') & (
-                        final_df['receiver_province_code'] == '01'))
+                ((tmp_df2['sender_province_code'] == '01') & (
+                        tmp_df2['receiver_province_code'] == '79')) |
+                ((tmp_df2['sender_province_code'] == '79') & (
+                        tmp_df2['receiver_province_code'] == '01'))
         ),
         'order_type'
     ] = 'Liên Thành'
 
-    final_df = calculate_service_fee(final_df)
+    tmp_df3 = calculate_service_fee(tmp_df2)
+    assert len(tmp_df3) == len(tmp_df2), 'Tính toán fee vận chuyển sai'
+
+    del tmp_df2
+    gc.collect()
 
     print('iii. Tính ranking nhà vận chuyển theo tiêu chí rẻ nhất')
-    final_df = calculate_notification(final_df)
+    tmp_df4 = calculate_notification(tmp_df3)
+    assert len(tmp_df4) == len(tmp_df3), 'Tính toán ranking nhà vận chuyển theo tiêu chí rẻ nhất sai'
+
+    del tmp_df3
+    gc.collect()
 
     print('iv. Tính nhà vận chuyển tốt nhất cho đối tác')
-    final_df = partner_best_carrier(final_df)
+    final_df = partner_best_carrier(tmp_df4)
+    assert len(final_df) == len(tmp_df4), 'Tính toán ranking nhà vận chuyển tốt nhất cho đối tác sai'
+
+    del tmp_df4
+    gc.collect()
 
     print('v. Lưu data tính toán...')
     final_df = final_df[FINAL_COLS]  # FINAL_FULL_COLS
@@ -224,6 +243,8 @@ def out_data_final(
     gc.collect()
 
     print('-' * 100)
+
+    # return final_df
 
 
 def _get_data_viz(target_df, threshold=0.6):
