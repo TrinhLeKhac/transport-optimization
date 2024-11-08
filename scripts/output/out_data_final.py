@@ -94,7 +94,7 @@ def combine_info_from_api(
     return result_df
 
 
-def calculate_service_fee(target_df):
+def calculate_service_fee_old(target_df):
 
     target_df.loc[target_df['weight'] > 50000, 'weight'] = 50000
     target_df['weight'] = target_df['weight'].where(target_df['weight'] % 500 == 0, 500 * (target_df['weight'] // 500 + 1))
@@ -121,6 +121,56 @@ def calculate_service_fee(target_df):
         result_df['delivery_type'].isin(['Lấy Tận Nơi']),
         'service_fee'
     ] = result_df['service_fee'] + 1000
+
+    return result_df
+
+
+def calculate_service_fee(target_df, carriers):
+
+    target_df.loc[target_df['weight'] > 50000, 'weight'] = 50000
+    target_df['weight'] = target_df['weight'].where(target_df['weight'] % 500 == 0, 500 * (target_df['weight'] // 500 + 1))
+
+    cuoc_phi_df = pd.read_parquet(ROOT_PATH + '/processed_data/cuoc_phi.parquet')
+    cuoc_phi_df = cuoc_phi_df[['carrier', 'order_type', 'lt_or_eq', 'service_fee']].rename(
+        columns={'lt_or_eq': 'weight'})
+
+    result_dfs = []
+    for carrier in carriers:
+        carrier_df = target_df[target_df['carrier'] == carrier]
+        carrier_df = carrier_df.drop('carrier', axis=1)
+
+        # Merge with cuoc_phi_df specific to carrier
+        carrier_result_df = carrier_df.merge(
+            cuoc_phi_df[cuoc_phi_df['carrier'] == carrier],
+            on=['order_type', 'weight'],
+            how='inner'
+        )
+
+        # Apply additional fees based on carrier and delivery type
+        if carrier == 'Ninja Van':
+            carrier_result_df.loc[
+                carrier_result_df['delivery_type'] == 'Lấy Tận Nơi',
+                'service_fee'
+            ] = carrier_result_df['service_fee'] + 1500
+
+        elif carrier == 'GHN':
+            carrier_result_df.loc[
+                carrier_result_df['delivery_type'] == 'Lấy Tận Nơi',
+                'service_fee'
+            ] = carrier_result_df['service_fee'] + 1000
+
+        result_dfs.append(carrier_result_df)
+
+        # Clean up memory
+        del carrier_df, carrier_result_df
+        gc.collect()
+
+    # Concatenate all carrier-specific results
+    result_df = pd.concat(result_dfs, ignore_index=True)
+
+    # Further cleanup
+    del result_dfs
+    gc.collect()
 
     return result_df
 
@@ -203,7 +253,7 @@ def out_data_final(
         'order_type'
     ] = 'Liên Thành'
 
-    final_df = calculate_service_fee(final_df)
+    final_df = calculate_service_fee(final_df, carriers)
 
     print('iii. Tính ranking nhà vận chuyển theo tiêu chí rẻ nhất')
     final_df = calculate_notification(final_df)
