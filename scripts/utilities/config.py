@@ -26,7 +26,7 @@ TRONG_SO = {
         },
     },
     'Tỉ lệ giao hàng': {
-        'Tiêu chí': 18,
+        'Tiêu chí': 20,
         'Phân loại': {
             'Tổng đơn hàng từ 30 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 10,
             'Tổng đơn hàng từ 20 đơn trở lên và có tỷ lệ giao hàng thành công trên 95%': 8,
@@ -75,7 +75,7 @@ TRONG_SO = {
         }
     },
     'Thời gian giao hàng': {
-        'Tiêu chí': 1.59,  # total 10 order_type => scale weight 20 -> 20/10=2
+        'Tiêu chí': 1.9,  # total 10 order_type => scale weight 20 -> 20/10=2
         'Phân loại': {
             'Cách Miền': {
                 # 96h
@@ -491,4 +491,4 @@ DF_STATUS_MAPPING = pd.DataFrame(data={
               ['Thất lạc'] * len(THAT_LAC_STATUS) + ['Không xét'] * len(KHONG_XET_STATUS)
 })
 
-DELTA = 0.9
+DELTA = 0
