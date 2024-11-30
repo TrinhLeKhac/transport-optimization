@@ -102,6 +102,16 @@ TABLE_SCHEMA = {
         'weight': INTEGER,
         'service_fee': INTEGER,
     },
+    'tbl_priority_route': {
+        'carrier_id': SMALLINT,
+        'sender_province_code': VARCHAR(length=2),
+        'sender_district_code': VARCHAR(length=3),
+        'receiver_province_code': VARCHAR(length=2),
+        'receiver_district_code': VARCHAR(length=3),
+        'new_type': VARCHAR(length=2),
+        'route_type': VARCHAR(length=1),
+        "import_date": VARCHAR(length=10),
+    },
     'tbl_data_api': {
         'receiver_province_code': VARCHAR(length=2),
         'receiver_district_code': VARCHAR(length=3),
