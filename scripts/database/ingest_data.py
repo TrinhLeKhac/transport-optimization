@@ -49,6 +49,10 @@ config_daily = [
         'carrier_id, order_type, weight, pickup'
     ),
     (
+        ROOT_PATH + '/output/tuyen_uu_tien_api.parquet', 'tbl_priority_route', True, False,
+        'carrier_id, receiver_province_code, receiver_district_code, new_type'
+    ),
+    (
         ROOT_PATH + '/output/data_api.parquet', 'tbl_data_api', True, False,
         'carrier_id, receiver_province_code, receiver_district_code, new_type'
     ),
