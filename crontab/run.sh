@@ -42,6 +42,9 @@ python ./scripts/output/out_data_api.py --run_date $run_date &&
 # Run script out data for visualization
 python ./scripts/output/out_data_final.py --run_date $run_date &&
 
+# Run script out data tuyen uu tien
+python ./scripts/output/out_data_tuyen_uu_tien.py --run_date $run_date &&
+
 # Run script out data query database
 python ./scripts/output/out_data_query_db.py --mode $mode &&
 
