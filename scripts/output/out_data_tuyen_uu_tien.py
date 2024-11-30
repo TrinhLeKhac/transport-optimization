@@ -33,7 +33,7 @@ API_COLS = [
 ]
 
 
-def get_total_order_date():
+def get_total_order():
     print('Getting total order data...')
     df_total_order_old = pd.read_parquet(ROOT_PATH + '/processed_data/total_order.parquet')
     df_order_new = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
@@ -253,6 +253,7 @@ if __name__ == '__main__':
     n_months_back = 12
     priority_type = 'top 20%'
 
+    get_total_order()
     get_metadata_tuyen_uu_tien(options.run_date, n_months_back=n_months_back)
     get_data_tuyen_uu_tien(
         run_date_str=options.run_date,
