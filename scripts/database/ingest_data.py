@@ -50,7 +50,7 @@ config_daily = [
     ),
     (
         ROOT_PATH + '/output/tuyen_uu_tien_api.parquet', 'tbl_priority_route', True, False,
-        'carrier_id, receiver_province_code, receiver_district_code, new_type'
+        'carrier_id, sender_province_code, sender_district_code, receiver_province_code, receiver_district_code'
     ),
     (
         ROOT_PATH + '/output/data_api.parquet', 'tbl_data_api', True, False,
