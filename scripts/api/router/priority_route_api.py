@@ -2,7 +2,7 @@ import psycopg2
 from fastapi import APIRouter
 from scripts.api import schemas
 from scripts.api.database import *
-from scripts.utilities.helper import QUERY_SQL_API_BY_DISTRICT
+from scripts.utilities.helper import QUERY_SQL_PRIORITY_ROUTE_BY_DISTRICT
 
 router = APIRouter()
 
@@ -17,7 +17,7 @@ def execute_query(
 
     cursor = connection.cursor()
 
-    table_query = QUERY_SQL_API_BY_DISTRICT.format(receiver_district_code)
+    table_query = QUERY_SQL_PRIORITY_ROUTE_BY_DISTRICT.format(receiver_district_code)
 
     cursor.execute(table_query)
     rows = cursor.fetchall()
