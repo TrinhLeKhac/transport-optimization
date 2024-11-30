@@ -507,6 +507,18 @@ def transform_dict(g):
     })
 
 
+QUERY_SQL_PRIORITY_ROUTE_BY_DISTRICT = """
+    -- Select properties from API data
+
+    SELECT carrier_id, 
+    sender_province_code, sender_district_code, 
+    receiver_province_code, receiver_district_code, 
+    route_type, new_type
+    FROM db_schema.tbl_priority_route
+    WHERE tbl_priority_route.receiver_district_code = '{}';
+"""
+
+
 QUERY_SQL_API_BY_DISTRICT = """
     -- Select properties from API data
     
