@@ -48,6 +48,19 @@ class OrderModel(BaseModel):
         from_attributes = True
 
 
+class PriorityModel(BaseModel):
+    carrier_id: conint(strict=True)
+    sender_province_code: constr(max_length=2, strict=True)
+    sender_district_code: constr(max_length=3, strict=True)
+    receiver_province_code: constr(max_length=2, strict=True)
+    receiver_district_code: constr(max_length=3, strict=True)
+    route_type: constr(max_length=1, strict=True)
+    new_type: constr(max_length=2, strict=True)
+
+    class Config:
+        from_attributes = True
+
+
 class APIModel(BaseModel):
     province_code: constr(max_length=2, strict=True)
     district_code: constr(max_length=3, strict=True)
