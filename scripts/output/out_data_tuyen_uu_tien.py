@@ -38,6 +38,7 @@ def get_total_order():
     df_total_order_old = pd.read_parquet(ROOT_PATH + '/processed_data/total_order.parquet')
     df_order_new = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
     df_total_order = pd.concat([df_total_order_old, df_order_new]).drop_duplicates().reset_index(drop=True)
+    df_total_order['sys_order_type_id'] = df_total_order['sys_order_type_id'].astype('int')
 
     print('Shape before: ', len(df_total_order_old))
     print('Shape after: ', len(df_total_order))
