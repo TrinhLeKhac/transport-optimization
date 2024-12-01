@@ -82,6 +82,22 @@ class Order(Base):
     __table_args__ = (PrimaryKeyConstraint("id", name="order_pkey"), {"schema": "db_schema"})
 
 
+class PriorityAPI(Base):
+    __tablename__ = "tbl_priority_route"
+
+    id: Mapped[int] = mapped_column(Integer, autoincrement=True)
+    carrier_id: Mapped[int] = mapped_column(Integer)
+    sender_province_code: Mapped[str] = mapped_column(String(2))
+    sender_district_code: Mapped[str] = mapped_column(String(3))
+    receiver_province_code: Mapped[str] = mapped_column(String(2))
+    receiver_district_code: Mapped[str] = mapped_column(String(3))
+    new_type: Mapped[str] = mapped_column(String(2))
+    route_type: Mapped[str] = mapped_column(String(1))
+    import_date: Mapped[str] = mapped_column(String(10))
+
+    __table_args__ = (PrimaryKeyConstraint("id", name="data_priority_route_pkey"), {"schema": "db_schema"})
+
+
 class API(Base):
     __tablename__ = "tbl_data_api"
 
