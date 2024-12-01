@@ -82,27 +82,27 @@ class Order(Base):
     __table_args__ = (PrimaryKeyConstraint("id", name="order_pkey"), {"schema": "db_schema"})
 
 
-# class API(Base):
-#     __tablename__ = "tbl_data_api"
-#
-#     id: Mapped[int] = mapped_column(Integer, autoincrement=True)
-#     receiver_province_code: Mapped[str] = mapped_column(String(2))
-#     receiver_district_code: Mapped[str] = mapped_column(String(3))
-#     carrier_id: Mapped[int] = mapped_column(Integer)
-#     new_type: Mapped[str] = mapped_column(String(2))
-#     route_type: Mapped[str] = mapped_column(String(1))
-#     status: Mapped[str] = mapped_column(String(1))
-#     description: Mapped[str] = mapped_column(String(512))
-#     time_data: Mapped[float] = mapped_column(Numeric(5, 2))
-#     time_display: Mapped[str] = mapped_column(String(30))
-#     rate: Mapped[float] = mapped_column(Numeric(5, 2))
-#     score: Mapped[float] = mapped_column(Numeric(3, 2))
-#     star: Mapped[float] = mapped_column(Numeric(2, 1))
-#     for_shop: Mapped[int] = mapped_column(Integer)
-#     speed_ranking: Mapped[int] = mapped_column(Integer)
-#     score_ranking: Mapped[int] = mapped_column(Integer)
-#     # total_order: Mapped[int] = mapped_column(Integer)
-#     # rate_ranking: Mapped[int] = mapped_column(Integer)
-#     import_date: Mapped[str] = mapped_column(String(10))
-#
-#     __table_args__ = (PrimaryKeyConstraint("id", name="data_api_pkey"), {"schema": "db_schema"})
+class API(Base):
+    __tablename__ = "tbl_data_api"
+
+    id: Mapped[int] = mapped_column(Integer, autoincrement=True)
+    receiver_province_code: Mapped[str] = mapped_column(String(2))
+    receiver_district_code: Mapped[str] = mapped_column(String(3))
+    carrier_id: Mapped[int] = mapped_column(Integer)
+    new_type: Mapped[str] = mapped_column(String(2))
+    route_type: Mapped[str] = mapped_column(String(1))
+    status: Mapped[str] = mapped_column(String(1))
+    description: Mapped[str] = mapped_column(String(512))
+    time_data: Mapped[float] = mapped_column(Numeric(5, 2))
+    time_display: Mapped[str] = mapped_column(String(30))
+    rate: Mapped[float] = mapped_column(Numeric(5, 2))
+    score: Mapped[float] = mapped_column(Numeric(3, 2))
+    star: Mapped[float] = mapped_column(Numeric(2, 1))
+    for_shop: Mapped[int] = mapped_column(Integer)
+    speed_ranking: Mapped[int] = mapped_column(Integer)
+    score_ranking: Mapped[int] = mapped_column(Integer)
+    # total_order: Mapped[int] = mapped_column(Integer)
+    # rate_ranking: Mapped[int] = mapped_column(Integer)
+    import_date: Mapped[str] = mapped_column(String(10))
+
+    __table_args__ = (PrimaryKeyConstraint("id", name="data_api_pkey"), {"schema": "db_schema"})
