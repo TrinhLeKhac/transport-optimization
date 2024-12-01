@@ -157,6 +157,8 @@ def get_data_tuyen_uu_tien(run_date_str, n_months_back=12, priority_type='top 20
         & (df_target_modified['last_delivering_at'].dt.hour < 9)
         ]
 
+    priority_df.to_parquet(ROOT_PATH + '/processed_data/order_with_priority_route_streamlit.parquet', index=False)
+
     grouped_priority_df = (
         priority_df
         .groupby(['carrier', 'sender_province_code', 'sender_district_code', 'receiver_province_code',
@@ -234,8 +236,8 @@ def get_data_tuyen_uu_tien(run_date_str, n_months_back=12, priority_type='top 20
     api_priority_df = final_priority_df[API_COLS].drop_duplicates().rename(
         columns={'preferred_carrier_id': 'carrier_id', 'order_type_id': 'new_type', 'sys_order_type_id': 'route_type'})
 
-    final_priority_df.to_parquet(ROOT_PATH + '/output/tuyen_uu_tien_full.parquet', index=False)
-    api_priority_df.to_parquet(ROOT_PATH + '/output/tuyen_uu_tien_api.parquet', index=False)
+    final_priority_df.to_parquet(ROOT_PATH + '/output/priority_route_full.parquet', index=False)
+    api_priority_df.to_parquet(ROOT_PATH + '/output/priority_route_api.parquet', index=False)
 
 
 if __name__ == '__main__':
