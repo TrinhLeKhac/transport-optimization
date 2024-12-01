@@ -42,7 +42,7 @@ app.include_router(order.router, tags=[""], prefix="/superai/order", dependencie
 app.include_router(result.router, tags=[""], prefix="/superai/result", dependencies=[Depends(validate_token)])
 app.include_router(result_final.router, tags=[""], prefix="/superai/final", dependencies=[Depends(validate_token)])
 app.include_router(result_super.router, tags=[""], prefix="/superai/super", dependencies=[Depends(validate_token)])
-app.include_router(priority_route_api.router, tags=[""], prefix="/superai/priority_route/district", dependencies=[Depends(validate_token)])
+app.include_router(priority_route_api.router, tags=[""], prefix="/superai/priority_route", dependencies=[Depends(validate_token)])
 app.include_router(api_output.router, tags=[""], prefix="/superai/district", dependencies=[Depends(validate_token)])
 app.include_router(api_ngung_giao_nhan.router, tags=[""], prefix="/superai/status", dependencies=[Depends(validate_token)])
 app.include_router(api_ngung_giao_nhan_rev.router, tags=[""], prefix="/superai/get_status", dependencies=[Depends(validate_token)])
