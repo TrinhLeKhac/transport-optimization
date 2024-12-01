@@ -78,17 +78,17 @@ def get_metadata_tuyen_uu_tien(run_date_str, n_months_back=12):
     get_top_by_25_pct_df['type'] = 'top 25%'
 
     get_top_by_pct_df = pd.concat([get_top_by_15_pct_df, get_top_by_20_pct_df, get_top_by_25_pct_df])
-    meta_tuyen_uu_tien_df = get_top_by_pct_df.groupby(['order_type_id', 'type'])['delta_hour'].mean().reset_index()
-    meta_tuyen_uu_tien_df['rounded_delta_hour'] = np.round(meta_tuyen_uu_tien_df['delta_hour'], 2)
-    meta_tuyen_uu_tien_df = meta_tuyen_uu_tien_df.sort_values(['type', 'delta_hour']).reset_index(drop=True)
+    meta_priority_route_df = get_top_by_pct_df.groupby(['order_type_id', 'type'])['delta_hour'].mean().reset_index()
+    meta_priority_route_df['rounded_delta_hour'] = np.round(meta_priority_route_df['delta_hour'], 2)
+    meta_priority_route_df = meta_priority_route_df.sort_values(['type', 'delta_hour']).reset_index(drop=True)
 
-    meta_tuyen_uu_tien_df['idea_delta_hour'] = meta_tuyen_uu_tien_df['rounded_delta_hour']
-    meta_tuyen_uu_tien_df.loc[meta_tuyen_uu_tien_df['rounded_delta_hour'] < 24, 'idea_delta_hour'] = 24
-    meta_tuyen_uu_tien_df['order_type'] = meta_tuyen_uu_tien_df['order_type_id'].map(MAPPING_ID_ORDER_TYPE)
-    meta_tuyen_uu_tien_df = meta_tuyen_uu_tien_df[
+    meta_priority_route_df['idea_delta_hour'] = meta_priority_route_df['rounded_delta_hour']
+    meta_priority_route_df.loc[meta_priority_route_df['rounded_delta_hour'] < 24, 'idea_delta_hour'] = 24
+    meta_priority_route_df['order_type'] = meta_priority_route_df['order_type_id'].map(MAPPING_ID_ORDER_TYPE)
+    meta_priority_route_df = meta_priority_route_df[
         ['order_type', 'order_type_id', 'type', 'delta_hour', 'rounded_delta_hour', 'idea_delta_hour']]
 
-    meta_tuyen_uu_tien_df.to_parquet(ROOT_PATH + '/processed_data/meta_tuyen_uu_tien.parquet', index=False)
+    meta_priority_route_df.to_parquet(ROOT_PATH + '/processed_data/meta_priority_route.parquet', index=False)
 
 
 @exception_wrapper
@@ -144,13 +144,13 @@ def get_data_tuyen_uu_tien(run_date_str, n_months_back=12, priority_type='top 20
     print('Done\n')
 
     print('2. Lấy metadata tuyến ưu tiên...')
-    meta_tuyen_uu_tien_df = pd.read_parquet(ROOT_PATH + '/processed_data/meta_tuyen_uu_tien.parquet')
-    meta_tuyen_uu_tien_df = meta_tuyen_uu_tien_df.loc[meta_tuyen_uu_tien_df['type'] == priority_type][
+    meta_priority_route_df = pd.read_parquet(ROOT_PATH + '/processed_data/meta_priority_route.parquet')
+    meta_priority_route_df = meta_priority_route_df.loc[meta_priority_route_df['type'] == priority_type][
         ['order_type_id', 'idea_delta_hour']]
     print('Done\n')
 
     print('3. Transform data tuyến ưu tiên...')
-    df_target_modified = df_target.merge(meta_tuyen_uu_tien_df, on='order_type_id', how='inner')
+    df_target_modified = df_target.merge(meta_priority_route_df, on='order_type_id', how='inner')
     priority_df = df_target_modified.loc[
         (df_target_modified['delta_hour'] <= df_target_modified['idea_delta_hour'])
         & (df_target_modified['picked_at'].dt.hour < 18)
