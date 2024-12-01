@@ -9,7 +9,7 @@ from scripts.utilities.helper import *
 from scripts.utilities.config import *
 
 
-@exception_wrapper
+# @exception_wrapper
 def out_data_order_type(carriers=ACTIVE_CARRIER, include_supership=True, show_logs=True):
 
     if show_logs:
