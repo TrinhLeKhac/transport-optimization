@@ -418,6 +418,7 @@ def create_type_of_delivery(input_df):
         'order_type_id'
     ] = 2
 
+    target_df['order_type_id'] = target_df['order_type_id'].astype('int')
     target_df['order_type'] = target_df['order_type_id'].map(MAPPING_ID_ORDER_TYPE)
 
     # ------------------------------------- Adhoc order_type ---------------------------------------------------------
@@ -491,6 +492,7 @@ def create_type_of_delivery(input_df):
     #     'sys_order_type_id'
     # ] = 7
     target_df['sys_order_type_id'] = target_df['order_type_id'].map(MAPPING_ORDER_TYPE_ID_ROUTE_TYPE)
+    target_df['sys_order_type_id'] = target_df['sys_order_type_id'].astype('int')
 
     return target_df
 
