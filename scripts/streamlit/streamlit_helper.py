@@ -27,6 +27,57 @@ def st_get_province_mapping_district():
 
 
 @st.cache_data
+def st_get_data_meta_priority_route():
+    df_meta_priority = pd.read_parquet(ROOT_PATH + '/processed_data/meta_priority_route.parquet')
+    return df_meta_priority
+
+
+@st.cache_data
+def st_get_data_priority_route():
+    raw_priority_df = pd.read_parquet(ROOT_PATH + '/output/priority_route_full.parquet', columns=[
+        'carrier', 'preferred_carrier',
+        'sender_province', 'sender_district',
+        'receiver_province', 'receiver_district',
+        'order_type',
+        'orders_in_1_month', 'ndays_in_1_month',
+        'orders_in_2_month', 'ndays_in_2_month',
+        'orders_in_3_month', 'ndays_in_3_month',
+        'orders_in_6_month', 'ndays_in_6_month',
+        'orders_in_12_month', 'ndays_in_12_month',
+    ])
+    dup_priority_df = raw_priority_df.loc[
+        raw_priority_df[['sender_province', 'sender_district', 'receiver_province', 'receiver_district', 'order_type']].duplicated(keep=False)
+    ]
+
+    return raw_priority_df, dup_priority_df
+
+
+@st.cache_data
+def st_get_data_priority_route_details():
+    raw_priority_details_df = pd.read_parquet(ROOT_PATH + '/processed_data/order_with_priority_route_streamlit.parquet', columns=[
+        'order_code', 'carrier',
+        'sender_province', 'sender_district',
+        'receiver_province', 'receiver_district',
+        'order_status', 'carrier_status', 'order_type',
+        'picked_at', 'last_delivering_at',
+        'is_1_month', 'day_picked_at_1m',
+        'is_2_month', 'day_picked_at_2m',
+        'is_3_month', 'day_picked_at_3m',
+        'is_6_month', 'day_picked_at_6m',
+        'is_12_month', 'day_picked_at_12m',
+    ])
+    _, dup_priority_df = st_get_data_priority_route()
+    dup_priority_details_df = (
+        raw_priority_details_df.merge(
+            dup_priority_df[['carrier', 'sender_province', 'sender_district', 'receiver_province', 'receiver_district', 'order_type']],
+            on=['carrier', 'sender_province', 'sender_district', 'receiver_province', 'receiver_district', 'order_type'],
+            how='inner'
+        )
+    )
+    return raw_priority_details_df, dup_priority_details_df
+
+
+@st.cache_data
 def st_get_data_zns():
     df_zns = pd.read_parquet(ROOT_PATH + '/processed_data/danh_gia_zns.parquet')
     df_zns = df_zns.loc[df_zns['reviewed_at'].notna()]

@@ -46,13 +46,207 @@ def draw_order(filter_order_df):
 def create_analytic_tab(run_date_str):
     interactive = st.container()
     with interactive:
-        # 1. Load data
+
+        # 1. Thống kê tuyến ưu tiên
+
+        # 1.1. Load data
+        meta_priority_df = st_get_data_meta_priority_route()
+        raw_priority_df, dup_priority_df = st_get_data_priority_route()
+        raw_priority_details_df, dup_priority_details_df = st_get_data_priority_route_details()
+
+        # 1.2. Thông tin tuyến ưu tiên
+        st.info(
+            f"""
+                    **Thống kê dữ liệu :red[Tuyến ưu tiên]**   
+                    * Thông tin:  
+                    👉 Khoảng thời gian đánh giá: :red[**1 tháng**], :red[**2 tháng**], :red[**3 tháng**], :red[**6 tháng**], :red[**12 tháng**]  
+                    👉 Chỉ xét đơn NVC lấy thành công :red[**trước 18:00**] ngày hôm trước (:red[**picked_at**])  
+                    👉 Thời gian shipper lấy từ kho ở tỉnh đi giao :red[**trước 09:00**] ngày hôm sau (:red[**last_delivering_at**])  
+                    👉 Tỉ lệ tính đang lấy ở mức top :red[**20%**]    
+                """
+        )
+
+        # 1.3 Tỉ lệ tính
+        meta_div, _, _ = st.columns(3)
+        meta_div.selectbox(
+            ":blue[**Chọn tỉ lệ tính**]",
+            options=sorted(meta_priority_df['type'].unique().tolist(), key=vietnamese_sort_key),
+            key='meta_priority_type',
+        )
+
+        filter_priority_meta_df = meta_priority_df.loc[
+            (meta_priority_df['type'] == st.session_state['meta_priority_type'])
+            ][[ 'order_type', 'rounded_delta_hour', 'idea_delta_hour']]
+
+        st.dataframe(
+            filter_priority_meta_df,
+            column_config={
+                'order_type': "Hình thức vận chuyển",
+                'rounded_delta_hour': "Thời gian vận chuyển (last_delivering_at - picked_at)(h)",
+                'idea_delta_hour': "Thòi gian vận chuyển (tính xét tuyến ưu tiên)",
+            },
+            hide_index=True,
+        )
+        st.divider()
+
+        # 1.4 Thông tin thống kê
+        # Checkbox filter tuyến ưu tiên có nhiều hơn 1 NVC
+        find_duplicates = st.checkbox("Check tuyến ưu tiên có nhiều hơn 1 NVC")
+        if find_duplicates:
+            priority_df = dup_priority_df
+            priority_details_df = dup_priority_details_df
+        else:
+            priority_df = raw_priority_df
+            priority_details_df = raw_priority_details_df
+
+        # 1.4.1 Select box chọn thông tin thống kê
+        priority_div1, priority_div2, priority_div3 = st.columns(3)
+
+        priority_div1.selectbox(
+            ":blue[**Chọn Tỉnh/Thành Phố Nhận**]",
+            options=sorted(priority_df['receiver_province'].unique().tolist(), key=vietnamese_sort_key),
+            key='priority_receiver_province',
+        )
+        priority_div2.selectbox(
+            ":blue[**Chọn Quận/Huyện Nhận**]",
+            options=sorted(priority_df.loc[
+                               (priority_df['receiver_province'] == st.session_state[
+                                   'priority_receiver_province'])
+                           ]['receiver_district'].unique().tolist(), key=vietnamese_sort_key),
+            key='priority_receiver_district',
+        )
+        priority_div3.selectbox(
+            ":blue[**Chọn Loại Vận Chuyển**]",
+            options=sorted(priority_df.loc[
+                               (priority_df['receiver_province'] == st.session_state[
+                                   'priority_receiver_province'])
+                               & (priority_df['receiver_district'] == st.session_state[
+                                   'priority_receiver_district'])
+                               ]['order_type'].unique().tolist(), key=vietnamese_sort_key),
+            key='priority_order_type',
+        )
+
+        # 1.4.2 Thông tin thống kê
+        filter_priority_df = priority_df.loc[
+            (priority_df['receiver_province'] == st.session_state['priority_receiver_province'])
+            & (priority_df['receiver_district'] == st.session_state['priority_receiver_district'])
+            & (priority_df['order_type'] == st.session_state['priority_order_type'])
+            ]
+
+        filter_priority_df = filter_priority_df[[
+            'carrier', 'preferred_carrier',
+            'sender_province', 'sender_district', 'receiver_province', 'receiver_district',
+            'order_type',
+            'orders_in_1_month', 'ndays_in_1_month',
+            'orders_in_2_month', 'ndays_in_2_month',
+            'orders_in_3_month', 'ndays_in_3_month',
+            'orders_in_6_month', 'ndays_in_6_month',
+            'orders_in_12_month', 'ndays_in_12_month'
+        ]]
+        st_p1, _, _, _, _ = st.columns(5)
+
+        # 1.4.3 Hiển thị thống kê
+        st_p1.info(":red[**Thống kê**]")
+        st.dataframe(
+            filter_priority_df,
+            column_config={
+                "carrier": "Nhà vận chuyển",
+                "preferred_carrier": "Ưu tiên",
+                'sender_province': "Tỉnh thành gửi",
+                'sender_district': "Quận huyện gửi",
+                'receiver_province': "Tỉnh thành nhận",
+                'receiver_district': "Quận huyện nhận",
+                'order_type': "Hình thức vận chuyển",
+                'orders_in_1_month': "Đơn (1 tháng)",
+                'ndays_in_1_month': 'Ngày (1 tháng)',
+                'orders_in_2_month': "Đơn (2 tháng)",
+                'ndays_in_2_month': 'Ngày (2 tháng)',
+                'orders_in_3_month': "Đơn (3 tháng)",
+                'ndays_in_3_month': 'Ngày (3 tháng)',
+                'orders_in_6_month': "Đơn (6 tháng)",
+                'ndays_in_6_month': 'Ngày (6 tháng)',
+                'orders_in_12_month': "Đơn (12 tháng)",
+                'ndays_in_12_month': 'Ngày (12 tháng)',
+            },
+            hide_index=True,
+        )
+
+        # 1.5 Thông tin chi tiết
+        st_p2, _, _, _, _ = st.columns(5)
+        st_p2.info(":red[**Đơn chi tiết**]")
+        details_priority_div1, details_priority_div2, _ = st.columns(3) # Add thêm bộ lọc
+
+        filter_priority_details_df = priority_details_df.loc[
+            (priority_details_df['receiver_province'] == st.session_state['priority_receiver_province'])
+            & (priority_details_df['receiver_district'] == st.session_state['priority_receiver_district'])
+            & (priority_details_df['order_type'] == st.session_state['priority_order_type'])
+            ]
+
+        # Add thêm bộ lọc
+        details_priority_div1.selectbox(
+            ":blue[**Chọn Tỉnh/Thành Phố Gửi**]",
+            options=sorted(filter_priority_details_df['sender_province'].unique().tolist(), key=vietnamese_sort_key),
+            key='detail_priority_sender_province',
+        )
+        # Add thêm bộ lọc
+        details_priority_div2.selectbox(
+            ":blue[**Chọn Quận/Huyện Gửi**]",
+            options=sorted(filter_priority_details_df.loc[
+                               (filter_priority_details_df['sender_province'] == st.session_state[
+                                   'detail_priority_sender_province'])
+                           ]['sender_district'].unique().tolist(), key=vietnamese_sort_key),
+            key='detail_priority_sender_district',
+        )
+
+        # 1.5.2 Thông tin chi tiết
+
+        filter_priority_details_df = filter_priority_details_df.loc[
+            (filter_priority_details_df['sender_province'] == st.session_state['detail_priority_sender_province'])
+            & (filter_priority_details_df['sender_district'] == st.session_state['detail_priority_sender_district'])
+            ]
+
+        filter_priority_details_df = filter_priority_details_df[[
+            'order_code', 'carrier',
+            'sender_province', 'sender_district',
+            'receiver_province', 'receiver_district',
+            'order_status',
+            # 'carrier_status',
+            # 'order_type',
+            'picked_at', 'last_delivering_at',
+            # 'is_1_month', 'day_picked_at_1m',
+            # 'is_2_month', 'day_picked_at_2m',
+            # 'is_3_month', 'day_picked_at_3m',
+            # 'is_6_month', 'day_picked_at_6m',
+            # 'is_12_month', 'day_picked_at_12m',
+        ]]
+
+        # 1.5.3 Thông tin chi tiết để hiển thị
+        st.dataframe(
+            filter_priority_details_df,
+            column_config={
+                "order_code": "Mã đơn hàng",
+                "carrier": "Nhà vận chuyển",
+                'sender_province': "Tỉnh thành gửi",
+                'sender_district': "Quận huyện gửi",
+                'receiver_province': "Tỉnh thành nhận",
+                'receiver_district': "Quận huyện nhận",
+                'order_status': "Trạng thái đơn hàng",
+                # 'carrier_status': "Trạng thái vận chuyển",
+                'picked_at': "Thời gian shipper NVC lấy hàng",
+                'last_delivering_at': "Thời gian shipper giao lấy từ kho ở tỉnh đi giao"
+            },
+            hide_index=True,
+        )
+        st.divider()
+
+        # 2. Thống kê ZNS
+        # 2.1. Load data
         total_zns_df = st_get_data_zns()
         comment_zns_df = total_zns_df[['receiver_province', 'receiver_district', 'carrier', 'comment']].explode(
             column='comment')
         comment_zns_df = comment_zns_df.loc[comment_zns_df['comment'].notna()]
 
-        # 2. Thống kê data ZNS
+        # 2.2. Thống kê data ZNS
         st.info(
             f"""
             **Thống kê dữ liệu :red[đánh giá ZNS]**   
@@ -65,7 +259,7 @@ def create_analytic_tab(run_date_str):
 
         chart_zns_message, _, chart_zns_comment = st.columns([4, 1, 3])
 
-        # 2.1 ZNS message div
+        # 2.3 ZNS message div
         opt_zns_mess_province, opt_zns_mess_district = chart_zns_message.columns(2)
         opt_zns_mess_province.selectbox(  # multiselect
             ":blue[**Chọn Tỉnh/Thành Phố**]",
@@ -111,7 +305,7 @@ def create_analytic_tab(run_date_str):
 
         # ----------------------------------------------------------------------------------------------
 
-        # 2.2 ZNS comment div
+        # 2.4 ZNS comment div
         opt_zns_com_province, opt_zns_com_district = chart_zns_comment.columns(2)
 
         opt_zns_com_province.selectbox(
