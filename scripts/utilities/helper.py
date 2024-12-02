@@ -559,6 +559,7 @@ QUERY_SQL_COMMAND_API = """
             ELSE tbl_ngn.status
         END AS ngn_status,
         tbl_zns.n_days,
+        COALESCE(tbl_priority_route.is_priority_route, 'No') AS is_priority_route, 
         tbl_api.status::varchar(1) AS status, tbl_api.description, tbl_api.time_data, 
         tbl_api.time_display, tbl_api.rate, tbl_api.score, 
         ROUND(tbl_api.score, 1) AS star, -- Nhu cầu business => lấy star bằng cột score
@@ -585,6 +586,18 @@ QUERY_SQL_COMMAND_API = """
         SELECT score AS optimal_score FROM db_schema.tbl_optimal_score 
         WHERE date = (SELECT MAX(date) FROM db_schema.tbl_optimal_score)
         ) AS tbl_optimal_score 
+        LEFT JOIN (
+            SELECT carrier_id, 
+            sender_province_code, sender_district_code, 
+            receiver_province_code, receiver_district_code,
+            'Yes' AS is_priority_route 
+            FROM db_schema.tbl_priority_route
+        ) AS tbl_priority_route
+        ON tbl_ord.carrier_id = tbl_priority_route.carrier_id 
+        AND tbl_ord.sender_province_code = tbl_priority_route.sender_province_code 
+        AND tbl_ord.sender_district_code = tbl_priority_route.sender_district_code
+        AND tbl_ord.receiver_province_code = tbl_priority_route.receiver_province_code 
+        AND tbl_ord.receiver_district_code = tbl_priority_route.receiver_district_code
         WHERE tbl_ord.sender_province_code = '{}' 
         AND tbl_ord.sender_district_code = '{}' 
         AND tbl_ord.receiver_province_code = '{}' 
@@ -594,7 +607,7 @@ QUERY_SQL_COMMAND_API = """
     ),
     
     carrier_information AS ( 
-        SELECT carrier_id, route_type, price, ngn_status, status, n_days, 
+        SELECT carrier_id, route_type, price, ngn_status, status, is_priority_route, n_days, 
         CASE
             WHEN ngn_status = 'Quá tải'
                 THEN 
@@ -617,7 +630,7 @@ QUERY_SQL_COMMAND_API = """
     
     carrier_information_above AS ( 
         SELECT carrier_id, route_type, price, 
-        status, description, time_data, 
+        status, ngn_status, is_priority_route, description, time_data, 
         time_display, rate, score, star, for_shop, 
         CAST (DENSE_RANK() OVER ( 
             ORDER BY price ASC, score DESC, time_data ASC 
@@ -633,7 +646,7 @@ QUERY_SQL_COMMAND_API = """
     
     carrier_information_below_tmp1 AS ( 
         SELECT carrier_id, route_type, price, 
-        status, description, time_data, 
+        status, ngn_status, is_priority_route, description, time_data, 
         time_display, rate, score, star, for_shop, 
         CAST (DENSE_RANK() OVER ( 
             ORDER BY score DESC, price ASC, time_data ASC 
@@ -656,7 +669,7 @@ QUERY_SQL_COMMAND_API = """
     
     carrier_information_below AS ( 
         SELECT carrier_id, route_type, price, 
-        status, description, time_data, 
+        status, ngn_status, is_priority_route, description, time_data, 
         time_display, rate, score, star, for_shop, 
         for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner 
         speed_ranking, score_ranking 
@@ -674,7 +687,7 @@ QUERY_SQL_COMMAND_API = """
     
     carrier_information_overload_tmp1 AS ( 
         SELECT carrier_id, route_type, price, 
-        status, description, time_data, 
+        status, ngn_status, is_priority_route, description, time_data, 
         time_display, rate, score, star, for_shop, 
         CAST (DENSE_RANK() OVER ( 
             ORDER BY score DESC, price ASC, time_data ASC 
@@ -692,7 +705,7 @@ QUERY_SQL_COMMAND_API = """
     
     carrier_information_overload AS ( 
         SELECT carrier_id, route_type, price, 
-        status, description, time_data, 
+        status, ngn_status, is_priority_route, description, time_data, 
         time_display, rate, score, star, for_shop, 
         for_partner + max_idx_partner AS for_partner, --ADD for_partner with max_idx_partner 
         speed_ranking, score_ranking 
@@ -706,9 +719,9 @@ QUERY_SQL_COMMAND_API = """
     ),
     
     -- UPDATE for_fshop EQUAL for_partner
-    carrier_information_final AS ( 
+    carrier_information_final_tmp1 AS ( 
         SELECT carrier_id, route_type, price, 
-        status, description, time_data, 
+        status, ngn_status, is_priority_route, description, time_data, 
         time_display, rate, score, star, 
         for_partner AS for_shop, -- UPDATE for_shop = for_partner 
         for_partner, 
@@ -716,6 +729,55 @@ QUERY_SQL_COMMAND_API = """
             ORDER BY price ASC 
         ) AS smallint) AS price_ranking, 
         speed_ranking, score_ranking FROM carrier_information_union 
+    ),
+    
+    carrier_information_priority_route AS ( 
+        SELECT carrier_id, route_type, price, 
+        status, is_priority_route, description, time_data, 
+        time_display, rate, score, star, 
+        for_shop,
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY for_partner ASC 
+        ) AS smallint) AS for_partner,
+        speed_ranking, score_ranking 
+        FROM carrier_information_final_tmp1 
+        WHERE (status != '1') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
+    ),
+    
+    carrier_information_final_tmp2 AS ( 
+        SELECT carrier_id, route_type, price,
+        status, is_priority_route, description, time_data, 
+        time_display, rate, score, star, 
+        for_shop, 
+        CAST (DENSE_RANK() OVER ( 
+            ORDER BY for_partner ASC 
+        ) AS smallint) AS for_partner, 
+        speed_ranking, score_ranking
+        FROM carrier_information_final_tmp1 
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
+    ),
+    
+    carrier_information_final_tmp3 AS ( 
+        SELECT * FROM carrier_information_final_tmp2 
+        CROSS JOIN 
+        -- using COALESCE in case 
+        -- n_rows of carrier_information_above == 0 => max_idx_partner is Null 
+        (SELECT COALESCE(MAX(for_partner), 0) AS max_idx_partner FROM carrier_information_priority_route) AS tbl_max_idx_partner 
+    ),
+    
+    carrier_information_final_tmp4 AS ( 
+        SELECT carrier_id, route_type, price, 
+        status, is_priority_route, description, time_data, 
+        time_display, rate, score, star, for_shop, 
+        for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner 
+        speed_ranking, score_ranking 
+        FROM carrier_information_final_tmp3 
+    ),
+    
+    carrier_information_final AS ( 
+        SELECT * FROM carrier_information_priority_route 
+        UNION ALL 
+        SELECT * FROM carrier_information_final_tmp4 
     )
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id; 
