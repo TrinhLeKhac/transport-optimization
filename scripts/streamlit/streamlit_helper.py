@@ -57,8 +57,8 @@ def st_get_data_priority_route_details():
         'receiver_province', 'receiver_district',
         'order_status', 'carrier_status', 'order_type',
         'picked_at', 'last_delivering_at',
-        'is_1_month', 'day_picked_at_1m',
-        'is_2_month', 'day_picked_at_2m',
+        'is_1_month', 'day_last_delivering_at_1m',
+        'is_2_month', 'day_last_delivering_at_2m',
     ])
     _, dup_priority_df = st_get_data_priority_route()
     dup_priority_details_df = (
