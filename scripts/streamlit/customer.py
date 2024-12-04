@@ -189,6 +189,7 @@ def create_customer_tab():
         result_df1 = result_df[[
             'carrier',
             'description',
+            'is_priority_route',
             'price',
             'redeem_fee',
             'insurance_fee',
@@ -197,10 +198,10 @@ def create_customer_tab():
             'time_data',
             'rate',
             'star',
+            'for_shop',
+            'for_partner',
             'score',
             'optimal_score',
-            # 'for_shop',
-            # 'for_partner',
         ]]
 
         # Show dataframe of information
@@ -211,6 +212,7 @@ def create_customer_tab():
                 column_config={
                     "carrier": "Nhà vận chuyển",
                     'description': "Trạng thái tuyến giao",
+                    "is_priority_route": "Tuyến ưu tiên ",
                     'price': "Phí giao hàng",
                     'redeem_fee': "Phí thu hồi",
                     'insurance_fee': "Phí bảo hiểm",
@@ -222,6 +224,8 @@ def create_customer_tab():
                         "Số sao đánh giá trung bình",
                         format="%.1f ⭐",
                     ),
+                    "for_shop": "Ranking NVC (cũ)",
+                    "for_partner": "Ranking NVC (mới)",
                     "score": "Score chất lượng giao hàng",
                     "optimal_score": "Điểm chất lượng tối ưu",
                 },
