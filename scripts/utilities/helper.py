@@ -774,10 +774,19 @@ QUERY_SQL_COMMAND_API = """
         FROM carrier_information_final_tmp3 
     ),
     
+    carrier_information_final_tmp5 AS ( 
+        SELECT carrier_id, route_type, price, 
+        status, is_priority_route, description, time_data, 
+        time_display, rate, score, star, for_partner AS for_shop, 
+        for_partner,
+        speed_ranking, score_ranking 
+        FROM carrier_information_final_tmp4
+    ),
+    
     carrier_information_final AS ( 
         SELECT * FROM carrier_information_priority_route 
         UNION ALL 
-        SELECT * FROM carrier_information_final_tmp4 
+        SELECT * FROM carrier_information_final_tmp5
     )
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id; 
@@ -1016,10 +1025,19 @@ QUERY_SQL_COMMAND_API_SUPER = """
         FROM carrier_information_final_tmp3 
     ),
     
+    carrier_information_final_tmp5 AS ( 
+        SELECT carrier_id, route_type, price, 
+        status, is_priority_route, description, time_data, 
+        time_display, rate, score, star, for_partner AS for_shop, 
+        for_partner,
+        speed_ranking, score_ranking 
+        FROM carrier_information_final_tmp4
+    ),
+    
     carrier_information_final AS ( 
         SELECT * FROM carrier_information_priority_route 
         UNION ALL 
-        SELECT * FROM carrier_information_final_tmp4 
+        SELECT * FROM carrier_information_final_tmp5
     )
         
     SELECT * FROM carrier_information_final ORDER BY carrier_id; 
@@ -1472,10 +1490,19 @@ QUERY_SQL_COMMAND_API_FINAL = """
         FROM carrier_information_final_tmp3 
     ),
     
+    carrier_information_final_tmp5 AS ( 
+        SELECT carrier_id, route_type, price, 
+        status, is_priority_route, description, time_data, 
+        time_display, rate, score, star, for_partner AS for_shop, 
+        for_partner,
+        speed_ranking, score_ranking 
+        FROM carrier_information_final_tmp4
+    ),
+    
     carrier_information_final AS ( 
         SELECT * FROM carrier_information_priority_route 
         UNION ALL 
-        SELECT * FROM carrier_information_final_tmp4 
+        SELECT * FROM carrier_information_final_tmp5 
     )
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id; 
@@ -1889,9 +1916,9 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     ),
     
     carrier_information_priority_route AS ( 
-        SELECT carrier_id, new_type, price, 
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
         status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, 
+        time_display, rate, score, optimal_score, star, 
         for_shop,
         CAST (DENSE_RANK() OVER ( 
             ORDER BY for_partner ASC 
@@ -1902,9 +1929,9 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     ),
     
     carrier_information_final_tmp2 AS ( 
-        SELECT carrier_id, new_type, price,
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
         status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, 
+        time_display, rate, score, optimal_score, star, 
         for_shop, 
         CAST (DENSE_RANK() OVER ( 
             ORDER BY for_partner ASC 
@@ -1923,14 +1950,15 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     ),
     
     carrier_information_final_tmp4 AS ( 
-        SELECT carrier_id, new_type, price, 
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price, 
         status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, for_shop, 
+        time_display, rate, score, optimal_score, star, 
+        for_shop, 
         for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner 
         speed_ranking, score_ranking 
         FROM carrier_information_final_tmp3 
     ),
-    
+    -- Riêng data streamlit không update for_fshop =  for_partner, để tracking thứ tự nhà vận chuyển cũ và mới
     carrier_information_final AS ( 
         SELECT * FROM carrier_information_priority_route 
         UNION ALL 
