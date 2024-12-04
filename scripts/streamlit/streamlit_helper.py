@@ -41,9 +41,6 @@ def st_get_data_priority_route():
         'order_type',
         'orders_in_1_month', 'ndays_in_1_month',
         'orders_in_2_month', 'ndays_in_2_month',
-        # 'orders_in_3_month', 'ndays_in_3_month',
-        # 'orders_in_6_month', 'ndays_in_6_month',
-        # 'orders_in_12_month', 'ndays_in_12_month',
     ])
     dup_priority_df = raw_priority_df.loc[
         raw_priority_df[['sender_province', 'sender_district', 'receiver_province', 'receiver_district', 'order_type']].duplicated(keep=False)
@@ -62,9 +59,6 @@ def st_get_data_priority_route_details():
         'picked_at', 'last_delivering_at',
         'is_1_month', 'day_picked_at_1m',
         'is_2_month', 'day_picked_at_2m',
-        # 'is_3_month', 'day_picked_at_3m',
-        # 'is_6_month', 'day_picked_at_6m',
-        # 'is_12_month', 'day_picked_at_12m',
     ])
     _, dup_priority_df = st_get_data_priority_route()
     dup_priority_details_df = (

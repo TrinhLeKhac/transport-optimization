@@ -103,34 +103,65 @@ def create_analytic_tab(run_date_str):
         priority_div1, priority_div2, priority_div3 = st.columns(3)
 
         priority_div1.selectbox(
-            ":blue[**Chọn Tỉnh/Thành Phố Nhận**]",
-            options=sorted(priority_df['receiver_province'].unique().tolist(), key=vietnamese_sort_key),
-            key='priority_receiver_province',
+            ":blue[**Chọn Tỉnh/Thành Phố Gửi**]",
+            options=sorted(priority_df['sender_province'].unique().tolist(), key=vietnamese_sort_key),
+            key='priority_sender_province',
         )
         priority_div2.selectbox(
-            ":blue[**Chọn Quận/Huyện Nhận**]",
+            ":blue[**Chọn Quận/Huyện Gửi**]",
             options=sorted(priority_df.loc[
-                               (priority_df['receiver_province'] == st.session_state[
-                                   'priority_receiver_province'])
-                           ]['receiver_district'].unique().tolist(), key=vietnamese_sort_key),
-            key='priority_receiver_district',
+                               (priority_df['sender_province'] == st.session_state[
+                                   'priority_sender_province'])
+                           ]['sender_district'].unique().tolist(), key=vietnamese_sort_key),
+            key='priority_sender_district',
         )
         priority_div3.selectbox(
             ":blue[**Chọn Loại Vận Chuyển**]",
             options=sorted(priority_df.loc[
-                               (priority_df['receiver_province'] == st.session_state[
-                                   'priority_receiver_province'])
-                               & (priority_df['receiver_district'] == st.session_state[
-                                   'priority_receiver_district'])
+                               (priority_df['sender_province'] == st.session_state[
+                                   'priority_sender_province'])
+                               & (priority_df['sender_district'] == st.session_state[
+                                   'priority_sender_district'])
                                ]['order_type'].unique().tolist(), key=vietnamese_sort_key),
             key='priority_order_type',
         )
 
+        priority_div4, priority_div5, _ = st.columns(3)
+
+        priority_div4.selectbox(
+            ":blue[**Chọn Tỉnh/Thành Phố Nhận**]",
+            options=sorted(priority_df.loc[
+                               (priority_df['sender_province'] == st.session_state[
+                                   'priority_sender_province'])
+                               & (priority_df['sender_district'] == st.session_state[
+                                   'priority_sender_district'])
+                               & (priority_df['order_type'] == st.session_state[
+                                   'priority_order_type'])
+                               ]['receiver_province'].unique().tolist(), key=vietnamese_sort_key),
+            key='priority_receiver_province',
+        )
+        priority_div5.selectbox(
+            ":blue[**Chọn Quận/Huyện Nhận**]",
+            options=sorted(priority_df.loc[
+                               (priority_df['sender_province'] == st.session_state[
+                                   'priority_sender_province'])
+                               & (priority_df['sender_district'] == st.session_state[
+                                   'priority_sender_district'])
+                               & (priority_df['order_type'] == st.session_state[
+                                   'priority_order_type'])
+                               & (priority_df['receiver_province'] == st.session_state[
+                                   'priority_receiver_province'])
+                               ]['receiver_district'].unique().tolist(), key=vietnamese_sort_key),
+            key='priority_receiver_district',
+        )
+
         # 1.4.2 Thông tin thống kê
         filter_priority_df = priority_df.loc[
-            (priority_df['receiver_province'] == st.session_state['priority_receiver_province'])
-            & (priority_df['receiver_district'] == st.session_state['priority_receiver_district'])
-            & (priority_df['order_type'] == st.session_state['priority_order_type'])
+             (priority_df['sender_province'] == st.session_state['priority_sender_province'])
+             & (priority_df['sender_district'] == st.session_state['priority_sender_district'])
+             & (priority_df['order_type'] == st.session_state['priority_order_type'])
+             & (priority_df['receiver_province'] == st.session_state['priority_receiver_province'])
+             & (priority_df['receiver_district'] == st.session_state['priority_receiver_district'])
             ]
 
         filter_priority_df = filter_priority_df[[
@@ -139,9 +170,6 @@ def create_analytic_tab(run_date_str):
             'order_type',
             'orders_in_1_month', 'ndays_in_1_month',
             'orders_in_2_month', 'ndays_in_2_month',
-            'orders_in_3_month', 'ndays_in_3_month',
-            'orders_in_6_month', 'ndays_in_6_month',
-            'orders_in_12_month', 'ndays_in_12_month'
         ]]
         st_p1, _, _, _, _ = st.columns(5)
 
@@ -161,48 +189,16 @@ def create_analytic_tab(run_date_str):
                 'ndays_in_1_month': 'Ngày (1 tháng)',
                 'orders_in_2_month': "Đơn (2 tháng)",
                 'ndays_in_2_month': 'Ngày (2 tháng)',
-                'orders_in_3_month': "Đơn (3 tháng)",
-                'ndays_in_3_month': 'Ngày (3 tháng)',
-                'orders_in_6_month': "Đơn (6 tháng)",
-                'ndays_in_6_month': 'Ngày (6 tháng)',
-                'orders_in_12_month': "Đơn (12 tháng)",
-                'ndays_in_12_month': 'Ngày (12 tháng)',
             },
             hide_index=True,
         )
 
-        # 1.5 Thông tin chi tiết
-        st_p2, _, _, _, _ = st.columns(5)
-        st_p2.info(":red[**Đơn chi tiết**]")
-        details_priority_div1, details_priority_div2, _ = st.columns(3) # Add thêm bộ lọc
-
         filter_priority_details_df = priority_details_df.loc[
-            (priority_details_df['receiver_province'] == st.session_state['priority_receiver_province'])
-            & (priority_details_df['receiver_district'] == st.session_state['priority_receiver_district'])
+            (priority_details_df['sender_province'] == st.session_state['priority_sender_province'])
+            & (priority_details_df['sender_district'] == st.session_state['priority_sender_district'])
             & (priority_details_df['order_type'] == st.session_state['priority_order_type'])
-            ]
-
-        # Add thêm bộ lọc
-        details_priority_div1.selectbox(
-            ":blue[**Chọn Tỉnh/Thành Phố Gửi**]",
-            options=sorted(filter_priority_details_df['sender_province'].unique().tolist(), key=vietnamese_sort_key),
-            key='detail_priority_sender_province',
-        )
-        # Add thêm bộ lọc
-        details_priority_div2.selectbox(
-            ":blue[**Chọn Quận/Huyện Gửi**]",
-            options=sorted(filter_priority_details_df.loc[
-                               (filter_priority_details_df['sender_province'] == st.session_state[
-                                   'detail_priority_sender_province'])
-                           ]['sender_district'].unique().tolist(), key=vietnamese_sort_key),
-            key='detail_priority_sender_district',
-        )
-
-        # 1.5.2 Thông tin chi tiết
-
-        filter_priority_details_df = filter_priority_details_df.loc[
-            (filter_priority_details_df['sender_province'] == st.session_state['detail_priority_sender_province'])
-            & (filter_priority_details_df['sender_district'] == st.session_state['detail_priority_sender_district'])
+            & (priority_details_df['receiver_province'] == st.session_state['priority_receiver_province'])
+            & (priority_details_df['receiver_district'] == st.session_state['priority_receiver_district'])
             ]
 
         filter_priority_details_df = filter_priority_details_df[[
@@ -210,14 +206,7 @@ def create_analytic_tab(run_date_str):
             'sender_province', 'sender_district',
             'receiver_province', 'receiver_district',
             'order_status',
-            # 'carrier_status',
-            # 'order_type',
             'picked_at', 'last_delivering_at',
-            # 'is_1_month', 'day_picked_at_1m',
-            # 'is_2_month', 'day_picked_at_2m',
-            # 'is_3_month', 'day_picked_at_3m',
-            # 'is_6_month', 'day_picked_at_6m',
-            # 'is_12_month', 'day_picked_at_12m',
         ]]
 
         # 1.5.3 Thông tin chi tiết để hiển thị
@@ -231,7 +220,6 @@ def create_analytic_tab(run_date_str):
                 'receiver_province': "Tỉnh thành nhận",
                 'receiver_district': "Quận huyện nhận",
                 'order_status': "Trạng thái đơn hàng",
-                # 'carrier_status': "Trạng thái vận chuyển",
                 'picked_at': "Thời gian shipper NVC lấy hàng",
                 'last_delivering_at': "Thời gian shipper giao lấy từ kho ở tỉnh đi giao"
             },
