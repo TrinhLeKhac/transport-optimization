@@ -145,6 +145,7 @@ class SuggestCarrierOutput(BaseModel):
     route_type: constr(max_length=1, strict=True)
     price: int
     status: constr(max_length=1, strict=True)
+    is_priority_route: constr(max_length=3, strict=True)
     description: constr(max_length=512, strict=True)
     time_data: confloat(ge=0, le=100.00, strict=True)
     time_display: constr(max_length=30, strict=True)
