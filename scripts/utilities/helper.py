@@ -739,7 +739,7 @@ QUERY_SQL_COMMAND_API = """
         CAST (DENSE_RANK() OVER ( 
             ORDER BY for_partner ASC 
         ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking 
+        price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp1 
         WHERE (status != '1') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
     ),
@@ -752,7 +752,7 @@ QUERY_SQL_COMMAND_API = """
         CAST (DENSE_RANK() OVER ( 
             ORDER BY for_partner ASC 
         ) AS smallint) AS for_partner, 
-        speed_ranking, score_ranking
+        price_ranking, speed_ranking, score_ranking
         FROM carrier_information_final_tmp1 
         WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
     ),
@@ -770,7 +770,7 @@ QUERY_SQL_COMMAND_API = """
         status, is_priority_route, description, time_data, 
         time_display, rate, score, star, for_shop, 
         for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner 
-        speed_ranking, score_ranking 
+        price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp3 
     ),
     
@@ -779,7 +779,7 @@ QUERY_SQL_COMMAND_API = """
         status, is_priority_route, description, time_data, 
         time_display, rate, score, star, for_partner AS for_shop, 
         for_partner,
-        speed_ranking, score_ranking 
+        price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp4
     ),
     
@@ -990,7 +990,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         CAST (DENSE_RANK() OVER ( 
             ORDER BY for_partner ASC 
         ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking 
+        price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp1 
         WHERE (status != '1') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
     ),
@@ -1003,7 +1003,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         CAST (DENSE_RANK() OVER ( 
             ORDER BY for_partner ASC 
         ) AS smallint) AS for_partner, 
-        speed_ranking, score_ranking
+        price_ranking, speed_ranking, score_ranking
         FROM carrier_information_final_tmp1 
         WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
     ),
@@ -1021,7 +1021,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         status, is_priority_route, description, time_data, 
         time_display, rate, score, star, for_shop, 
         for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner 
-        speed_ranking, score_ranking 
+        price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp3 
     ),
     
@@ -1030,7 +1030,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         status, is_priority_route, description, time_data, 
         time_display, rate, score, star, for_partner AS for_shop, 
         for_partner,
-        speed_ranking, score_ranking 
+        price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp4
     ),
     
@@ -1455,7 +1455,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         CAST (DENSE_RANK() OVER ( 
             ORDER BY for_partner ASC 
         ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking 
+        price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp1 
         WHERE (status != '1') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
     ),
@@ -1468,7 +1468,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         CAST (DENSE_RANK() OVER ( 
             ORDER BY for_partner ASC 
         ) AS smallint) AS for_partner, 
-        speed_ranking, score_ranking
+        price_ranking, speed_ranking, score_ranking
         FROM carrier_information_final_tmp1 
         WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
     ),
@@ -1486,7 +1486,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         status, is_priority_route, description, time_data, 
         time_display, rate, score, star, for_shop, 
         for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner 
-        speed_ranking, score_ranking 
+        price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp3 
     ),
     
@@ -1495,7 +1495,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         status, is_priority_route, description, time_data, 
         time_display, rate, score, star, for_partner AS for_shop, 
         for_partner,
-        speed_ranking, score_ranking 
+        price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp4
     ),
     
@@ -1923,7 +1923,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         CAST (DENSE_RANK() OVER ( 
             ORDER BY for_partner ASC 
         ) AS smallint) AS for_partner,
-        speed_ranking, score_ranking 
+        price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp1 
         WHERE (status != '1') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
     ),
@@ -1936,7 +1936,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         CAST (DENSE_RANK() OVER ( 
             ORDER BY for_partner ASC 
         ) AS smallint) AS for_partner, 
-        speed_ranking, score_ranking
+        price_ranking, speed_ranking, score_ranking
         FROM carrier_information_final_tmp1 
         WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
     ),
@@ -1955,7 +1955,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         time_display, rate, score, optimal_score, star, 
         for_shop, 
         for_partner + max_idx_partner as for_partner, --ADD for_partner with max_idx_partner 
-        speed_ranking, score_ranking 
+        price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp3 
     ),
     -- Riêng data streamlit không update for_fshop =  for_partner, để tracking thứ tự nhà vận chuyển cũ và mới
