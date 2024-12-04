@@ -171,10 +171,12 @@ def create_analytic_tab(run_date_str):
             'orders_in_1_month', 'ndays_in_1_month',
             'orders_in_2_month', 'ndays_in_2_month',
         ]]
-        st_p1, _, _, _, _ = st.columns(5)
 
         # 1.4.3 Hiển thị thống kê
+
+        st_p1, _, _, _, _ = st.columns(5)
         st_p1.info(":red[**Thống kê**]")
+
         st.dataframe(
             filter_priority_df,
             column_config={
@@ -209,7 +211,12 @@ def create_analytic_tab(run_date_str):
             'picked_at', 'last_delivering_at',
         ]]
 
+
         # 1.5.3 Thông tin chi tiết để hiển thị
+
+        st_p2, _, _, _, _ = st.columns(5)
+        st_p2.info(":red[**Chi tiết**]")
+
         st.dataframe(
             filter_priority_details_df,
             column_config={
