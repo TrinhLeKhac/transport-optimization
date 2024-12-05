@@ -741,7 +741,7 @@ QUERY_SQL_COMMAND_API = """
         ) AS smallint) AS for_partner,
         price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp1 
-        WHERE (status != '1') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
+        WHERE (status == '0') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
     ),
     
     carrier_information_final_tmp2 AS ( 
@@ -754,7 +754,7 @@ QUERY_SQL_COMMAND_API = """
         ) AS smallint) AS for_partner, 
         price_ranking, speed_ranking, score_ranking
         FROM carrier_information_final_tmp1 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
+        WHERE (status != '0') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
     ),
     
     carrier_information_final_tmp3 AS ( 
@@ -992,7 +992,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ) AS smallint) AS for_partner,
         price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp1 
-        WHERE (status != '1') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
+        WHERE (status == '0') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
     ),
     
     carrier_information_final_tmp2 AS ( 
@@ -1005,7 +1005,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ) AS smallint) AS for_partner, 
         price_ranking, speed_ranking, score_ranking
         FROM carrier_information_final_tmp1 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
+        WHERE (status != '0') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
     ),
     
     carrier_information_final_tmp3 AS ( 
@@ -1457,7 +1457,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         ) AS smallint) AS for_partner,
         price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp1 
-        WHERE (status != '1') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
+        WHERE (status == '0') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
     ),
     
     carrier_information_final_tmp2 AS ( 
@@ -1470,7 +1470,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         ) AS smallint) AS for_partner, 
         price_ranking, speed_ranking, score_ranking
         FROM carrier_information_final_tmp1 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
+        WHERE (status != '0') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
     ),
     
     carrier_information_final_tmp3 AS ( 
@@ -1925,7 +1925,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ) AS smallint) AS for_partner,
         price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp1 
-        WHERE (status != '1') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
+        WHERE (status == '0') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes')
     ),
     
     carrier_information_final_tmp2 AS ( 
@@ -1938,7 +1938,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ) AS smallint) AS for_partner, 
         price_ranking, speed_ranking, score_ranking
         FROM carrier_information_final_tmp1 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
+        WHERE (status != '0') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No')
     ),
     
     carrier_information_final_tmp3 AS ( 
