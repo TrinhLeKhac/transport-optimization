@@ -59,10 +59,10 @@ def create_analytic_tab(run_date_str):
             f"""
                     **Thống kê dữ liệu :red[Tuyến ưu tiên]**   
                     * Thông tin:  
-                    👉 Khoảng thời gian đánh giá: :red[**1 tháng**], :red[**2 tháng**], :red[**3 tháng**], :red[**6 tháng**], :red[**12 tháng**]  
-                    👉 Chỉ xét đơn NVC lấy thành công :red[**trước 18:00**] ngày hôm trước (:red[**picked_at**])  
-                    👉 Thời gian shipper lấy từ kho ở tỉnh đi giao :red[**trước 09:00**] ngày hôm sau (:red[**last_delivering_at**])  
-                    👉 Tỉ lệ tính đang lấy ở mức top :red[**20%**]    
+                    👉 Khoảng thời gian đánh giá: :red[**1 tháng**], :red[**2 tháng**]     
+                    👉 Chỉ xét đơn NVC lấy thành công :red[**trước 18:00**] ngày hôm trước (:red[**picked_at**])   
+                    👉 Thời gian shipper lấy từ kho ở tỉnh đi giao :red[**trước 10:00**] ngày hôm sau (:red[**last_delivering_at**])  
+                    👉 Tỉ lệ tính đang lấy ở mức top :red[**25%**]    
                 """
         )
 
