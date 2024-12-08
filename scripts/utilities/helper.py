@@ -418,8 +418,8 @@ def create_type_of_delivery(input_df):
         'order_type_id'
     ] = 2
 
-    # assert len(target_df.loc[target_df['order_type_id'] == -1]) == 0, 'Một số chuyến không xác định được loại vận chuyển'
-    target_df = target_df.loc[target_df['order_type_id'] != -1]
+    assert len(target_df.loc[target_df['order_type_id'] == -1]) == 0, 'Một số chuyến không xác định được loại vận chuyển'
+    # target_df = target_df.loc[target_df['order_type_id'] != -1]
     target_df['order_type'] = target_df['order_type_id'].map(MAPPING_ID_ORDER_TYPE)
 
     # ------------------------------------- Adhoc order_type ---------------------------------------------------------
