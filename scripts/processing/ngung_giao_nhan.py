@@ -5,17 +5,17 @@ from scripts.utilities.helper import *
 def xu_ly_ngung_giao_nhan():
     # Đọc data ngưng giao nhận
     try:
-        ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/user_input/ngung_giao_nhan.xlsx')
+        ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/user_input/ngung_giao_nhan.xlsx', dtype=str)
     except FileNotFoundError:
         print(f"Error: The file {ROOT_PATH}/user_input/ngung_giao_nhan.xlsx was not found. Use file {ROOT_PATH}/input/ngung_giao_nhan.xlsx instead.")
-        ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/input/ngung_giao_nhan.xlsx')
+        ngung_giao_nhan_df = pd.read_excel(ROOT_PATH + '/input/ngung_giao_nhan.xlsx', dtype=str)
 
     # Chọn lấy cột cần thiết và đổi tên cột
     ngung_giao_nhan_df.columns = [
         'id', 'id_receiver_district', 'receiver_province', 'receiver_district', 'short_receiver_district',
         'Ninja Van', 'GHN', 'BEST Express', 'SPX Express', 'GHTK', 'Viettel Post', 'VNPost', 'Lazada Logistics'
     ]
-    ngung_giao_nhan_df = ngung_giao_nhan_df[['receiver_province', 'id_receiver_district',
+    ngung_giao_nhan_df = ngung_giao_nhan_df[['id_receiver_district',
                                              'Ninja Van', 'GHN', 'BEST Express', 'SPX Express', 'GHTK', 'Viettel Post',
                                              'VNPost', 'Lazada Logistics']]
 
@@ -23,26 +23,17 @@ def xu_ly_ngung_giao_nhan():
     ngung_giao_nhan_df['id_receiver_district'] = ngung_giao_nhan_df['id_receiver_district'].str.zfill(3)
 
     ngung_giao_nhan_df = ngung_giao_nhan_df.merge(
-        PROVINCE_MAPPING_DISTRICT_DF[['district_code', 'district']].rename(columns={
+        PROVINCE_MAPPING_DISTRICT_DF[['district_code', 'district', 'province']].rename(columns={
             'district_code': 'id_receiver_district',
-            'district': 'receiver_district'
+            'district': 'receiver_district',
+            'province': 'receiver_province',
         }), on='id_receiver_district', how='inner')
     ngung_giao_nhan_df = ngung_giao_nhan_df[['receiver_province', 'receiver_district',
                                              'Ninja Van', 'GHN', 'BEST Express', 'SPX Express', 'GHTK', 'Viettel Post',
                                              'VNPost', 'Lazada Logistics']]
 
-    # Chuẩn hóa thông tin quận/huyện, tỉnh/thành
-    ngung_giao_nhan_df = normalize_province_district(ngung_giao_nhan_df, tinh_thanh='receiver_province',
-                                                     quan_huyen='receiver_district')
-    ngung_giao_nhan_filter_df = ngung_giao_nhan_df.loc[
-        ngung_giao_nhan_df['receiver_province'].notna()
-        & ngung_giao_nhan_df['receiver_district'].notna()
-    ]
-
-    # assert len(ngung_giao_nhan_df) == len(ngung_giao_nhan_filter_df), 'File Excel cung cấp thông tin sai format tỉnh/thành, quận/huyện'
-
     ngung_giao_nhan_final_df = pd.melt(
-        ngung_giao_nhan_filter_df,
+        ngung_giao_nhan_df,
         id_vars=['receiver_province', 'receiver_district'],
         value_vars=[
             'Ninja Van', 'GHN', 'BEST Express', 'SPX Express', 'GHTK', 'Viettel Post', 'VNPost', 'Lazada Logistics'
