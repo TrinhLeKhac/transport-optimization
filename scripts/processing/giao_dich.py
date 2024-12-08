@@ -152,7 +152,7 @@ def xu_ly_giao_dich_co_khoi_luong():
 
 
 @exception_wrapper
-def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
+def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30, save_output=True):
     run_date = datetime.strptime(run_date_str, '%Y-%m-%d')
     if not from_api:
         print('Đọc thông tin giao dịch và giao dịch có khối lượng...')
@@ -229,8 +229,6 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
         set_norm_full_carrier = set(MAPPING_CARRIER_ID.keys())
         assert set_carrier - set_norm_full_carrier == set(), 'Ops, Tên nhà vận chuyển chưa được chuẩn hóa'
 
-        print('Lưu thông tin...')
-        valid_order_df.to_parquet(ROOT_PATH + '/processed_data/order.parquet', index=False)
     else:
         port = settings.SQLALCHEMY_DATABASE_URI
         engine = create_engine(port)
@@ -308,5 +306,8 @@ def tong_hop_thong_tin_giao_dich(run_date_str, from_api=True, n_days_back=30):
         print('Max (created_at): ', valid_order_df['created_at'].max())
         print('Shape final: ', len(valid_order_df))
 
-        # 4. Lưu thông tin
+    if save_output:
+        print('Lưu thông tin...')
         valid_order_df.to_parquet(ROOT_PATH + '/processed_data/order.parquet', index=False)
+    else:
+        return valid_order_df

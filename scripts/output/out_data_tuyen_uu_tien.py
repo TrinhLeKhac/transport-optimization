@@ -30,18 +30,6 @@ API_COLS = [
 ]
 
 
-def get_total_order():
-    print('Getting total order data...')
-    df_total_order_old = pd.read_parquet(ROOT_PATH + '/processed_data/total_order.parquet')
-    df_order_new = pd.read_parquet(ROOT_PATH + '/processed_data/order.parquet')
-    df_total_order = pd.concat([df_total_order_old, df_order_new]).drop_duplicates().reset_index(drop=True)
-
-    print('Shape before: ', len(df_total_order_old))
-    print('Shape after: ', len(df_total_order))
-
-    df_total_order.to_parquet(ROOT_PATH + '/processed_data/total_order.parquet', index=False)
-
-
 def get_top_percent(group, sort_col, ascending=True, pct=0.25):
     sorted_group = group.sort_values(by=sort_col, ascending=ascending)
     top_n = max(1, int(len(sorted_group) * pct))
@@ -231,7 +219,6 @@ if __name__ == '__main__':
     n_months_back = 2
     priority_type = 'top 25%'
 
-    get_total_order()
     get_metadata_tuyen_uu_tien(options.run_date, n_months_back=n_months_back)
     get_data_tuyen_uu_tien(
         run_date_str=options.run_date,
