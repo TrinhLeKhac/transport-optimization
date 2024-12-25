@@ -718,12 +718,11 @@ QUERY_SQL_COMMAND_API = """
         SELECT * FROM carrier_information_overload 
     ),
     
-    -- UPDATE for_fshop EQUAL for_partner
     carrier_information_final_tmp1 AS ( 
         SELECT carrier_id, route_type, price, 
-        status, ngn_status, is_priority_route, description, time_data, 
+        status, is_priority_route, description, time_data, 
         time_display, rate, score, star, 
-        for_partner AS for_shop, -- UPDATE for_shop = for_partner 
+        for_partner AS for_shop,
         for_partner, 
         CAST (DENSE_RANK() OVER ( 
             ORDER BY price ASC 
@@ -731,30 +730,52 @@ QUERY_SQL_COMMAND_API = """
         speed_ranking, score_ranking FROM carrier_information_union 
     ),
     
+    carrier_priority_over AS (
+        SELECT carrier_id FROM carrier_information_above 
+        WHERE is_priority_route = 'Yes'
+    ),
+    
+    row_count_check AS (
+        SELECT COUNT(*) AS row_count
+        FROM carrier_priority_over
+    ),
+    
     carrier_information_priority_route AS ( 
         SELECT carrier_id, route_type, price, 
         status, is_priority_route, description, time_data, 
         time_display, rate, score, star, 
         for_shop,
-        CAST (DENSE_RANK() OVER ( 
-            ORDER BY for_partner ASC 
-        ) AS smallint) AS for_partner,
+        CASE 
+            WHEN (SELECT row_count FROM row_count_check) >= 2 THEN 
+                CAST(DENSE_RANK() OVER (ORDER BY for_partner ASC) AS smallint)
+            ELSE for_partner
+        END AS for_partner,
         price_ranking, speed_ranking, score_ranking 
-        FROM carrier_information_final_tmp1 
-        WHERE (status = '0') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes') AND (for_partner <= 3)
+        FROM carrier_information_final_tmp1 cift1
+        WHERE EXISTS (
+            SELECT 1
+            FROM carrier_priority_over AS cpo
+            WHERE cift1.carrier_id = cpo.carrier_id
+        )
     ),
     
     carrier_information_final_tmp2 AS ( 
-        SELECT carrier_id, route_type, price,
+        SELECT carrier_id, route_type, price, 
         status, is_priority_route, description, time_data, 
         time_display, rate, score, star, 
-        for_shop, 
-        CAST (DENSE_RANK() OVER ( 
-            ORDER BY for_partner ASC 
-        ) AS smallint) AS for_partner, 
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_final_tmp1 
-        WHERE (status != '0') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No') OR (for_partner > 3)
+        for_shop,
+        CASE 
+            WHEN (SELECT row_count FROM row_count_check) >= 2 THEN 
+                CAST(DENSE_RANK() OVER (ORDER BY for_partner ASC) AS smallint)
+            ELSE for_partner
+        END AS for_partner,
+        price_ranking, speed_ranking, score_ranking 
+        FROM carrier_information_final_tmp1 cift1
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM carrier_priority_over AS cpo
+            WHERE cift1.carrier_id = cpo.carrier_id
+        )
     ),
     
     carrier_information_final_tmp3 AS ( 
@@ -774,10 +795,19 @@ QUERY_SQL_COMMAND_API = """
         FROM carrier_information_final_tmp3 
     ),
     
-    carrier_information_final_tmp5 AS ( 
-        SELECT * FROM carrier_information_priority_route 
-        UNION ALL 
-        SELECT * FROM carrier_information_final_tmp4
+    
+    carrier_information_final_tmp5 AS (
+        SELECT *
+        FROM carrier_information_final_tmp1
+        WHERE (SELECT row_count FROM row_count_check) < 2
+        UNION ALL
+        SELECT *
+        FROM carrier_information_priority_route
+        WHERE (SELECT row_count FROM row_count_check) >= 2   
+        UNION ALL
+        SELECT *
+        FROM carrier_information_final_tmp4
+        WHERE (SELECT row_count FROM row_count_check) >= 2    
     ),
     
     carrier_information_final AS ( 
@@ -969,12 +999,11 @@ QUERY_SQL_COMMAND_API_SUPER = """
         SELECT * FROM carrier_information_overload 
     ),
     
-    -- UPDATE for_fshop EQUAL for_partner 
     carrier_information_final_tmp1 AS ( 
         SELECT carrier_id, route_type, price, 
-        status, ngn_status, is_priority_route, description, time_data, 
+        status, is_priority_route, description, time_data, 
         time_display, rate, score, star, 
-        for_partner AS for_shop, -- UPDATE for_shop = for_partner 
+        for_partner AS for_shop,
         for_partner, 
         CAST (DENSE_RANK() OVER ( 
             ORDER BY price ASC 
@@ -982,30 +1011,52 @@ QUERY_SQL_COMMAND_API_SUPER = """
         speed_ranking, score_ranking FROM carrier_information_union 
     ),
     
+    carrier_priority_over AS (
+        SELECT carrier_id FROM carrier_information_above 
+        WHERE is_priority_route = 'Yes'
+    ),
+    
+    row_count_check AS (
+        SELECT COUNT(*) AS row_count
+        FROM carrier_priority_over
+    ),
+    
     carrier_information_priority_route AS ( 
         SELECT carrier_id, route_type, price, 
         status, is_priority_route, description, time_data, 
         time_display, rate, score, star, 
         for_shop,
-        CAST (DENSE_RANK() OVER ( 
-            ORDER BY for_partner ASC 
-        ) AS smallint) AS for_partner,
+        CASE 
+            WHEN (SELECT row_count FROM row_count_check) >= 2 THEN 
+                CAST(DENSE_RANK() OVER (ORDER BY for_partner ASC) AS smallint)
+            ELSE for_partner
+        END AS for_partner,
         price_ranking, speed_ranking, score_ranking 
-        FROM carrier_information_final_tmp1 
-        WHERE (status = '0') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes') AND (for_partner <= 3)
+        FROM carrier_information_final_tmp1 cift1
+        WHERE EXISTS (
+            SELECT 1
+            FROM carrier_priority_over AS cpo
+            WHERE cift1.carrier_id = cpo.carrier_id
+        )
     ),
     
     carrier_information_final_tmp2 AS ( 
-        SELECT carrier_id, route_type, price,
+        SELECT carrier_id, route_type, price, 
         status, is_priority_route, description, time_data, 
         time_display, rate, score, star, 
-        for_shop, 
-        CAST (DENSE_RANK() OVER ( 
-            ORDER BY for_partner ASC 
-        ) AS smallint) AS for_partner, 
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_final_tmp1 
-        WHERE (status != '0') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No') OR (for_partner > 3)
+        for_shop,
+        CASE 
+            WHEN (SELECT row_count FROM row_count_check) >= 2 THEN 
+                CAST(DENSE_RANK() OVER (ORDER BY for_partner ASC) AS smallint)
+            ELSE for_partner
+        END AS for_partner,
+        price_ranking, speed_ranking, score_ranking 
+        FROM carrier_information_final_tmp1 cift1
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM carrier_priority_over AS cpo
+            WHERE cift1.carrier_id = cpo.carrier_id
+        )
     ),
     
     carrier_information_final_tmp3 AS ( 
@@ -1025,10 +1076,19 @@ QUERY_SQL_COMMAND_API_SUPER = """
         FROM carrier_information_final_tmp3 
     ),
     
-    carrier_information_final_tmp5 AS ( 
-        SELECT * FROM carrier_information_priority_route 
-        UNION ALL 
-        SELECT * FROM carrier_information_final_tmp4
+    
+    carrier_information_final_tmp5 AS (
+        SELECT *
+        FROM carrier_information_final_tmp1
+        WHERE (SELECT row_count FROM row_count_check) < 2
+        UNION ALL
+        SELECT *
+        FROM carrier_information_priority_route
+        WHERE (SELECT row_count FROM row_count_check) >= 2   
+        UNION ALL
+        SELECT *
+        FROM carrier_information_final_tmp4
+        WHERE (SELECT row_count FROM row_count_check) >= 2    
     ),
     
     carrier_information_final AS ( 
@@ -1434,12 +1494,11 @@ QUERY_SQL_COMMAND_API_FINAL = """
         SELECT * FROM carrier_information_refuse 
     ),
     
-        -- UPDATE for_fshop EQUAL for_partner
     carrier_information_final_tmp1 AS ( 
         SELECT carrier_id, route_type, CAST (total_price AS int) AS price, 
-        status, ngn_status, is_priority_route, description, time_data, 
+        status, is_priority_route, description, time_data, 
         time_display, rate, score, star, 
-        for_partner AS for_shop, -- UPDATE for_shop = for_partner 
+        for_partner AS for_shop,
         for_partner, 
         CAST (DENSE_RANK() OVER ( 
             ORDER BY total_price ASC 
@@ -1452,12 +1511,9 @@ QUERY_SQL_COMMAND_API_FINAL = """
         WHERE is_priority_route = 'Yes'
     ),
     
-    carrier_information_with_count AS (
-        SELECT ci.*, 
-        COUNT(*) OVER () AS row_count
-        FROM carrier_information_final_tmp1 AS ci
-        INNER JOIN carrier_priority_over AS cpo
-        ON ci.carrier_id = cpo.carrier_id
+    row_count_check AS (
+        SELECT COUNT(*) AS row_count
+        FROM carrier_priority_over
     ),
     
     carrier_information_priority_route AS ( 
@@ -1466,20 +1522,35 @@ QUERY_SQL_COMMAND_API_FINAL = """
         time_display, rate, score, star, 
         for_shop,
         CASE 
-            WHEN row_count >= 2 THEN CAST(DENSE_RANK() OVER (ORDER BY for_partner ASC) AS smallint)
+            WHEN (SELECT row_count FROM row_count_check) >= 2 THEN 
+                CAST(DENSE_RANK() OVER (ORDER BY for_partner ASC) AS smallint)
             ELSE for_partner
         END AS for_partner,
         price_ranking, speed_ranking, score_ranking 
-        FROM carrier_information_with_count
+        FROM carrier_information_final_tmp1 cift1
+        WHERE EXISTS (
+            SELECT 1
+            FROM carrier_priority_over AS cpo
+            WHERE cift1.carrier_id = cpo.carrier_id
+        )
     ),
     
-    carrier_information_final_tmp2 AS (
-        SELECT *
-        FROM carrier_information_final_tmp1 AS ci
+    carrier_information_final_tmp2 AS ( 
+        SELECT carrier_id, route_type, price, 
+        status, is_priority_route, description, time_data, 
+        time_display, rate, score, star, 
+        for_shop,
+        CASE 
+            WHEN (SELECT row_count FROM row_count_check) >= 2 THEN 
+                CAST(DENSE_RANK() OVER (ORDER BY for_partner ASC) AS smallint)
+            ELSE for_partner
+        END AS for_partner,
+        price_ranking, speed_ranking, score_ranking 
+        FROM carrier_information_final_tmp1 cift1
         WHERE NOT EXISTS (
-            SELECT 1 
-            FROM carrier_information_priority_route AS cwc
-            WHERE ci.carrier_id = cwc.carrier_id
+            SELECT 1
+            FROM carrier_priority_over AS cpo
+            WHERE cift1.carrier_id = cpo.carrier_id
         )
     ),
     
@@ -1500,10 +1571,19 @@ QUERY_SQL_COMMAND_API_FINAL = """
         FROM carrier_information_final_tmp3 
     ),
     
-    carrier_information_final_tmp5 AS ( 
-        SELECT * FROM carrier_information_priority_route 
-        UNION ALL 
-        SELECT * FROM carrier_information_final_tmp4 
+    
+    carrier_information_final_tmp5 AS (
+        SELECT *
+        FROM carrier_information_final_tmp1
+        WHERE (SELECT row_count FROM row_count_check) < 2
+        UNION ALL
+        SELECT *
+        FROM carrier_information_priority_route
+        WHERE (SELECT row_count FROM row_count_check) >= 2   
+        UNION ALL
+        SELECT *
+        FROM carrier_information_final_tmp4
+        WHERE (SELECT row_count FROM row_count_check) >= 2    
     ),
     
     carrier_information_final AS ( 
@@ -1912,12 +1992,11 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         SELECT * FROM carrier_information_refuse 
     ),
     
-    -- UPDATE for_fshop EQUAL for_partner
     carrier_information_final_tmp1 AS ( 
         SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price, 
-        status, ngn_status, is_priority_route, description, time_data, 
+        status, is_priority_route, description, time_data, 
         time_display, rate, score, optimal_score, star, 
-        for_partner AS for_shop, -- UPDATE for_shop = for_partner 
+        for_partner AS for_shop,
         for_partner, 
         CAST (DENSE_RANK() OVER ( 
             ORDER BY total_price ASC 
@@ -1925,30 +2004,52 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         speed_ranking, score_ranking FROM carrier_information_union 
     ),
     
+    carrier_priority_over AS (
+        SELECT carrier_id FROM carrier_information_above 
+        WHERE is_priority_route = 'Yes'
+    ),
+    
+    row_count_check AS (
+        SELECT COUNT(*) AS row_count
+        FROM carrier_priority_over
+    ),
+    
     carrier_information_priority_route AS ( 
         SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
         status, is_priority_route, description, time_data, 
         time_display, rate, score, optimal_score, star, 
         for_shop,
-        CAST (DENSE_RANK() OVER ( 
-            ORDER BY for_partner ASC 
-        ) AS smallint) AS for_partner,
+        CASE 
+            WHEN (SELECT row_count FROM row_count_check) >= 2 THEN 
+                CAST(DENSE_RANK() OVER (ORDER BY for_partner ASC) AS smallint)
+            ELSE for_partner
+        END AS for_partner,
         price_ranking, speed_ranking, score_ranking 
-        FROM carrier_information_final_tmp1 
-        WHERE (status = '0') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes') AND (for_partner <= 3)
+        FROM carrier_information_final_tmp1 cift1
+        WHERE EXISTS (
+            SELECT 1
+            FROM carrier_priority_over AS cpo
+            WHERE cift1.carrier_id = cpo.carrier_id
+        )
     ),
     
     carrier_information_final_tmp2 AS ( 
         SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
         status, is_priority_route, description, time_data, 
         time_display, rate, score, optimal_score, star, 
-        for_shop, 
-        CAST (DENSE_RANK() OVER ( 
-            ORDER BY for_partner ASC 
-        ) AS smallint) AS for_partner, 
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_final_tmp1 
-        WHERE (status != '0') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No') OR (for_partner > 3)
+        for_shop,
+        CASE 
+            WHEN (SELECT row_count FROM row_count_check) >= 2 THEN 
+                CAST(DENSE_RANK() OVER (ORDER BY for_partner ASC) AS smallint)
+            ELSE for_partner
+        END AS for_partner,
+        price_ranking, speed_ranking, score_ranking 
+        FROM carrier_information_final_tmp1 cift1
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM carrier_priority_over AS cpo
+            WHERE cift1.carrier_id = cpo.carrier_id
+        )
     ),
     
     carrier_information_final_tmp3 AS ( 
@@ -1960,7 +2061,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     ),
     
     carrier_information_final_tmp4 AS ( 
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price, 
+        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
         status, is_priority_route, description, time_data, 
         time_display, rate, score, optimal_score, star, 
         for_shop, 
@@ -1968,12 +2069,21 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         price_ranking, speed_ranking, score_ranking 
         FROM carrier_information_final_tmp3 
     ),
+    
     -- Riêng data streamlit không update for_fshop =  for_partner, để tracking thứ tự nhà vận chuyển cũ và mới
-    carrier_information_final AS ( 
-        SELECT * FROM carrier_information_priority_route 
-        UNION ALL 
-        SELECT * FROM carrier_information_final_tmp4 
-    )
+    carrier_information_final AS (
+        SELECT *
+        FROM carrier_information_final_tmp1
+        WHERE (SELECT row_count FROM row_count_check) < 2
+        UNION ALL
+        SELECT *
+        FROM carrier_information_priority_route
+        WHERE (SELECT row_count FROM row_count_check) >= 2   
+        UNION ALL
+        SELECT *
+        FROM carrier_information_final_tmp4
+        WHERE (SELECT row_count FROM row_count_check) >= 2    
+    ),
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id; 
 """
