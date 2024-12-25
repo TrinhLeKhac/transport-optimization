@@ -1447,30 +1447,40 @@ QUERY_SQL_COMMAND_API_FINAL = """
         speed_ranking, score_ranking FROM carrier_information_union 
     ),
     
+    carrier_priority_over AS (
+        SELECT carrier_id FROM carrier_information_above 
+        WHERE is_priority_route = 'Yes'
+    ),
+    
+    carrier_information_with_count AS (
+        SELECT ci.*, 
+        COUNT(*) OVER () AS row_count
+        FROM carrier_information_final_tmp1 AS ci
+        INNER JOIN carrier_priority_over AS cpo
+        ON ci.carrier_id = cpo.carrier_id
+    ),
+    
     carrier_information_priority_route AS ( 
         SELECT carrier_id, route_type, price, 
         status, is_priority_route, description, time_data, 
         time_display, rate, score, star, 
         for_shop,
-        CAST (DENSE_RANK() OVER ( 
-            ORDER BY for_partner ASC 
-        ) AS smallint) AS for_partner,
+        CASE 
+            WHEN row_count >= 2 THEN CAST(DENSE_RANK() OVER (ORDER BY for_partner ASC) AS smallint)
+            ELSE for_partner
+        END AS for_partner,
         price_ranking, speed_ranking, score_ranking 
-        FROM carrier_information_final_tmp1 
-        WHERE (status = '0') AND (ngn_status != 'Quá tải') AND (is_priority_route = 'Yes') AND (for_partner <= 3)
+        FROM carrier_information_with_count
     ),
     
-    carrier_information_final_tmp2 AS ( 
-        SELECT carrier_id, route_type, price,
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, 
-        for_shop, 
-        CAST (DENSE_RANK() OVER ( 
-            ORDER BY for_partner ASC 
-        ) AS smallint) AS for_partner, 
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_final_tmp1 
-        WHERE (status != '0') OR (ngn_status = 'Quá tải') OR (is_priority_route = 'No') OR (for_partner > 3)
+    carrier_information_final_tmp2 AS (
+        SELECT *
+        FROM carrier_information_final_tmp1 AS ci
+        WHERE NOT EXISTS (
+            SELECT 1 
+            FROM carrier_information_priority_route AS cwc
+            WHERE ci.carrier_id = cwc.carrier_id
+        )
     ),
     
     carrier_information_final_tmp3 AS ( 
