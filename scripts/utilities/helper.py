@@ -637,7 +637,7 @@ QUERY_SQL_COMMAND_API = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score >= optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 10)
+        WHERE (score >= optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 15)
     ), 
     
     -- Create carrier_information_below_tmp CTE by 
@@ -653,7 +653,7 @@ QUERY_SQL_COMMAND_API = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score < optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 10)
+        WHERE (score < optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 15)
     ),
     
     -- Create carrier_information_below CTE by 
@@ -694,7 +694,7 @@ QUERY_SQL_COMMAND_API = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 10)
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 15)
     ),
     
     carrier_information_overload_tmp2 AS (
@@ -918,7 +918,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score >= optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 10)
+        WHERE (score >= optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 15)
     ), 
     
     -- Create carrier_information_below_tmp CTE by 
@@ -934,7 +934,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (score < optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 10)
+        WHERE (score < optimal_score) AND (status != '1') AND (ngn_status != 'Quá tải') AND (n_days > 15)
     ),
     
     -- Create carrier_information_below CTE by 
@@ -975,7 +975,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 10)
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 15)
     ),
     
     carrier_information_overload_tmp2 AS ( 
@@ -1370,7 +1370,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
             AND (collection_fee != -1) 
             AND (status != '1') 
             AND (ngn_status != 'Quá tải') 
-            AND (n_days > 10)
+            AND (n_days > 15)
     ), 
     
     -- Create carrier_information_below_tmp CTE by 
@@ -1392,7 +1392,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
             AND (collection_fee != -1) 
             AND (status != '1')
             AND (ngn_status != 'Quá tải')
-            AND (n_days > 10)
+            AND (n_days > 15)
     ),
     
     -- Create carrier_information_below CTE by 
@@ -1433,7 +1433,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 10)
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 15)
     ),
     
     carrier_information_overload_tmp2 AS ( 
@@ -1470,7 +1470,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
             ((insurance_fee = -1) OR (collection_fee = -1))
             AND (status != '1') 
             AND (ngn_status != 'Quá tải')
-            AND (n_days > 10)
+            AND (n_days > 15)
     ),
     
     carrier_information_refuse_tmp2 AS ( 
@@ -1868,7 +1868,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             AND (collection_fee != -1) 
             AND (status != '1') 
             AND (ngn_status != 'Quá tải')
-            AND (n_days > 10)
+            AND (n_days > 15)
     ), 
     
     -- Create carrier_information_below_tmp CTE by 
@@ -1890,7 +1890,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             AND (collection_fee != -1) 
             AND (status != '1')
             AND (ngn_status != 'Quá tải')
-            AND (n_days > 10)
+            AND (n_days > 15)
     ),
     
     -- Create carrier_information_below CTE by 
@@ -1931,7 +1931,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         ) AS smallint) AS for_partner, 
         speed_ranking, score_ranking 
         FROM carrier_information 
-        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 10)
+        WHERE (status = '1') OR (ngn_status = 'Quá tải') OR (n_days <= 15)
     ),
     
     carrier_information_overload_tmp2 AS ( 
@@ -1968,7 +1968,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             ((insurance_fee = -1) OR (collection_fee = -1)) 
             AND (status != '1') 
             AND (ngn_status != 'Quá tải')
-            AND (n_days > 10)
+            AND (n_days > 15)
     ),
     
     carrier_information_refuse_tmp2 AS ( 
