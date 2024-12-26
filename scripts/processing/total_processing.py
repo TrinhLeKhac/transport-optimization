@@ -75,7 +75,7 @@ def total_processing(run_date_str, from_api=True, n_days_back=30):
         print('>>> Done\n')
 
         print('8. Tổng hợp thông tin giao dịch tổng...')
-        valid_order_df = tong_hop_thong_tin_giao_dich(run_date_str, from_api=from_api, n_days_back=90, save_output=False)
+        valid_order_df = tong_hop_thong_tin_giao_dich(run_date_str, from_api=from_api, n_days_back=70, save_output=False)
         valid_order_df.to_parquet(ROOT_PATH + '/processed_data/total_order.parquet', index=False)
         print('>>> Done\n')
     else:
