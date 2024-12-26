@@ -2083,7 +2083,7 @@ QUERY_SQL_COMMAND_STREAMLIT = """
         SELECT *
         FROM carrier_information_final_tmp4
         WHERE (SELECT row_count FROM row_count_check) >= 2    
-    ),
+    )
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id; 
 """
