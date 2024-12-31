@@ -797,29 +797,38 @@ QUERY_SQL_COMMAND_API = """
     
     
     carrier_information_final AS (
-        SELECT carrier_id, route_type, price, 
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, for_partner AS for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_final_tmp1
-        WHERE (SELECT row_count FROM row_count_check) < 2
+        SELECT 
+            carrier_id, route_type, price, 
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, star, for_partner AS for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking
+        FROM 
+            carrier_information_final_tmp1
+        WHERE 
+            (SELECT row_count FROM row_count_check) < 2
         UNION ALL
-        SELECT carrier_id, route_type, price, 
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, for_partner AS for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_priority_route
-        WHERE (SELECT row_count FROM row_count_check) >= 2   
+        SELECT 
+            carrier_id, route_type, price, 
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, star, for_partner AS for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking
+        FROM 
+            carrier_information_priority_route
+        WHERE 
+            (SELECT row_count FROM row_count_check) >= 2   
         UNION ALL
-        SELECT carrier_id, route_type, price, 
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, for_partner AS for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_final_tmp4
-        WHERE (SELECT row_count FROM row_count_check) >= 2    
+        SELECT 
+            carrier_id, route_type, price, 
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, star, for_partner AS for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking
+        FROM 
+            carrier_information_final_tmp4
+        WHERE 
+            (SELECT row_count FROM row_count_check) >= 2    
     ),
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id; 
@@ -1081,29 +1090,38 @@ QUERY_SQL_COMMAND_API_SUPER = """
     
     
     carrier_information_final AS (
-        SELECT carrier_id, route_type, price, 
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, for_partner AS for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_final_tmp1
-        WHERE (SELECT row_count FROM row_count_check) < 2
+        SELECT 
+            carrier_id, route_type, price, 
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, star, for_partner AS for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking
+        FROM 
+            carrier_information_final_tmp1
+        WHERE 
+            (SELECT row_count FROM row_count_check) < 2
         UNION ALL
-        SELECT carrier_id, route_type, price, 
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, for_partner AS for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_priority_route
-        WHERE (SELECT row_count FROM row_count_check) >= 2   
+        SELECT 
+            carrier_id, route_type, price, 
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, star, for_partner AS for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking
+        FROM 
+            carrier_information_priority_route
+        WHERE 
+            (SELECT row_count FROM row_count_check) >= 2   
         UNION ALL
-        SELECT carrier_id, route_type, price, 
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, for_partner AS for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_final_tmp4
-        WHERE (SELECT row_count FROM row_count_check) >= 2    
+        SELECT 
+            carrier_id, route_type, price, 
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, star, for_partner AS for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking
+        FROM 
+            carrier_information_final_tmp4
+        WHERE 
+            (SELECT row_count FROM row_count_check) >= 2    
     ),
         
     SELECT * FROM carrier_information_final ORDER BY carrier_id; 
@@ -1579,29 +1597,38 @@ QUERY_SQL_COMMAND_API_FINAL = """
     
     
     carrier_information_final AS (
-        SELECT SELECT carrier_id, route_type, price, 
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, for_partner AS for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_final_tmp1
-        WHERE (SELECT row_count FROM row_count_check) < 2
+        SELECT 
+            carrier_id, route_type, price, 
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, star, for_partner AS for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking
+        FROM 
+            carrier_information_final_tmp1
+        WHERE 
+            (SELECT row_count FROM row_count_check) < 2
         UNION ALL
-        SELECT SELECT carrier_id, route_type, price, 
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, for_partner AS for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_priority_route
-        WHERE (SELECT row_count FROM row_count_check) >= 2   
+        SELECT 
+            carrier_id, route_type, price, 
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, star, for_partner AS for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking
+        FROM 
+            carrier_information_priority_route
+        WHERE 
+            (SELECT row_count FROM row_count_check) >= 2   
         UNION ALL
-        SELECT SELECT carrier_id, route_type, price, 
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, star, for_partner AS for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking
-        FROM carrier_information_final_tmp4
-        WHERE (SELECT row_count FROM row_count_check) >= 2    
+        SELECT 
+            carrier_id, route_type, price, 
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, star, for_partner AS for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking
+        FROM 
+            carrier_information_final_tmp4
+        WHERE 
+            (SELECT row_count FROM row_count_check) >= 2    
     ),
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id; 
@@ -2081,32 +2108,41 @@ QUERY_SQL_COMMAND_STREAMLIT = """
     
     -- Riêng data streamlit không update for_fshop =  for_partner, để tracking thứ tự nhà vận chuyển cũ và mới
     carrier_information_final AS (
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, optimal_score, star, 
-        for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking 
-        FROM carrier_information_final_tmp1
-        WHERE (SELECT row_count FROM row_count_check) < 2
+        SELECT 
+            carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, optimal_score, star, 
+            for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking 
+        FROM 
+            carrier_information_final_tmp1
+        WHERE 
+            (SELECT row_count FROM row_count_check) < 2
         UNION ALL
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, optimal_score, star, 
-        for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking 
-        FROM carrier_information_priority_route
-        WHERE (SELECT row_count FROM row_count_check) >= 2   
+        SELECT 
+            carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, optimal_score, star, 
+            for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking 
+        FROM 
+            carrier_information_priority_route
+        WHERE 
+            (SELECT row_count FROM row_count_check) >= 2   
         UNION ALL
-        SELECT carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
-        status, is_priority_route, description, time_data, 
-        time_display, rate, score, optimal_score, star, 
-        for_shop, 
-        for_partner,
-        price_ranking, speed_ranking, score_ranking 
-        FROM carrier_information_final_tmp4
-        WHERE (SELECT row_count FROM row_count_check) >= 2    
+        SELECT 
+            carrier_id, new_type, price, insurance_fee, collection_fee, redeem_fee, total_price,
+            status, is_priority_route, description, time_data, 
+            time_display, rate, score, optimal_score, star, 
+            for_shop, 
+            for_partner,
+            price_ranking, speed_ranking, score_ranking 
+        FROM 
+            carrier_information_final_tmp4
+        WHERE 
+            (SELECT row_count FROM row_count_check) >= 2    
     )
     
     SELECT * FROM carrier_information_final ORDER BY carrier_id; 
