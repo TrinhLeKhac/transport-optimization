@@ -831,7 +831,7 @@ QUERY_SQL_COMMAND_API = """
             (SELECT row_count FROM row_count_check) >= 2    
     )
     
-    SELECT * FROM carrier_information_final ORDER BY carrier_id; 
+    SELECT * FROM carrier_information_final_tmp1 ORDER BY carrier_id; 
 """
 
 QUERY_SQL_COMMAND_API_SUPER = """
@@ -1124,7 +1124,7 @@ QUERY_SQL_COMMAND_API_SUPER = """
             (SELECT row_count FROM row_count_check) >= 2    
     )
         
-    SELECT * FROM carrier_information_final ORDER BY carrier_id; 
+    SELECT * FROM carrier_information_final_tmp1 ORDER BY carrier_id; 
 """
 
 QUERY_SQL_COMMAND_API_FINAL = """
@@ -1631,7 +1631,7 @@ QUERY_SQL_COMMAND_API_FINAL = """
             (SELECT row_count FROM row_count_check) >= 2    
     )
     
-    SELECT * FROM carrier_information_final ORDER BY carrier_id; 
+    SELECT * FROM carrier_information_final_tmp1 ORDER BY carrier_id; 
 """
 
 QUERY_SQL_COMMAND_STREAMLIT = """
@@ -2145,5 +2145,5 @@ QUERY_SQL_COMMAND_STREAMLIT = """
             (SELECT row_count FROM row_count_check) >= 2    
     )
     
-    SELECT * FROM carrier_information_final ORDER BY carrier_id; 
+    SELECT * FROM carrier_information_final_tmp1 ORDER BY carrier_id; 
 """
