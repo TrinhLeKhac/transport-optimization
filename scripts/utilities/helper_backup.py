@@ -1,17 +1,19 @@
+import json
+import os
+import re
+import traceback
+import warnings
+from datetime import datetime, timedelta
+from functools import reduce
+from time import time
+
 import numpy as np
 import pandas as pd
 import requests
-import json
-from unidecode import unidecode
-from scripts.utilities.config import *
 import streamlit as st
-from functools import reduce
-from datetime import datetime, timedelta
-from time import time
-import re
-import os
-import traceback
-import warnings
+from unidecode import unidecode
+
+from scripts.utilities.config import *
 
 warnings.filterwarnings("ignore")
 from config import Settings
@@ -34,27 +36,40 @@ def exception_wrapper(func):
 
 
 def telegram_bot_send_success_message():
-    telegram_bot_send_message(f"""
+    telegram_bot_send_message(
+        f"""
         ✅✅✅ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Task run daily *SUCCESSED*!!!
-    """)
+    """
+    )
 
 
 def telegram_bot_send_error_message(message):
-    telegram_bot_send_message(f"""
+    telegram_bot_send_message(
+        f"""
         ❌❌❌ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Task run daily *FAILED*!!!  
-    """)
-    telegram_bot_send_message(f"""
+    """
+    )
+    telegram_bot_send_message(
+        f"""
         Details of error:  
         {message}
-    """)
+    """
+    )
 
 
 def telegram_bot_send_message(
-        bot_message,
-        bot_token=Settings.TELEGRAM_BOT_TOKEN,
-        bot_chat_id=Settings.TELEGRAM_CHAT_ID,
+    bot_message,
+    bot_token=Settings.TELEGRAM_BOT_TOKEN,
+    bot_chat_id=Settings.TELEGRAM_CHAT_ID,
 ):
-    send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chat_id + '&parse_mode=Markdown&text=' + bot_message
+    send_text = (
+        "https://api.telegram.org/bot"
+        + bot_token
+        + "/sendMessage?chat_id="
+        + bot_chat_id
+        + "&parse_mode=Markdown&text="
+        + bot_message
+    )
     res = requests.get(send_text)
     return res.json()
 
@@ -62,23 +77,19 @@ def telegram_bot_send_message(
 def convert_time_m_s(stop, start):
     minute = int((stop - start) / 60)
     second = int(stop - start) - int((stop - start) / 60) * 60
-    return '{}m{}s'.format(minute, second)
+    return "{}m{}s".format(minute, second)
 
 
 def merge_left_only(df1, df2, keys=list()):
     result = pd.merge(
-        df1, df2,
-        how='outer',
-        on=keys,
-        indicator=True,
-        suffixes=('', '_foo')
+        df1, df2, how="outer", on=keys, indicator=True, suffixes=("", "_foo")
     ).query('_merge == "left_only"')[df1.columns.tolist()]
     return result
 
 
 def vietnamese_sort_key(s):
     # Define the Vietnamese alphabet order
-    vietnamese_order = 'aăâbcdđeêghiklmnoôơpqrstuưvxyáàảãạắằẳẵặấầẩẫậéèẻẽẹếềểễệíìỉĩịóòỏõọốồổỗộớờởỡợúùủũụứừửữựýỳỷỹỵ'
+    vietnamese_order = "aăâbcdđeêghiklmnoôơpqrstuưvxyáàảãạắằẳẵặấầẩẫậéèẻẽẹếềểễệíìỉĩịóòỏõọốồổỗộớờởỡợúùủũụứừửữựýỳỷỹỵ"
 
     # Create a mapping of each character to its order index
     char_order = {char: idx for idx, char in enumerate(vietnamese_order)}
@@ -88,57 +99,77 @@ def vietnamese_sort_key(s):
 
 
 try:
-    PROVINCE_MAPPING_DISTRICT_DF = pd.read_parquet(ROOT_PATH + '/user_input/province_mapping_district.parquet')
+    PROVINCE_MAPPING_DISTRICT_DF = pd.read_parquet(
+        ROOT_PATH + "/user_input/province_mapping_district.parquet"
+    )
 except FileNotFoundError:
     print(
-        f"Error: The file {ROOT_PATH}/user_input/province_mapping_district.parquet was not found. Use file {ROOT_PATH}/input/province_mapping_district.parquet instead.")
-    PROVINCE_MAPPING_DISTRICT_DF = pd.read_parquet(ROOT_PATH + '/input/province_mapping_district.parquet')
+        f"Error: The file {ROOT_PATH}/user_input/province_mapping_district.parquet was not found. Use file {ROOT_PATH}/input/province_mapping_district.parquet instead."
+    )
+    PROVINCE_MAPPING_DISTRICT_DF = pd.read_parquet(
+        ROOT_PATH + "/input/province_mapping_district.parquet"
+    )
 
 try:
     PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF = pd.read_parquet(
-        ROOT_PATH + '/user_input/province_mapping_district_mapping_ward.parquet')
+        ROOT_PATH + "/user_input/province_mapping_district_mapping_ward.parquet"
+    )
 except FileNotFoundError:
     print(
-        f"Error: The file {ROOT_PATH}/user_input/province_mapping_district_mapping_ward.parquet was not found. Use file {ROOT_PATH}/input/province_mapping_district_mapping_ward.parquet instead.")
+        f"Error: The file {ROOT_PATH}/user_input/province_mapping_district_mapping_ward.parquet was not found. Use file {ROOT_PATH}/input/province_mapping_district_mapping_ward.parquet instead."
+    )
     PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF = pd.read_parquet(
-        ROOT_PATH + '/input/province_mapping_district_mapping_ward.parquet')
+        ROOT_PATH + "/input/province_mapping_district_mapping_ward.parquet"
+    )
 
-active_carrier_df = pd.DataFrame(data={'carrier': ACTIVE_CARRIER})
+active_carrier_df = pd.DataFrame(data={"carrier": ACTIVE_CARRIER})
 PROVINCE_MAPPING_DISTRICT_CROSS_CARRIER_DF = (
-    PROVINCE_MAPPING_DISTRICT_DF[['province', 'district']].rename(columns={
-        'province': 'receiver_province',
-        'district': 'receiver_district'
-    }).merge(active_carrier_df, how='cross')
+    PROVINCE_MAPPING_DISTRICT_DF[["province", "district"]]
+    .rename(columns={"province": "receiver_province", "district": "receiver_district"})
+    .merge(active_carrier_df, how="cross")
 )
 PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_CROSS_CARRIER_DF = (
-    PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF[['province', 'district', 'commune']].rename(columns={
-        'province': 'receiver_province',
-        'district': 'receiver_district',
-        'commune': 'receiver_commune',
-    }).merge(active_carrier_df, how='cross')
+    PROVINCE_MAPPING_DISTRICT_MAPPING_WARD_DF[["province", "district", "commune"]]
+    .rename(
+        columns={
+            "province": "receiver_province",
+            "district": "receiver_district",
+            "commune": "receiver_commune",
+        }
+    )
+    .merge(active_carrier_df, how="cross")
 )
 
 try:
-    with open(ROOT_PATH + '/user_input/province_mapping_district_from_api.json') as file:
+    with open(
+        ROOT_PATH + "/user_input/province_mapping_district_from_api.json"
+    ) as file:
         PROVINCE_MAPPING_DISTRICT = json.load(file)
 except FileNotFoundError:
-    with open(ROOT_PATH + '/input/province_mapping_district_from_api.json') as file:
+    with open(ROOT_PATH + "/input/province_mapping_district_from_api.json") as file:
         PROVINCE_MAPPING_DISTRICT = json.load(file)
 
 try:
-    with open(ROOT_PATH + '/user_input/province_mapping_district_mapping_ward_from_api.json') as file:
+    with open(
+        ROOT_PATH + "/user_input/province_mapping_district_mapping_ward_from_api.json"
+    ) as file:
         PROVINCE_MAPPING_DISTRICT_MAPPING_WARD = json.load(file)
 except FileNotFoundError:
-    with open(ROOT_PATH + '/input/province_mapping_district_mapping_ward_from_api.json') as file:
+    with open(
+        ROOT_PATH + "/input/province_mapping_district_mapping_ward_from_api.json"
+    ) as file:
         PROVINCE_MAPPING_DISTRICT_MAPPING_WARD = json.load(file)
 
 
 # để norm được case dấu đặt khác vị trí => dùng unidecode
 # unidecode dùng sau cùng (case tỉnh hà tĩnh)
 
+
 def preprocess_str(target_str):
-    tmp_str = target_str.replace('-', ' ')  # case tỉnh Bà Rịa - Vũng Tàu, Thành phố Phan Rang-Tháp Chàm
-    tmp_str = ' '.join(tmp_str.split())  # remove khoảng trống dư giữa các từ
+    tmp_str = target_str.replace(
+        "-", " "
+    )  # case tỉnh Bà Rịa - Vũng Tàu, Thành phố Phan Rang-Tháp Chàm
+    tmp_str = " ".join(tmp_str.split())  # remove khoảng trống dư giữa các từ
     tmp_str = tmp_str.strip()
     tmp_str = tmp_str.lower()
     # tmp_str = unidecode(tmp_str) # chú ý case tỉnh hà tĩnh, không bỏ dấu được
@@ -148,13 +179,19 @@ def preprocess_str(target_str):
 def get_norm_province(province):
     if province is not None:
         short_province = unidecode(
-            preprocess_str(province).replace('tỉnh ', '').replace('thành phố ', '').replace('tp ', '').replace('.',
-                                                                                                               '').replace(
-                ',', ''))
-        if short_province == 'ba ria vung tau':
-            return 'Tỉnh Bà Rịa - Vũng Tàu'
+            preprocess_str(province)
+            .replace("tỉnh ", "")
+            .replace("thành phố ", "")
+            .replace("tp ", "")
+            .replace(".", "")
+            .replace(",", "")
+        )
+        if short_province == "ba ria vung tau":
+            return "Tỉnh Bà Rịa - Vũng Tàu"
         for n_province in PROVINCE_MAPPING_DISTRICT.keys():
-            if unidecode(n_province.lower()).endswith(unidecode(preprocess_str(province))):
+            if unidecode(n_province.lower()).endswith(
+                unidecode(preprocess_str(province))
+            ):
                 return n_province
         for n_province in PROVINCE_MAPPING_DISTRICT.keys():
             if unidecode(n_province.lower()).endswith(short_province):
@@ -168,19 +205,26 @@ def get_norm_district(province, district):
         # province đưa vào hàm phải ở dạng chuẩn
         # 1. sử dụng get_norm_province => 2. sử dụng hàm get_norm_district
         short_district = unidecode(
-            preprocess_str(district).replace('quận ', '').replace('huyện ', '').replace('thị xã ', '')
-            .replace('thành phố ', '').replace('.', '').replace(',', '')
+            preprocess_str(district)
+            .replace("quận ", "")
+            .replace("huyện ", "")
+            .replace("thị xã ", "")
+            .replace("thành phố ", "")
+            .replace(".", "")
+            .replace(",", "")
         )
-        if short_district == 'phan rang thap cham':
-            return 'Thành phố Phan Rang-Tháp Chàm'
-        if province == 'Tỉnh Bình Định' and short_district == 'qui nhon':
-            return 'Thành phố Quy Nhơn'
-        if province == 'Tỉnh Bình Thuận' and short_district == 'phu quy':
-            return 'Huyện Phú Quí'
-        if province == 'Tỉnh Kon Tum' and short_district == "ia h'drai":
+        if short_district == "phan rang thap cham":
+            return "Thành phố Phan Rang-Tháp Chàm"
+        if province == "Tỉnh Bình Định" and short_district == "qui nhon":
+            return "Thành phố Quy Nhơn"
+        if province == "Tỉnh Bình Thuận" and short_district == "phu quy":
+            return "Huyện Phú Quí"
+        if province == "Tỉnh Kon Tum" and short_district == "ia h'drai":
             return "Huyện Ia H' Drai"
         for n_district in PROVINCE_MAPPING_DISTRICT[province]:
-            if unidecode(n_district.lower()).endswith(unidecode(preprocess_str(district))):
+            if unidecode(n_district.lower()).endswith(
+                unidecode(preprocess_str(district))
+            ):
                 return n_district
         for n_district in PROVINCE_MAPPING_DISTRICT[province]:
             if unidecode(n_district.lower()).endswith(short_district):
@@ -194,9 +238,12 @@ def get_norm_commune(province, district, commune):
         # province, district đưa vào hàm phải ở dạng chuẩn
         # 1. sử dụng get_norm_province => 2. sử dụng hàm get_norm_district => 3. sử dụng hàm get_norm_commune
         short_commune = unidecode(
-            preprocess_str(commune).replace('xã ', '').replace('phường ', '').replace('thị trấn ', '').replace('.',
-                                                                                                               '').replace(
-                ',', '')
+            preprocess_str(commune)
+            .replace("xã ", "")
+            .replace("phường ", "")
+            .replace("thị trấn ", "")
+            .replace(".", "")
+            .replace(",", "")
         )
         # if short_commune == 'phan rang thap cham':
         #     return 'Thành phố Phan Rang-Tháp Chàm'
@@ -204,7 +251,9 @@ def get_norm_commune(province, district, commune):
         #     return 'abc'
         try:
             for n_commune in PROVINCE_MAPPING_DISTRICT_MAPPING_WARD[province][district]:
-                if unidecode(n_commune.lower()).endswith(unidecode(preprocess_str(commune))):
+                if unidecode(n_commune.lower()).endswith(
+                    unidecode(preprocess_str(commune))
+                ):
                     return n_commune
             for n_commune in PROVINCE_MAPPING_DISTRICT_MAPPING_WARD[province][district]:
                 if unidecode(n_commune.lower()).endswith(short_commune):
@@ -215,212 +264,282 @@ def get_norm_commune(province, district, commune):
         return None
 
 
-def normalize_province_district(target_df, tinh_thanh='tinh_thanh', quan_huyen='quan_huyen'):
+def normalize_province_district(
+    target_df, tinh_thanh="tinh_thanh", quan_huyen="quan_huyen"
+):
     # 1. province
-    print('Normalizing province...')
+    print("Normalizing province...")
     target_df = target_df[target_df[tinh_thanh].notna()]
-    print('Before: ', len(target_df))
+    print("Before: ", len(target_df))
 
     target_df[tinh_thanh] = target_df[tinh_thanh].apply(get_norm_province)
 
     target_df = target_df[target_df[tinh_thanh].notna()]
-    print('After: ', len(target_df))
+    print("After: ", len(target_df))
 
     # 2. district
-    print('Normalizing district...')
-    print('Before: ', target_df[target_df[quan_huyen].notna()].shape[0])
-    target_df[quan_huyen] = \
-        target_df[[tinh_thanh, quan_huyen]] \
-            .apply(lambda x: get_norm_district(x[tinh_thanh], x[quan_huyen]), axis=1)
-    print('After: ', target_df[target_df[quan_huyen].notna()].shape[0])
+    print("Normalizing district...")
+    print("Before: ", target_df[target_df[quan_huyen].notna()].shape[0])
+    target_df[quan_huyen] = target_df[[tinh_thanh, quan_huyen]].apply(
+        lambda x: get_norm_district(x[tinh_thanh], x[quan_huyen]), axis=1
+    )
+    print("After: ", target_df[target_df[quan_huyen].notna()].shape[0])
 
     return target_df
 
 
-def normalize_province_district_ward(focus_df, tinh_thanh='tinh_thanh', quan_huyen='quan_huyen', phuong_xa='phuong_xa'):
+def normalize_province_district_ward(
+    focus_df, tinh_thanh="tinh_thanh", quan_huyen="quan_huyen", phuong_xa="phuong_xa"
+):
     target_df = focus_df.copy()
     # Có thể comment toàn bộ dòng filter notna()
     # # để tìm ra tên tỉnh/thành, quận/huyện, phường/xã bị sai
 
     # 1. province
-    print('Normalizing province...')
+    print("Normalizing province...")
     target_df = target_df[target_df[tinh_thanh].notna()]
-    print('Before: ', len(target_df))
+    print("Before: ", len(target_df))
 
     target_df[tinh_thanh] = target_df[tinh_thanh].apply(get_norm_province)
 
     target_df = target_df[target_df[tinh_thanh].notna()]
-    print('After: ', len(target_df))
+    print("After: ", len(target_df))
 
     # 2. district
-    print('Normalizing district...')
+    print("Normalizing district...")
     target_df = target_df[target_df[quan_huyen].notna()]
-    print('Before: ', len(target_df))
+    print("Before: ", len(target_df))
 
-    target_df[quan_huyen] = \
-        target_df[[tinh_thanh, quan_huyen]] \
-            .apply(lambda x: get_norm_district(x[tinh_thanh], x[quan_huyen]), axis=1)
+    target_df[quan_huyen] = target_df[[tinh_thanh, quan_huyen]].apply(
+        lambda x: get_norm_district(x[tinh_thanh], x[quan_huyen]), axis=1
+    )
     target_df = target_df[target_df[quan_huyen].notna()]
-    print('After: ', len(target_df))
+    print("After: ", len(target_df))
 
     # 3. commune
-    print('Normalizing commune...')
+    print("Normalizing commune...")
     target_df = target_df[target_df[phuong_xa].notna()]
-    print('Before: ', len(target_df))
+    print("Before: ", len(target_df))
 
-    target_df[phuong_xa] = \
-        target_df[[tinh_thanh, quan_huyen, phuong_xa]] \
-            .apply(lambda x: get_norm_commune(x[tinh_thanh], x[quan_huyen], x[phuong_xa]), axis=1)
+    target_df[phuong_xa] = target_df[[tinh_thanh, quan_huyen, phuong_xa]].apply(
+        lambda x: get_norm_commune(x[tinh_thanh], x[quan_huyen], x[phuong_xa]), axis=1
+    )
 
     target_df = target_df[target_df[phuong_xa].notna()]
-    print('After: ', len(target_df))
+    print("After: ", len(target_df))
 
     return target_df
 
 
 def generate_sample_input(n_rows=1000):
     result_df = pd.DataFrame()
-    result_df['order_code'] = [
-        ''.join(np.random.choice(list('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 12)) \
-        + ''.join(np.random.choice(list('123456789'), 9))
+    result_df["order_code"] = [
+        "".join(np.random.choice(list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 12))
+        + "".join(np.random.choice(list("123456789"), 9))
         for i in range(n_rows)
     ]
-    result_df['sender_district_code'] = np.random.choice(PROVINCE_MAPPING_DISTRICT_DF['district_code'].tolist(), n_rows)
-    result_df['receiver_district_code'] = np.random.choice(PROVINCE_MAPPING_DISTRICT_DF['district_code'].tolist(),
-                                                           n_rows)
-    result_df = (
-        result_df.merge(
-            PROVINCE_MAPPING_DISTRICT_DF[['province_code', 'district_code']].rename(columns={
-                'province_code': 'sender_province_code',
-                'district_code': 'sender_district_code'
-            }), on='sender_district_code', how='left')
-        .merge(
-            PROVINCE_MAPPING_DISTRICT_DF[['province_code', 'district_code']].rename(columns={
-                'province_code': 'receiver_province_code',
-                'district_code': 'receiver_district_code'
-            }), on='receiver_district_code', how='left')
+    result_df["sender_district_code"] = np.random.choice(
+        PROVINCE_MAPPING_DISTRICT_DF["district_code"].tolist(), n_rows
     )
-    result_df['weight'] = [
-        np.random.choice(list(range(100, 50000, 100)))
-        for i in range(n_rows)
+    result_df["receiver_district_code"] = np.random.choice(
+        PROVINCE_MAPPING_DISTRICT_DF["district_code"].tolist(), n_rows
+    )
+    result_df = result_df.merge(
+        PROVINCE_MAPPING_DISTRICT_DF[["province_code", "district_code"]].rename(
+            columns={
+                "province_code": "sender_province_code",
+                "district_code": "sender_district_code",
+            }
+        ),
+        on="sender_district_code",
+        how="left",
+    ).merge(
+        PROVINCE_MAPPING_DISTRICT_DF[["province_code", "district_code"]].rename(
+            columns={
+                "province_code": "receiver_province_code",
+                "district_code": "receiver_district_code",
+            }
+        ),
+        on="receiver_district_code",
+        how="left",
+    )
+    result_df["weight"] = [
+        np.random.choice(list(range(100, 50000, 100))) for i in range(n_rows)
     ]
 
-    result_df['delivery_type'] = [
-        np.random.choice(['Lấy Tận Nơi', 'Gửi Bưu Cục'])
-        for i in range(n_rows)
+    result_df["delivery_type"] = [
+        np.random.choice(["Lấy Tận Nơi", "Gửi Bưu Cục"]) for i in range(n_rows)
     ]
 
-    return result_df[[
-        'order_code', 'weight', 'delivery_type',
-        'sender_province_code', 'sender_district_code', 'receiver_province_code', 'receiver_district_code',
-    ]]
+    return result_df[
+        [
+            "order_code",
+            "weight",
+            "delivery_type",
+            "sender_province_code",
+            "sender_district_code",
+            "receiver_province_code",
+            "receiver_district_code",
+        ]
+    ]
 
 
 def create_type_of_delivery(input_df):
     target_df = input_df.copy()
 
-    phan_vung_nvc = pd.read_parquet(ROOT_PATH + '/processed_data/phan_vung_nvc.parquet')
-    phan_vung_nvc = phan_vung_nvc[[
-        'carrier_id', 'receiver_province_code', 'receiver_district_code',
-        'outer_region_id', 'inner_region_id'
-    ]]
-    target_df = (
-        target_df.merge(
-            phan_vung_nvc.rename(columns={
-                'receiver_province_code': 'sender_province_code',
-                'receiver_district_code': 'sender_district_code',
-                'outer_region_id': 'sender_outer_region_id',
-                'inner_region_id': 'sender_inner_region_id',
-            }), on=['carrier_id', 'sender_province_code', 'sender_district_code'], how='left')
-        .merge(
-            phan_vung_nvc.rename(columns={
-                'outer_region_id': 'receiver_outer_region_id',
-                'inner_region_id': 'receiver_inner_region_id',
-            }), on=['carrier_id', 'receiver_province_code', 'receiver_district_code'], how='left')
+    phan_vung_nvc = pd.read_parquet(ROOT_PATH + "/processed_data/phan_vung_nvc.parquet")
+    phan_vung_nvc = phan_vung_nvc[
+        [
+            "carrier_id",
+            "receiver_province_code",
+            "receiver_district_code",
+            "outer_region_id",
+            "inner_region_id",
+        ]
+    ]
+    target_df = target_df.merge(
+        phan_vung_nvc.rename(
+            columns={
+                "receiver_province_code": "sender_province_code",
+                "receiver_district_code": "sender_district_code",
+                "outer_region_id": "sender_outer_region_id",
+                "inner_region_id": "sender_inner_region_id",
+            }
+        ),
+        on=["carrier_id", "sender_province_code", "sender_district_code"],
+        how="left",
+    ).merge(
+        phan_vung_nvc.rename(
+            columns={
+                "outer_region_id": "receiver_outer_region_id",
+                "inner_region_id": "receiver_inner_region_id",
+            }
+        ),
+        on=["carrier_id", "receiver_province_code", "receiver_district_code"],
+        how="left",
     )
 
-    target_df['order_type_id'] = -1
+    target_df["order_type_id"] = -1
     target_df.loc[
-        (((target_df['sender_province_code'] == '79') & (
-            target_df['receiver_province_code'].isin(['01', '48']))) | ((target_df['sender_province_code'] == '01') & (
-            target_df['receiver_province_code'].isin(['79', '48']))) | (
-                 (target_df['receiver_province_code'] == '79') & (
-             target_df['sender_province_code'].isin(['01', '48']))) | (
-                 (target_df['receiver_province_code'] == '01') & (
-             target_df['sender_province_code'].isin(['79', '48']))))
-        & (target_df['order_type_id'] == -1),
-        'order_type_id'
+        (
+            (
+                (target_df["sender_province_code"] == "79")
+                & (target_df["receiver_province_code"].isin(["01", "48"]))
+            )
+            | (
+                (target_df["sender_province_code"] == "01")
+                & (target_df["receiver_province_code"].isin(["79", "48"]))
+            )
+            | (
+                (target_df["receiver_province_code"] == "79")
+                & (target_df["sender_province_code"].isin(["01", "48"]))
+            )
+            | (
+                (target_df["receiver_province_code"] == "01")
+                & (target_df["sender_province_code"].isin(["79", "48"]))
+            )
+        )
+        & (target_df["order_type_id"] == -1),
+        "order_type_id",
     ] = 10
 
     target_df.loc[
-        (((target_df['sender_province_code'] == '79') & (
-            target_df['receiver_outer_region_id'].isin([0, 1])))
-         | (
-                 (target_df['sender_province_code'] == '01') & (target_df['receiver_outer_region_id'].isin([1, 2]))))
-        & (target_df['order_type_id'] == -1),
-        'order_type_id'
+        (
+            (
+                (target_df["sender_province_code"] == "79")
+                & (target_df["receiver_outer_region_id"].isin([0, 1]))
+            )
+            | (
+                (target_df["sender_province_code"] == "01")
+                & (target_df["receiver_outer_region_id"].isin([1, 2]))
+            )
+        )
+        & (target_df["order_type_id"] == -1),
+        "order_type_id",
     ] = 9
 
     target_df.loc[
-        (((target_df['sender_outer_region_id'] == 0) & (target_df['receiver_outer_region_id'] == 2))
-         | ((target_df['sender_outer_region_id'] == 2) & (target_df['receiver_outer_region_id'] == 0)))
-        & (target_df['order_type_id'] == -1),
-        'order_type_id'
+        (
+            (
+                (target_df["sender_outer_region_id"] == 0)
+                & (target_df["receiver_outer_region_id"] == 2)
+            )
+            | (
+                (target_df["sender_outer_region_id"] == 2)
+                & (target_df["receiver_outer_region_id"] == 0)
+            )
+        )
+        & (target_df["order_type_id"] == -1),
+        "order_type_id",
     ] = 7
 
     target_df.loc[
-        (((target_df['sender_outer_region_id'] == 0) & (target_df['receiver_outer_region_id'] == 1))
-         | ((target_df['sender_outer_region_id'] == 1) & (target_df['receiver_outer_region_id'] == 2))
-         | ((target_df['sender_outer_region_id'] == 1) & (target_df['receiver_outer_region_id'] == 0))
-         | ((target_df['sender_outer_region_id'] == 2) & (target_df['receiver_outer_region_id'] == 1)))
-        & (target_df['order_type_id'] == -1),
-        'order_type_id'
+        (
+            (
+                (target_df["sender_outer_region_id"] == 0)
+                & (target_df["receiver_outer_region_id"] == 1)
+            )
+            | (
+                (target_df["sender_outer_region_id"] == 1)
+                & (target_df["receiver_outer_region_id"] == 2)
+            )
+            | (
+                (target_df["sender_outer_region_id"] == 1)
+                & (target_df["receiver_outer_region_id"] == 0)
+            )
+            | (
+                (target_df["sender_outer_region_id"] == 2)
+                & (target_df["receiver_outer_region_id"] == 1)
+            )
+        )
+        & (target_df["order_type_id"] == -1),
+        "order_type_id",
     ] = 6
 
     target_df.loc[
-        (target_df['sender_province_code'] != target_df['receiver_province_code'])
-        & target_df['sender_province_code'].isin(['01', '79'])
-        & (target_df['order_type_id'] == -1),
-        'order_type_id'
+        (target_df["sender_province_code"] != target_df["receiver_province_code"])
+        & target_df["sender_province_code"].isin(["01", "79"])
+        & (target_df["order_type_id"] == -1),
+        "order_type_id",
     ] = 8
 
     target_df.loc[
-        (target_df['sender_province_code'] != target_df['receiver_province_code'])
-        & (target_df['order_type_id'] == -1),
-        'order_type_id'
+        (target_df["sender_province_code"] != target_df["receiver_province_code"])
+        & (target_df["order_type_id"] == -1),
+        "order_type_id",
     ] = 5
 
     target_df.loc[
-        (target_df['receiver_inner_region_id'] == 0)
-        & (target_df['receiver_province_code'].isin(['79', '01']))
-        & (target_df['order_type_id'] == -1),
-        'order_type_id'
+        (target_df["receiver_inner_region_id"] == 0)
+        & (target_df["receiver_province_code"].isin(["79", "01"]))
+        & (target_df["order_type_id"] == -1),
+        "order_type_id",
     ] = 3
 
     target_df.loc[
-        (target_df['receiver_inner_region_id'] == 0)
-        & (~target_df['receiver_province_code'].isin(['79', '01']))
-        & (target_df['order_type_id'] == -1),
-        'order_type_id'
+        (target_df["receiver_inner_region_id"] == 0)
+        & (~target_df["receiver_province_code"].isin(["79", "01"]))
+        & (target_df["order_type_id"] == -1),
+        "order_type_id",
     ] = 1
 
     target_df.loc[
-        (target_df['receiver_inner_region_id'] == 1)
-        & (target_df['receiver_province_code'].isin(['79', '01']))
-        & (target_df['order_type_id'] == -1),
-        'order_type_id'
+        (target_df["receiver_inner_region_id"] == 1)
+        & (target_df["receiver_province_code"].isin(["79", "01"]))
+        & (target_df["order_type_id"] == -1),
+        "order_type_id",
     ] = 4
 
     target_df.loc[
-        (target_df['receiver_inner_region_id'] == 1)
-        & (~target_df['receiver_province_code'].isin(['79', '01']))
-        & (target_df['order_type_id'] == -1),
-        'order_type_id'
+        (target_df["receiver_inner_region_id"] == 1)
+        & (~target_df["receiver_province_code"].isin(["79", "01"]))
+        & (target_df["order_type_id"] == -1),
+        "order_type_id",
     ] = 2
 
     # assert len(target_df.loc[target_df['order_type_id'] == -1]) == 0, 'Một số chuyến không xác định được loại vận chuyển'
-    target_df = target_df.loc[target_df['order_type_id'] != -1]
-    target_df['order_type'] = target_df['order_type_id'].map(MAPPING_ID_ORDER_TYPE)
+    target_df = target_df.loc[target_df["order_type_id"] != -1]
+    target_df["order_type"] = target_df["order_type_id"].map(MAPPING_ID_ORDER_TYPE)
 
     # ------------------------------------- Adhoc order_type ---------------------------------------------------------
     # Khong dung adhoc nay => data giao_dich khong co 'Lien Thanh' => out_data_api giu nguyen shape (713*6*10)
@@ -492,22 +611,28 @@ def create_type_of_delivery(input_df):
     #     & (target_df['sys_order_type_id'] == -1),
     #     'sys_order_type_id'
     # ] = 7
-    target_df['sys_order_type_id'] = target_df['order_type_id'].map(MAPPING_ORDER_TYPE_ID_ROUTE_TYPE)
-    assert len(target_df.loc[target_df['sys_order_type_id'].isna()]) == 0, 'Mapping order_type và sys_order_type bị thiếu'
+    target_df["sys_order_type_id"] = target_df["order_type_id"].map(
+        MAPPING_ORDER_TYPE_ID_ROUTE_TYPE
+    )
+    assert (
+        len(target_df.loc[target_df["sys_order_type_id"].isna()]) == 0
+    ), "Mapping order_type và sys_order_type bị thiếu"
 
     return target_df
 
 
 def transform_dict(g):
-    return pd.Series({
-        'ninja_van_stt': dict(zip(g['loai'], g['ninja_van_score'])),
-        'ghn_stt': dict(zip(g['loai'], g['ghn_score'])),
-        'best_stt': dict(zip(g['loai'], g['best_score'])),
-        'shopee_express_stt': dict(zip(g['loai'], g['shopee_express_score'])),
-        'ghtk_stt': dict(zip(g['loai'], g['ghtk_score'])),
-        'viettel_post_stt': dict(zip(g['loai'], g['viettel_post_score'])),
-        'tikinow_stt': dict(zip(g['loai'], g['tikinow_score'])),
-    })
+    return pd.Series(
+        {
+            "ninja_van_stt": dict(zip(g["loai"], g["ninja_van_score"])),
+            "ghn_stt": dict(zip(g["loai"], g["ghn_score"])),
+            "best_stt": dict(zip(g["loai"], g["best_score"])),
+            "shopee_express_stt": dict(zip(g["loai"], g["shopee_express_score"])),
+            "ghtk_stt": dict(zip(g["loai"], g["ghtk_score"])),
+            "viettel_post_stt": dict(zip(g["loai"], g["viettel_post_score"])),
+            "tikinow_stt": dict(zip(g["loai"], g["tikinow_score"])),
+        }
+    )
 
 
 QUERY_SQL_PRIORITY_ROUTE_BY_DISTRICT = """

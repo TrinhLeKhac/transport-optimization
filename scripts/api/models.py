@@ -1,15 +1,11 @@
-from typing import Union, List
+from typing import List, Union
 
+from sqlalchemy import Integer, PrimaryKeyConstraint, String, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql.sqltypes import Numeric
 from sqlalchemy.types import ARRAY
 
-from sqlalchemy import (
-    Integer,
-    PrimaryKeyConstraint,
-    String, select,
-)
-from sqlalchemy.orm import Mapped, mapped_column
 from scripts.api.base import Base
 
 
@@ -27,7 +23,10 @@ class MessageZNS(Base):
     submitted_at: Mapped[str] = mapped_column(String(20))
     date: Mapped[str] = mapped_column(String(10))
 
-    __table_args__ = (PrimaryKeyConstraint("id", name="message_zns_pkey"), {"schema": "db_schema"})
+    __table_args__ = (
+        PrimaryKeyConstraint("id", name="message_zns_pkey"),
+        {"schema": "db_schema"},
+    )
 
 
 class NGN(Base):
@@ -39,7 +38,10 @@ class NGN(Base):
     carrier_id: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(String(30))
 
-    __table_args__ = (PrimaryKeyConstraint("id", name="tbl_ngung_giao_nhan_rev_pkey"), {"schema": "db_schema"})
+    __table_args__ = (
+        PrimaryKeyConstraint("id", name="tbl_ngung_giao_nhan_rev_pkey"),
+        {"schema": "db_schema"},
+    )
 
 
 class NGNLV3(Base):
@@ -52,7 +54,10 @@ class NGNLV3(Base):
     carrier_id: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(String(30))
 
-    __table_args__ = (PrimaryKeyConstraint("id", name="tbl_ngung_giao_nhan_level_3_rev_pkey"), {"schema": "db_schema"})
+    __table_args__ = (
+        PrimaryKeyConstraint("id", name="tbl_ngung_giao_nhan_level_3_rev_pkey"),
+        {"schema": "db_schema"},
+    )
 
 
 class Order(Base):
@@ -79,7 +84,10 @@ class Order(Base):
     carrier_updated_at: Mapped[str] = mapped_column(String(20))
     date: Mapped[str] = mapped_column(String(10))
 
-    __table_args__ = (PrimaryKeyConstraint("id", name="order_pkey"), {"schema": "db_schema"})
+    __table_args__ = (
+        PrimaryKeyConstraint("id", name="order_pkey"),
+        {"schema": "db_schema"},
+    )
 
 
 class PriorityAPI(Base):
@@ -95,7 +103,10 @@ class PriorityAPI(Base):
     route_type: Mapped[str] = mapped_column(String(1))
     import_date: Mapped[str] = mapped_column(String(10))
 
-    __table_args__ = (PrimaryKeyConstraint("id", name="data_priority_route_pkey"), {"schema": "db_schema"})
+    __table_args__ = (
+        PrimaryKeyConstraint("id", name="data_priority_route_pkey"),
+        {"schema": "db_schema"},
+    )
 
 
 class API(Base):
@@ -121,4 +132,7 @@ class API(Base):
     # rate_ranking: Mapped[int] = mapped_column(Integer)
     import_date: Mapped[str] = mapped_column(String(10))
 
-    __table_args__ = (PrimaryKeyConstraint("id", name="data_api_pkey"), {"schema": "db_schema"})
+    __table_args__ = (
+        PrimaryKeyConstraint("id", name="data_api_pkey"),
+        {"schema": "db_schema"},
+    )

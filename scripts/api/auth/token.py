@@ -1,6 +1,8 @@
-from typing import Union, Any
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
+from typing import Any, Union
+
 import jwt
+
 from config import settings
 
 
@@ -11,11 +13,13 @@ def verify_password(username, password):
 
 
 def generate_token(username: Union[str, Any], password: Union[str, Any]) -> str:
-    expire = int((datetime.now() + timedelta(
-        seconds=settings.ACCESS_TOKEN_EXPIRE_SECONDS
-    )).strftime("%Y%m%d%H%M%S"))
-    to_encode = {
-        "exp": expire, "username": username, "password": password
-    }
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.SECURITY_ALGORITHM)
+    expire = int(
+        (
+            datetime.now() + timedelta(seconds=settings.ACCESS_TOKEN_EXPIRE_SECONDS)
+        ).strftime("%Y%m%d%H%M%S")
+    )
+    to_encode = {"exp": expire, "username": username, "password": password}
+    encoded_jwt = jwt.encode(
+        to_encode, settings.SECRET_KEY, algorithm=settings.SECURITY_ALGORITHM
+    )
     return encoded_jwt

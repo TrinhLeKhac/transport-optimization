@@ -1,5 +1,6 @@
 import psycopg2
 from fastapi import APIRouter
+
 from scripts.api import schemas
 from scripts.api.database import *
 from scripts.utilities.helper import QUERY_SQL_API_BY_DISTRICT
@@ -8,12 +9,10 @@ router = APIRouter()
 
 
 def execute_query(
-        receiver_district_code,
+    receiver_district_code,
 ):
     # Create connection
-    connection = psycopg2.connect(
-        settings.SQLALCHEMY_DATABASE_URI
-    )
+    connection = psycopg2.connect(settings.SQLALCHEMY_DATABASE_URI)
 
     cursor = connection.cursor()
 

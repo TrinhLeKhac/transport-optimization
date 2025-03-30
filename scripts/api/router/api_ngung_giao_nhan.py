@@ -1,8 +1,10 @@
+from typing import Optional
+
 import psycopg2
 from fastapi import APIRouter
+
 from scripts.api import schemas
 from scripts.api.database import *
-from typing import Optional
 
 router = APIRouter()
 
@@ -11,9 +13,7 @@ router = APIRouter()
 def calculate(carrier_id: Optional[int] = None):
 
     # Create connection
-    connection = psycopg2.connect(
-        settings.SQLALCHEMY_DATABASE_URI
-    )
+    connection = psycopg2.connect(settings.SQLALCHEMY_DATABASE_URI)
     cursor = connection.cursor()
 
     if carrier_id is None:

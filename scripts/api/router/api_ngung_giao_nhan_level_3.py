@@ -1,19 +1,23 @@
+from typing import Optional
+
 import psycopg2
 from fastapi import APIRouter
+
 from scripts.api import schemas
 from scripts.api.database import *
-from typing import Optional
 
 router = APIRouter()
 
 
 @router.post("")
-def calculate(carrier_id: Optional[int] = None, district: Optional[str] = None, commune: Optional[str] = None):
+def calculate(
+    carrier_id: Optional[int] = None,
+    district: Optional[str] = None,
+    commune: Optional[str] = None,
+):
 
     # Create connection
-    connection = psycopg2.connect(
-        settings.SQLALCHEMY_DATABASE_URI
-    )
+    connection = psycopg2.connect(settings.SQLALCHEMY_DATABASE_URI)
     cursor = connection.cursor()
 
     table_query = ""

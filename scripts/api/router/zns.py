@@ -1,10 +1,10 @@
 from typing import Annotated
 
-from fastapi import Depends, APIRouter, Body
-from sqlalchemy.exc import ProgrammingError, IntegrityError
+from fastapi import APIRouter, Body, Depends
+from sqlalchemy.exc import IntegrityError, ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from scripts.api import schemas, models
+from scripts.api import models, schemas
 from scripts.api.database import *
 from scripts.api.utilities.helper import *
 
@@ -14,7 +14,7 @@ router = APIRouter()
 @router.post("")
 async def get_data_zns(
     request_data: Annotated[schemas.MessageZNSModel, Body(description="Data zns")],
-    db_session: AsyncSession = Depends(get_db)
+    db_session: AsyncSession = Depends(get_db),
 ):
     try:
         data_dict = request_data.model_dump()
@@ -24,18 +24,18 @@ async def get_data_zns(
         await db_session.commit()
     except ProgrammingError as e:
         if 'relation "db_schema.zns" does not exist' in str(e):
-            create_tbl_if_not_exists('db_schema', 'zns')
+            create_tbl_if_not_exists("db_schema", "zns")
             return {
                 "error": True,
                 "message": "Table ZNS does not exist. Already created. Please insert data",
-                "data": {}
+                "data": {},
             }
     except IntegrityError as e:
         if "constraint_dup_" in str(e):
             return {
                 "error": True,
                 "message": "Duplicate row already exists",
-                "data": {}
+                "data": {},
             }
     else:
         return {

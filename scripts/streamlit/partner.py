@@ -1,8 +1,9 @@
-from scripts.streamlit.streamlit_helper import *
-import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
+import streamlit as st
 from plotly.subplots import make_subplots
+
+from scripts.streamlit.streamlit_helper import *
 
 
 def draw_fee_error(total_analyze_df):
@@ -17,30 +18,30 @@ def draw_fee_error(total_analyze_df):
     )
     # ----------------------------------------------------------------------------------------------
 
-    viz_df = total_analyze_df[['score', 'monetary', 'total_error']].drop_duplicates()
+    viz_df = total_analyze_df[["score", "monetary", "total_error"]].drop_duplicates()
 
     # subfig = make_subplots(specs=[[{"secondary_y": True}]])
 
     fig = px.line(
         viz_df,
-        x='score',
-        y='monetary',
-        title='',
+        x="score",
+        y="monetary",
+        title="",
     )
-    fig.update_traces(line=dict(color='seagreen'), showlegend=True)
+    fig.update_traces(line=dict(color="seagreen"), showlegend=True)
 
-    fig2 = px.line(viz_df, x='score', y='total_error')
+    fig2 = px.line(viz_df, x="score", y="total_error")
     # Change the axis for fig2
-    fig2.update_traces(yaxis='y2', line=dict(color='indianred'), showlegend=True)
+    fig2.update_traces(yaxis="y2", line=dict(color="indianred"), showlegend=True)
 
     # Add the figs to the subplot figure
     # subfig.add_traces(fig.data + fig2.data)
 
     fig.add_trace(fig2.data[0])
     fig.update_layout(
-        xaxis=dict(title='Score'),
-        yaxis=dict(title='Tổng tiền cước'),
-        yaxis2=dict(title='Tổng lỗi', overlaying='y', side='right'),
+        xaxis=dict(title="Score"),
+        yaxis=dict(title="Tổng tiền cước"),
+        yaxis2=dict(title="Tổng lỗi", overlaying="y", side="right"),
     )
     fee_err_div.plotly_chart(fig)
 
@@ -56,9 +57,9 @@ def score_sidebar(total_analyze_df):
     slider_num = slider_div.slider("", min_value=0, max_value=100, value=70)
 
     _th = 2.5 + slider_num * 0.025
-    slider_div.info(f'**Score: :red[{str(_th)[:5]}]**')
+    slider_div.info(f"**Score: :red[{str(_th)[:5]}]**")
 
-    viz_df = total_analyze_df[total_analyze_df['score'] == _th]
+    viz_df = total_analyze_df[total_analyze_df["score"] == _th]
     slider_div.info(
         f"""
         Tổng số đơn :red[**trên**] ngưỡng lọc: :red[**{str(viz_df['n_good_order'].values[0])}**]     
@@ -69,27 +70,27 @@ def score_sidebar(total_analyze_df):
 
 
 def error_by_score(total_analyze_df, threshold=0.75):
-    viz_df = total_analyze_df[total_analyze_df['score'] == threshold]
-    viz_df1 = viz_df.groupby('carrier')['n_errors'].sum().reset_index()
+    viz_df = total_analyze_df[total_analyze_df["score"] == threshold]
+    viz_df1 = viz_df.groupby("carrier")["n_errors"].sum().reset_index()
 
-    carriers = viz_df1['carrier'].tolist()
+    carriers = viz_df1["carrier"].tolist()
 
     fig = go.Figure()
     bar_width = 0.5
     fig.add_trace(
         go.Bar(
             x=carriers,
-            y=viz_df1['n_errors'],
+            y=viz_df1["n_errors"],
             width=bar_width,
-            text=viz_df1['n_errors'],
-            marker_color=['#2596BE']*len(carriers),
+            text=viz_df1["n_errors"],
+            marker_color=["#2596BE"] * len(carriers),
             # marker_color=px.colors.sequential.YlOrRd_r[0:len(carriers)],
         )
     )
 
     fig.update_layout(
-        xaxis=dict(title='Nhà vận chuyển', categoryorder='total descending'),
-        yaxis=dict(title='Tổng số lỗi'),
+        xaxis=dict(title="Nhà vận chuyển", categoryorder="total descending"),
+        yaxis=dict(title="Tổng số lỗi"),
         # legend=dict(
         #     orientation='h',
         #     y=1.12,
@@ -102,47 +103,54 @@ def error_by_score(total_analyze_df, threshold=0.75):
     return fig
 
 
-def detail_error_by_carrier(total_analyze_df, opt_carrier, type_viz='error_type', x_legend_position=0.4,
-                            threshold=0.75):
-    viz_df = total_analyze_df[
-        (total_analyze_df['score'] == threshold)
-        & (total_analyze_df['carrier'] == opt_carrier)
-        ].groupby(type_viz)['n_errors'].sum().reset_index()
+def detail_error_by_carrier(
+    total_analyze_df,
+    opt_carrier,
+    type_viz="error_type",
+    x_legend_position=0.4,
+    threshold=0.75,
+):
+    viz_df = (
+        total_analyze_df[
+            (total_analyze_df["score"] == threshold)
+            & (total_analyze_df["carrier"] == opt_carrier)
+        ]
+        .groupby(type_viz)["n_errors"]
+        .sum()
+        .reset_index()
+    )
     categories = viz_df[type_viz].tolist()
 
     fig = go.Figure()
     fig.add_trace(
         go.Bar(
-            x=viz_df['n_errors'],
+            x=viz_df["n_errors"],
             y=categories,
-            text=viz_df['n_errors'],
-            orientation='h',
-            marker_color=['#2596BE']*len(categories),
+            text=viz_df["n_errors"],
+            orientation="h",
+            marker_color=["#2596BE"] * len(categories),
         )
     )
 
     fig.update_layout(
-        xaxis=dict(title='Tổng số lỗi'),
-        yaxis=dict(categoryorder='total descending'),
+        xaxis=dict(title="Tổng số lỗi"),
+        yaxis=dict(categoryorder="total descending"),
         height=500,
     )
     return fig
 
 
-def analyze_by_carrier(total_analyze_df, type_viz='n_orders', threshold=0.75):
+def analyze_by_carrier(total_analyze_df, type_viz="n_orders", threshold=0.75):
 
-    viz_df = total_analyze_df[total_analyze_df['score'] == threshold]
-    categories = sorted(viz_df['carrier'].unique())
-    groups = ['good', 'bad']  # sorted(viz_df['quality'].unique())
-    colors = {
-        'good': '#2596BE',
-        'bad': 'firebrick'
-    }
+    viz_df = total_analyze_df[total_analyze_df["score"] == threshold]
+    categories = sorted(viz_df["carrier"].unique())
+    groups = ["good", "bad"]  # sorted(viz_df['quality'].unique())
+    colors = {"good": "#2596BE", "bad": "firebrick"}
 
     fig = go.Figure()
     bar_width = 0.3
     for i, group in enumerate(groups):
-        group_data = viz_df[viz_df['quality'] == group]
+        group_data = viz_df[viz_df["quality"] == group]
         positions = [pos + i * bar_width for pos in range(len(categories))]
         fig.add_trace(
             go.Bar(
@@ -150,28 +158,31 @@ def analyze_by_carrier(total_analyze_df, type_viz='n_orders', threshold=0.75):
                 y=group_data[type_viz],
                 name=group,
                 width=bar_width,
-                marker_color=colors[group]
+                marker_color=colors[group],
             )
         )
 
-    if type_viz == 'n_orders':
-        y_title = 'Số đơn hàng'
-    elif type_viz == 'monetary':
-        y_title = 'Tổng tiền'
+    if type_viz == "n_orders":
+        y_title = "Số đơn hàng"
+    elif type_viz == "monetary":
+        y_title = "Tổng tiền"
     else:
-        y_title = ''
+        y_title = ""
 
     fig.update_layout(
-        xaxis=dict(tickvals=[pos + (len(groups) - 1) * bar_width / 2 for pos in range(len(categories))],
-                   ticktext=categories, title='Nhà vận chuyển', categoryorder='total descending'),
-        yaxis=dict(title=y_title),
-        barmode='group',
-        legend=dict(
-            orientation='h',
-            y=1.12,
-            x=0.4
+        xaxis=dict(
+            tickvals=[
+                pos + (len(groups) - 1) * bar_width / 2
+                for pos in range(len(categories))
+            ],
+            ticktext=categories,
+            title="Nhà vận chuyển",
+            categoryorder="total descending",
         ),
-        legend_title='',
+        yaxis=dict(title=y_title),
+        barmode="group",
+        legend=dict(orientation="h", y=1.12, x=0.4),
+        legend_title="",
         height=500,
         # width=800,
     )
@@ -232,33 +243,42 @@ def create_partner_tab():
         """
         )
         with select_div:
-            viz_df = total_analyze_df1[total_analyze_df1['score'] == _th]
+            viz_df = total_analyze_df1[total_analyze_df1["score"] == _th]
             opt_carrier = st.selectbox(
                 "Chọn nhà vận chuyển",
-                options=sorted(viz_df['carrier'].unique().tolist(), key=vietnamese_sort_key),
-                key='carrier',
+                options=sorted(
+                    viz_df["carrier"].unique().tolist(), key=vietnamese_sort_key
+                ),
+                key="carrier",
             )
             opt_type_viz = st.selectbox(
                 "Thống kê theo",
-                options=['Category lỗi', 'Loại vận chuyển'],
-                key='type_viz',
+                options=["Category lỗi", "Loại vận chuyển"],
+                key="type_viz",
             )
 
         detail_error_by_carrier_div, _, error_by_score_div = st.columns([4, 1, 4])
 
         fig_error_by_score = error_by_score(total_analyze_df1, threshold=_th)
 
-        if opt_type_viz == 'Category lỗi':
+        if opt_type_viz == "Category lỗi":
             fig_detail_error_by_score = detail_error_by_carrier(
-                total_analyze_df1, opt_carrier,
-                type_viz='error_type', x_legend_position=0.4, threshold=_th
+                total_analyze_df1,
+                opt_carrier,
+                type_viz="error_type",
+                x_legend_position=0.4,
+                threshold=_th,
             )
-        elif opt_type_viz == 'Loại vận chuyển':
+        elif opt_type_viz == "Loại vận chuyển":
             fig_detail_error_by_score = detail_error_by_carrier(
-                total_analyze_df1, opt_carrier,
-                type_viz='order_type', x_legend_position=0.2, threshold=_th)
+                total_analyze_df1,
+                opt_carrier,
+                type_viz="order_type",
+                x_legend_position=0.2,
+                threshold=_th,
+            )
 
-        fig_detail_error_by_score.update_layout(yaxis=dict(anchor='x'), barmode='stack')
+        fig_detail_error_by_score.update_layout(yaxis=dict(anchor="x"), barmode="stack")
 
         # 4.2 Thống kê tổng lỗi NVC theo score
         with error_by_score_div:
@@ -283,9 +303,13 @@ def create_partner_tab():
         )
         analyze_by_order_div, _, analyze_by_money_div = st.columns([4, 1, 4])
 
-        fig_order_by_carrier = analyze_by_carrier(total_analyze_df2, type_viz='n_orders', threshold=_th)
-        fig_monatary_by_carrier = analyze_by_carrier(total_analyze_df2, type_viz='monetary', threshold=_th)
-        fig_monatary_by_carrier.update_layout(yaxis=dict(anchor='x'), barmode='stack')
+        fig_order_by_carrier = analyze_by_carrier(
+            total_analyze_df2, type_viz="n_orders", threshold=_th
+        )
+        fig_monatary_by_carrier = analyze_by_carrier(
+            total_analyze_df2, type_viz="monetary", threshold=_th
+        )
+        fig_monatary_by_carrier.update_layout(yaxis=dict(anchor="x"), barmode="stack")
 
         # 5.2. Thống kê đơn theo nhà vận chuyển
         with analyze_by_order_div:

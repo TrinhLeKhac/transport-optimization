@@ -1,20 +1,19 @@
 import psycopg2
 from psycopg2 import sql
+
 from config import settings
 
 
 def create_tbl_if_not_exists(schema_name, table_name):
     # Create connection
-    connection = psycopg2.connect(
-        settings.SQLALCHEMY_DATABASE_URI
-    )
+    connection = psycopg2.connect(settings.SQLALCHEMY_DATABASE_URI)
 
     # Create cursor
     cursor = connection.cursor()
 
     # Create query
     table_query = ""
-    if table_name == 'zns':
+    if table_name == "zns":
         table_query = f"""
             CREATE TABLE {schema_name}.{table_name} (
                 id SERIAL PRIMARY KEY,
@@ -41,7 +40,7 @@ def create_tbl_if_not_exists(schema_name, table_name):
             );
         """
 
-    elif table_name == 'order':
+    elif table_name == "order":
         table_query = f"""
             CREATE TABLE {schema_name}.{table_name} (
                 id SERIAL PRIMARY KEY,
@@ -87,7 +86,7 @@ def create_tbl_if_not_exists(schema_name, table_name):
                 date
             );
         """
-    elif table_name == 'tbl_ngung_giao_nhan_rev':
+    elif table_name == "tbl_ngung_giao_nhan_rev":
         table_query = f"""
             CREATE TABLE {schema_name}.{table_name} (
                 id SERIAL PRIMARY KEY,
@@ -97,7 +96,7 @@ def create_tbl_if_not_exists(schema_name, table_name):
                 status VARCHAR(30)
             );
         """
-    elif table_name == 'tbl_ngung_giao_nhan_level_3_rev':
+    elif table_name == "tbl_ngung_giao_nhan_level_3_rev":
         table_query = f"""
             CREATE TABLE {schema_name}.{table_name} (
                 id SERIAL PRIMARY KEY,

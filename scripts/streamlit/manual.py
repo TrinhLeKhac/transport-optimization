@@ -1,8 +1,8 @@
-from scripts.output.out_data_api import out_data_api, assign_supership_carrier
-from scripts.output.out_data_final import out_data_final, get_data_viz
+import scripts.streamlit.redirect as rd
+from scripts.output.out_data_api import assign_supership_carrier, out_data_api
+from scripts.output.out_data_final import get_data_viz, out_data_final
 from scripts.processing.total_processing import total_processing
 from scripts.streamlit.streamlit_helper import *
-import scripts.streamlit.redirect as rd
 
 
 def create_manual_tab():
@@ -28,25 +28,31 @@ def create_manual_tab():
     # ----------------------------------------------------------------------------------------------
 
     with st.expander("📂 :red[**Files cần upload**]"):
-        cuoc_phi_file = st.file_uploader(":one: Bảng Cước Phí", type=['xlsx'])
+        cuoc_phi_file = st.file_uploader(":one: Bảng Cước Phí", type=["xlsx"])
         if cuoc_phi_file is not None:
             save_uploaded_file(cuoc_phi_file, "user_input")
 
-        chat_luong_noi_bo_files = st.file_uploader(":two: Chất Lượng Nội Bộ", type=['xlsx'], accept_multiple_files=True)
+        chat_luong_noi_bo_files = st.file_uploader(
+            ":two: Chất Lượng Nội Bộ", type=["xlsx"], accept_multiple_files=True
+        )
         if chat_luong_noi_bo_files is not None:
             for file in chat_luong_noi_bo_files:
                 save_uploaded_file(file, "user_input")
 
-        kho_giao_nhan_files = st.file_uploader(":three: Bưu Cục", type=['xlsx'], accept_multiple_files=True)
+        kho_giao_nhan_files = st.file_uploader(
+            ":three: Bưu Cục", type=["xlsx"], accept_multiple_files=True
+        )
         if kho_giao_nhan_files is not None:
             for file in kho_giao_nhan_files:
                 save_uploaded_file(file, "user_input")
 
-        ngung_giao_nhan_file = st.file_uploader(":four: Ngưng giao nhận", type=['xlsx'])
+        ngung_giao_nhan_file = st.file_uploader(":four: Ngưng giao nhận", type=["xlsx"])
         if ngung_giao_nhan_file is not None:
             save_uploaded_file(ngung_giao_nhan_file, "user_input")
 
-        phan_vung_nvc_file = st.file_uploader(":five: Phân Vùng Nhà Vận Chuyển", type=['xlsx'])
+        phan_vung_nvc_file = st.file_uploader(
+            ":five: Phân Vùng Nhà Vận Chuyển", type=["xlsx"]
+        )
         if phan_vung_nvc_file is not None:
             save_uploaded_file(phan_vung_nvc_file, "user_input")
     # ----------------------------------------------------------------------------------------------

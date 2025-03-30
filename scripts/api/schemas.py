@@ -1,6 +1,6 @@
-from typing import Union
-from pydantic import BaseModel, conint, constr, confloat
-from typing import List
+from typing import List, Union
+
+from pydantic import BaseModel, confloat, conint, constr
 
 
 class LoginModel(BaseModel):
