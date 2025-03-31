@@ -363,6 +363,7 @@ def out_data_final(
     final_df["delivery_type"] = final_df["delivery_type"].fillna("Gửi Bưu Cục")
     final_df["order_type_id"] = final_df["order_type_id"].astype(str)
     final_df["sys_order_type_id"] = final_df["sys_order_type_id"].astype(str)
+    final_df = final_df.dropna(how="any")
 
     print("i. Gắn thông tin tính toán từ API")
     final_df = combine_info_from_api(
