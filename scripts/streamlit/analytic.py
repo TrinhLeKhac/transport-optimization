@@ -107,14 +107,15 @@ def create_analytic_tab(run_date_str):
 
         # 1.4.1 Select box chọn thông tin thống kê
         priority_div1, priority_div2, priority_div3 = st.columns(3)
-
+        lst_provinces_priority = sorted(
+            priority_df["sender_province"].unique().tolist(),
+            key=vietnamese_sort_key,
+        )
         priority_div1.selectbox(
             ":blue[**Chọn Tỉnh/Thành Phố Gửi**]",
-            options=sorted(
-                priority_df["sender_province"].unique().tolist(),
-                key=vietnamese_sort_key,
-            ),
+            options=lst_provinces_priority,
             key="priority_sender_province",
+            index=lst_provinces_priority.index("Thành phố Hà Nội")
         )
         priority_div2.selectbox(
             ":blue[**Chọn Quận/Huyện Gửi**]",
@@ -131,24 +132,26 @@ def create_analytic_tab(run_date_str):
             ),
             key="priority_sender_district",
         )
+        lst_order_type = sorted(
+            priority_df.loc[
+                (
+                    priority_df["sender_province"]
+                    == st.session_state["priority_sender_province"]
+                )
+                & (
+                    priority_df["sender_district"]
+                    == st.session_state["priority_sender_district"]
+                )
+            ]["order_type"]
+            .unique()
+            .tolist(),
+            key=vietnamese_sort_key,
+        )
         priority_div3.selectbox(
             ":blue[**Chọn Loại Vận Chuyển**]",
-            options=sorted(
-                priority_df.loc[
-                    (
-                        priority_df["sender_province"]
-                        == st.session_state["priority_sender_province"]
-                    )
-                    & (
-                        priority_df["sender_district"]
-                        == st.session_state["priority_sender_district"]
-                    )
-                ]["order_type"]
-                .unique()
-                .tolist(),
-                key=vietnamese_sort_key,
-            ),
+            options=lst_order_type,
             key="priority_order_type",
+            index=lst_order_type.index("Nội Miền Tp.HCM - HN")
         )
 
         priority_div4, priority_div5, _ = st.columns(3)
@@ -346,13 +349,15 @@ def create_analytic_tab(run_date_str):
 
         # 2.3 ZNS message div
         opt_zns_mess_province, opt_zns_mess_district = chart_zns_message.columns(2)
+        lst_provinces_zns = sorted(
+            total_zns_df["receiver_province"].unique().tolist(),
+            key=vietnamese_sort_key,
+        )
         opt_zns_mess_province.selectbox(  # multiselect
             ":blue[**Chọn Tỉnh/Thành Phố**]",
-            options=sorted(
-                total_zns_df["receiver_province"].unique().tolist(),
-                key=vietnamese_sort_key,
-            ),
+            options=lst_provinces_zns,
             key="zns_province",
+            index=lst_provinces_zns.index("Thành phố Hà Nội")
         )
         filter_zns_df1 = total_zns_df.loc[
             (total_zns_df["receiver_province"] == st.session_state["zns_province"])
@@ -407,14 +412,15 @@ def create_analytic_tab(run_date_str):
 
         # 2.4 ZNS comment div
         opt_zns_com_province, opt_zns_com_district = chart_zns_comment.columns(2)
-
+        lst_provinces_comment = sorted(
+            comment_zns_df["receiver_province"].unique().tolist(),
+            key=vietnamese_sort_key,
+        )
         opt_zns_com_province.selectbox(
             ":blue[**Chọn Tỉnh/Thành Phố**]",
-            options=sorted(
-                comment_zns_df["receiver_province"].unique().tolist(),
-                key=vietnamese_sort_key,
-            ),
+            options=lst_provinces_comment,
             key="zns_province2",
+            index=lst_provinces_comment.index("Thành phố Hà Nội")
         )
         filter_comment_zns_df1 = comment_zns_df.loc[
             (comment_zns_df["receiver_province"] == st.session_state["zns_province2"])
@@ -472,14 +478,15 @@ def create_analytic_tab(run_date_str):
 
         chart_order, _, chart_stuck = st.columns([8, 1, 7])
         opt_order_sender_province, opt_order_sender_district = chart_order.columns(2)
-
+        lst_provinces_order=sorted(
+            total_order_df["sender_province"].unique().tolist(),
+            key=vietnamese_sort_key,
+        )
         opt_order_sender_province.selectbox(
             ":blue[**Chọn Tỉnh/Thành Phố Giao**]",
-            options=sorted(
-                total_order_df["sender_province"].unique().tolist(),
-                key=vietnamese_sort_key,
-            ),
+            options=lst_provinces_order,
             key="order_sender_province",
+            index=lst_provinces_order.index("Thành phố Hà Nội")
         )
         filter_order_df1 = total_order_df.loc[
             total_order_df["sender_province"]
@@ -501,13 +508,15 @@ def create_analytic_tab(run_date_str):
             filter_order_df1["sender_district"]
             == st.session_state["order_sender_district"]
         ]
+        lst_provinces_order_2 = sorted(
+            filter_order_df2["receiver_province"].unique().tolist(),
+            key=vietnamese_sort_key,
+        )
         opt_order_receiver_province.selectbox(
             ":blue[**Chọn Tỉnh/Thành Phố Nhận**]",
-            options=sorted(
-                filter_order_df2["receiver_province"].unique().tolist(),
-                key=vietnamese_sort_key,
-            ),
+            options=lst_provinces_order_2,
             key="order_receiver_province",
+            index=lst_provinces_order_2.index("Thành phố Hà Nội")
         )
         filter_order_df3 = filter_order_df2.loc[
             filter_order_df2["receiver_province"]

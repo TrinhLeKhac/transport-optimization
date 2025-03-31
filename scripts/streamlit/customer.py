@@ -108,13 +108,15 @@ def create_customer_tab():
     with st.container():
         # ----------------------------------------------------------------------------------------------
         sender_province_field, sender_district_field = st.columns(2)
+        lst_provinces = sorted(
+            PROVINCE_MAPPING_DISTRICT_DF["province"].unique().tolist(),
+            key=vietnamese_sort_key,
+        )
         sender_province_field.selectbox(
             ":blue[**Tỉnh/Thành Phố của Người Gửi**]",
-            options=sorted(
-                PROVINCE_MAPPING_DISTRICT_DF["province"].unique().tolist(),
-                key=vietnamese_sort_key,
-            ),
+            options=lst_provinces,
             key="sender_province",
+            index=lst_provinces.index("Thành phố Hà Nội"),
         )
         sender_district_field.selectbox(
             ":blue[**Quận/Huyện của Người Gửi**]",
@@ -133,11 +135,9 @@ def create_customer_tab():
         receiver_province_field, receiver_district_field = st.columns(2)
         receiver_province_field.selectbox(
             ":blue[**Tỉnh/Thành Phố của Người Nhận**]",
-            options=sorted(
-                PROVINCE_MAPPING_DISTRICT_DF["province"].unique().tolist(),
-                key=vietnamese_sort_key,
-            ),
+            options=lst_provinces,
             key="receiver_province",
+            index=lst_provinces.index("Thành phố Hà Nội"),
         )
         receiver_district_field.selectbox(
             ":blue[**Quận/Huyện của Người Nhận**]",

@@ -244,12 +244,14 @@ def create_partner_tab():
         )
         with select_div:
             viz_df = total_analyze_df1[total_analyze_df1["score"] == _th]
+            lst_carrier = sorted(
+                viz_df["carrier"].unique().tolist(), key=vietnamese_sort_key
+            )
             opt_carrier = st.selectbox(
                 "Chọn nhà vận chuyển",
-                options=sorted(
-                    viz_df["carrier"].unique().tolist(), key=vietnamese_sort_key
-                ),
+                options=lst_carrier,
                 key="carrier",
+                index=lst_carrier.index("BEST Express")
             )
             opt_type_viz = st.selectbox(
                 "Thống kê theo",
