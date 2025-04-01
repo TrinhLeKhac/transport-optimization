@@ -13,4 +13,4 @@
 **/__pycache__/
 ./test_tich_hop_nvc.py
 input/
-user_input/
+watchdog/
